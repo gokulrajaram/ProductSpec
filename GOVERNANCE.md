@@ -2,7 +2,7 @@
 
 The Product Spec Standard is an open format. Anyone can implement it.
 
-Governance is community-driven through GitHub Issues and Pull Requests on the public `openproductspec/spec` repository.
+Governance is community-driven through GitHub Issues and Pull Requests on the public `gokulrajaram/productspec` repository.
 
 ProductSpec.io is one implementation of the Standard: the managed authoring, review, calibration, and collaboration product. It may be the reference implementation, but it does not control the Standard's evolution by itself.
 
