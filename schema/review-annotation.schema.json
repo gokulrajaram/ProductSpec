@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://productspec.io/schema/review-annotation.schema.json",
+  "title": "Product Spec Review Annotation",
+  "type": "object",
+  "required": ["review_id", "reviewer_tool", "reviewed_at", "sections"],
+  "properties": {
+    "review_id": { "type": "string", "minLength": 1 },
+    "reviewer_tool": { "type": "string", "minLength": 1 },
+    "reviewed_at": { "type": "string", "format": "date-time" },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section_id", "axes"],
+        "properties": {
+          "section_id": { "type": "string", "minLength": 1 },
+          "axes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["axis_key", "verdict", "suggestion"],
+              "properties": {
+                "axis_key": { "type": "string", "minLength": 1 },
+                "verdict": { "enum": ["pass", "fail", "warn"] },
+                "suggestion": { "type": "string" },
+                "raw_feedback": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
+

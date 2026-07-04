@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://productspec.io/schema/product-spec.schema.json",
+  "title": "Product Spec",
+  "type": "object",
+  "required": ["frontmatter", "sections"],
+  "properties": {
+    "frontmatter": {
+      "type": "object",
+      "required": ["spec_format_version", "title", "artifact_type", "author", "created_at", "updated_at"],
+      "properties": {
+        "spec_format_version": { "const": "0.1" },
+        "title": { "type": "string", "minLength": 1 },
+        "artifact_type": { "enum": ["hypothesis", "prd", "openspec_proposal"] },
+        "author": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "linked_github_repo": { "type": "string" },
+        "custom_sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "label", "after"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^custom-[a-z0-9]+(-[a-z0-9]+)*$" },
+              "label": { "type": "string", "minLength": 1 },
+              "after": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "tool_metadata": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "content"],
+        "properties": {
+          "id": {
+            "enum": [
+              "problem",
+              "hypothesis",
+              "scope",
+              "user_experience",
+              "acceptance_criteria",
+              "success_metrics",
+              "customer_truth",
+              "solution_alternatives",
+              "solution",
+              "strategic_positioning",
+              "adoption",
+              "pricing",
+              "risks",
+              "ai",
+              "open_questions",
+              "rollout"
+            ]
+          },
+          "label": { "type": "string", "minLength": 1 },
+          "content": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
+
