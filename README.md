@@ -26,6 +26,24 @@ strategic intent                 technical decomposition                    runn
 
 Both layers are SDD. Both use the spec as a control system. They serve different roles with different artifacts.
 
+## Where ProductSpec Fits
+
+ProductSpec does not replace Git, Jira, Linear, Figma, analytics tools, OpenSpec, Spec Kit, or AI coding agents.
+
+It sits upstream of them.
+
+```text
+ProductSpec -> Engineering Spec -> Tasks -> Code -> Evaluation -> Learning
+```
+
+- Git stores implementation history.
+- Jira and Linear store work history.
+- Figma stores design artifacts.
+- Analytics tools store outcome data.
+- OpenSpec and Spec Kit turn intent into engineering plans.
+- AI coding agents execute implementation tasks.
+- ProductSpec stores the software intent behind the work.
+
 ## What Is Included
 
 - `SPEC.md`: the canonical v0.1 standard.
