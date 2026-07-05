@@ -28,7 +28,7 @@ Out: team libraries, cross-video semantic search, uploaded video files, and paid
 
 Cut: transcript editing, speaker labels, and folder organization.
 
-## Surface
+## User Experience
 
 https://example.com/transcript-search-prototype
 

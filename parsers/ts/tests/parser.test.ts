@@ -14,7 +14,7 @@ describe("@productspec/parser", () => {
     expect(parseProductSpecMarkdown(serializeProductSpecMarkdown(parsed))).toEqual(parsed);
   });
 
-  it("treats surface as canonical and does not require user experience", () => {
+  it("does not require user experience", () => {
     const markdown = `---
 spec_format_version: "0.1"
 title: "API Import"
@@ -30,15 +30,11 @@ Teams cannot import customer records reliably.
 
 ## Hypothesis
 
-If imports expose a clear API surface, teams will trust automated onboarding.
+If imports expose a clear upload path, teams will trust automated onboarding.
 
 ## Scope
 
-In: CSV upload endpoint and error response shape.
-
-## Surface
-
-POST /imports with a CSV file returns accepted rows, rejected rows, and actionable row-level errors.
+In: CSV upload and row-level error responses.
 
 ## Acceptance Criteria
 
@@ -55,7 +51,6 @@ POST /imports with a CSV file returns accepted rows, rejected rows, and actionab
       "problem",
       "hypothesis",
       "scope",
-      "surface",
       "acceptance_criteria",
       "success_metrics"
     ]);

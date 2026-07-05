@@ -7,7 +7,6 @@ export const MANDATORY_SECTION_IDS = [
 ] as const;
 
 export const OPTIONAL_SECTION_IDS = [
-  "surface",
   "user_experience",
   "customer_truth",
   "solution_alternatives",
@@ -56,7 +55,6 @@ const LABELS: Record<string, string> = {
   problem: "Problem",
   hypothesis: "Hypothesis",
   scope: "Scope",
-  surface: "Surface",
   user_experience: "User Experience",
   acceptance_criteria: "Acceptance Criteria",
   success_metrics: "Success Metrics",

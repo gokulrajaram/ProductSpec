@@ -67,9 +67,9 @@ Mandatory sections, in order:
 
 Optional sections:
 
-`surface`, `user_experience`, `customer_truth`, `solution_alternatives`, `solution`, `strategic_positioning`, `adoption`, `pricing`, `risks`, `ai`, `open_questions`, `rollout`
+`user_experience`, `customer_truth`, `solution_alternatives`, `solution`, `strategic_positioning`, `adoption`, `pricing`, `risks`, `ai`, `open_questions`, `rollout`
 
-`surface` describes the externally observable interface of the work. Examples include a user-facing flow URL, API endpoint shape, CLI command, admin workflow, webhook payload, dashboard, config interface, internal tool screen, or agent/tool interface. `user_experience` is a narrower section for user-facing product flows.
+`user_experience` describes the externally observable experience of the work when there is one: for example, a prototype URL, mockup, design link, public deploy, Loom walkthrough, API documentation page, CLI demo, dashboard, or internal tool screen.
 
 Custom sections use `custom-<kebab-name>`.
 

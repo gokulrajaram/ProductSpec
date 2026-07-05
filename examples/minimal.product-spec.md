@@ -23,7 +23,7 @@ Out: multi-video projects, team workspaces, non-YouTube video imports, and autom
 
 Cut from this version: speaker diarization and transcript editing.
 
-## Surface
+## User Experience
 
 https://example.com/transcript-search-prototype
 

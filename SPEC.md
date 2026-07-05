@@ -50,7 +50,6 @@ Mandatory sections, in order:
 
 Optional sections:
 
-- `surface`
 - `user_experience`
 - `customer_truth`
 - `solution_alternatives`
@@ -65,19 +64,16 @@ Optional sections:
 
 Display labels are implementation-specific, except that tools should render `ai` as "AI Details".
 
-`surface` describes the externally observable interface of the work without prescribing implementation. Examples include:
+`user_experience` describes the externally observable experience of the work when there is one, without prescribing implementation. Examples include:
 
-- User-facing flow URL or mockup.
-- API endpoint shape.
-- CLI command.
+- User-facing prototype URL or mockup.
+- Design link.
+- Public deploy or walkthrough.
+- API documentation page.
+- CLI demo.
 - Admin workflow.
-- Webhook payload.
 - Dashboard or report.
-- Config interface.
 - Internal tool screen.
-- Agent or tool interface.
-
-`user_experience` is a narrower optional section for user-facing product flows. Product-focused tools may show it by default, but the open standard does not require every software-intent artifact to include a UX URL.
 
 For products with AI features, AI eval thresholds belong in `acceptance_criteria`, not `success_metrics`. Success metrics are post-launch product and business outcomes. Acceptance criteria are pre-launch build gates.
 

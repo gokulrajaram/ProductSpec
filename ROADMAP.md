@@ -11,7 +11,6 @@ Includes:
 - `.product-spec.md` file format.
 - Required frontmatter.
 - Canonical section vocabulary.
-- Optional `surface` section for externally observable interfaces.
 - Optional and custom sections.
 - JSON Schema for parsed Product Specs.
 - JSON Schema for portable review annotations.
