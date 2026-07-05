@@ -1,6 +1,6 @@
 # ProductSpec Roadmap
 
-ProductSpec starts as a small Markdown serialization and grows toward a stable semantic model for product intent.
+ProductSpec starts as a small Markdown serialization and grows toward a stable semantic model for software intent.
 
 ## v0.1: Document Format
 

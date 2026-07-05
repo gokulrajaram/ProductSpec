@@ -1,6 +1,6 @@
 # ProductSpec
 
-ProductSpec is an open standard for Product Specs: human-readable, AI-executable documents that capture product intent before implementation.
+ProductSpec is an open standard for software intent before implementation.
 
 ProductSpec is designed for Product Specs that need to be read by humans, reviewed by product tools, and executed by AI agents downstream.
 
@@ -8,13 +8,13 @@ ProductSpec.io is one implementation of ProductSpec. ProductSpec itself is neutr
 
 ## Naming
 
-- `ProductSpec` is the open standard, project, repository, and ecosystem.
+- `ProductSpec` is the open standard, project, repository, and ecosystem for software intent.
 - `Product Spec` is the artifact a person writes.
 - `ProductSpec.io` is a managed implementation of ProductSpec.
 
 ## Where This Sits
 
-ProductSpec operates at the intent layer: the what and why that come before engineering specs are written. This is where a team commits to the problem, hypothesis, scope, user experience, acceptance criteria, and success metrics.
+ProductSpec operates at the software intent layer: the what and why that come before engineering specs are written. This is where a team commits to the problem, hypothesis, scope, user experience, acceptance criteria, and success metrics.
 
 OpenSpec and Spec Kit operate at the engineering spec layer. OpenSpec's flow is propose -> apply -> archive. Spec Kit's flow is constitution -> specify -> clarify -> plan -> tasks -> analyze -> implement. Those artifacts live in the repo and are consumed by AI agents to build code.
 

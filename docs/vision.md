@@ -21,7 +21,7 @@ The software stack has mature standards for implementation:
 - Terraform for infrastructure.
 - SQL for data.
 
-There is no equivalent standard for product intent: the problem, hypothesis, scope, user experience, acceptance criteria, success metrics, tradeoffs, decisions, and evidence behind the work.
+There is no equivalent standard for software intent: the problem, hypothesis, scope, user experience, acceptance criteria, success metrics, tradeoffs, decisions, and evidence behind the work.
 
 Today that intent is scattered across docs, chat threads, meetings, issue trackers, design comments, analytics dashboards, and people's memories.
 
@@ -31,7 +31,7 @@ ProductSpec exists to make intent structured, portable, reviewable, executable b
 
 ProductSpec operates before engineering specs are written.
 
-It does not replace engineering specification systems such as OpenSpec or Spec Kit. Those systems operate downstream, after the product intent is clear enough to turn into design, tasks, implementation, and tests.
+It does not replace engineering specification systems such as OpenSpec or Spec Kit. Those systems operate downstream, after the software intent is clear enough to turn into design, tasks, implementation, and tests.
 
 ```text
 Product Spec (ProductSpec) -> Engineering Spec (OpenSpec / Spec Kit) -> Code (agents)
@@ -66,4 +66,4 @@ Markdown is the first serialization.
 
 Long term, the canonical representation should become a semantic model that can be serialized as Markdown, JSON, YAML, AST, or other formats.
 
-The goal is not a better document. The goal is a durable, portable layer for product intent that humans can read and AI agents can execute.
+The goal is not a better document. The goal is a durable, portable layer for software intent that humans can read and AI agents can execute.
