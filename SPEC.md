@@ -82,6 +82,33 @@ Display labels are implementation-specific, except that tools should render `ai`
 
 For products with AI features, AI eval thresholds belong in `acceptance_criteria`, not `success_metrics`. Success metrics are post-launch product and business outcomes. Acceptance criteria are pre-launch build gates.
 
+Structured AI evals may be included in `acceptance_criteria` with a fenced `productspec-ai-evals` block:
+
+````markdown
+```productspec-ai-evals
+- id: quote_relevance
+  type: rubric
+  input_set: evals/quote-search-cases.jsonl
+  evaluator: llm_judge
+  pass_threshold: 0.85
+  checks:
+    - returned passage answers the query
+    - citation links to the correct timestamp
+    - answer does not invent content outside the transcript
+```
+````
+
+Each AI eval item requires:
+
+- `id`: stable snake_case eval identifier.
+- `type`: eval type, for example `rubric`, `deterministic`, `regression`, or `human_review`.
+- `input_set`: path or URI for the eval cases.
+- `evaluator`: evaluator name or mechanism.
+- `pass_threshold`: number greater than `0` and less than or equal to `1`.
+- `checks`: one or more pass/fail checks.
+
+Tools should preserve the fenced block in Markdown and may expose parsed evals as structured data.
+
 ## Custom Sections
 
 Custom section IDs use `custom-<kebab-name>`.

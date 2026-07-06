@@ -39,7 +39,17 @@ https://example.com/transcript-search-prototype
 - Transcript pages show video metadata, search, timestamped passages, and copy controls.
 - Search highlights matching transcript text.
 - Copied passages include source URL and timestamp.
-- AI evals: on a 50-query golden set, at least 90% of returned passages include the cited text in the source transcript.
+
+```productspec-ai-evals
+- id: quote_grounding
+  type: rubric
+  input_set: evals/transcript-search-queries.jsonl
+  evaluator: llm_judge
+  pass_threshold: 0.9
+  checks:
+    - returned passage includes the cited text in the source transcript
+    - citation timestamp resolves to the source video
+```
 
 ## Success Metrics
 

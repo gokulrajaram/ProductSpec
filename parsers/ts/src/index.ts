@@ -45,6 +45,16 @@ export interface ProductSpecSection {
   id: string;
   label: string;
   content: string;
+  ai_evals?: ProductSpecAiEval[];
+}
+
+export interface ProductSpecAiEval {
+  id: string;
+  type: string;
+  input_set: string;
+  evaluator: string;
+  pass_threshold: number;
+  checks: string[];
 }
 
 export interface ProductSpecDocument {
@@ -152,6 +162,9 @@ function validationErrorFor(error: unknown): ProductSpecValidationError {
   if (message.includes("Invalid spec_revision")) {
     return { code: "invalid_spec_revision", message, path: "frontmatter.spec_revision" };
   }
+  if (message.includes("Invalid AI eval")) {
+    return { code: "invalid_ai_eval", message, path: "sections.acceptance_criteria.ai_evals" };
+  }
   return { code: "invalid_product_spec", message };
 }
 
@@ -218,6 +231,43 @@ function validateDocument(document: ProductSpecDocument): {
         message: `Required section is very short: ${sectionId}`,
         path: `sections.${sectionId}`
       });
+    }
+  }
+
+  for (const section of document.sections) {
+    for (const [index, aiEval] of (section.ai_evals ?? []).entries()) {
+      const path = `sections.${section.id}.ai_evals.${index}`;
+      if (section.id !== "acceptance_criteria") {
+        errors.push({
+          code: "invalid_ai_eval",
+          message: "AI eval blocks belong in Acceptance Criteria.",
+          path
+        });
+      }
+      const missingFields = ["id", "type", "input_set", "evaluator"].filter(
+        (field) => !String(aiEval[field as keyof ProductSpecAiEval] ?? "").trim()
+      );
+      if (missingFields.length) {
+        errors.push({
+          code: "invalid_ai_eval",
+          message: `Invalid AI eval: missing ${missingFields.join(", ")}.`,
+          path
+        });
+      }
+      if (!Number.isFinite(aiEval.pass_threshold) || aiEval.pass_threshold <= 0 || aiEval.pass_threshold > 1) {
+        errors.push({
+          code: "invalid_ai_eval",
+          message: "Invalid AI eval: pass_threshold must be a number greater than 0 and less than or equal to 1.",
+          path
+        });
+      }
+      if (!aiEval.checks.length || aiEval.checks.some((check) => !check.trim())) {
+        errors.push({
+          code: "invalid_ai_eval",
+          message: "Invalid AI eval: checks must include at least one non-empty item.",
+          path
+        });
+      }
     }
   }
 
@@ -301,12 +351,77 @@ function parseSections(
     const start = (match.index ?? 0) + match[0].length;
     const end = matches[index + 1]?.index ?? body.length;
     const id = sectionIdForLabel(label, customSections);
+    const content = body.slice(start, end).trim();
+    const ai_evals = parseAiEvalBlocks(content);
     return {
       id,
       label,
-      content: body.slice(start, end).trim()
+      content,
+      ...(ai_evals.length ? { ai_evals } : {})
     };
   });
+}
+
+function parseAiEvalBlocks(content: string): ProductSpecAiEval[] {
+  const blockPattern = /```productspec-ai-evals\n([\s\S]*?)\n```/g;
+  return [...content.matchAll(blockPattern)].flatMap((match) => parseAiEvalList(match[1]));
+}
+
+function parseAiEvalList(raw: string): ProductSpecAiEval[] {
+  const evals: Array<Partial<ProductSpecAiEval>> = [];
+  let current: Partial<ProductSpecAiEval> | undefined;
+  let inChecks = false;
+
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    if (line.startsWith("- ")) {
+      current = {};
+      evals.push(current);
+      assignAiEvalValue(current, line.slice(2));
+      inChecks = false;
+      continue;
+    }
+    if (!current) throw new Error("Invalid AI eval block: expected list item.");
+    if (line.trim() === "checks:") {
+      current.checks = [];
+      inChecks = true;
+      continue;
+    }
+    if (inChecks && line.startsWith("    - ")) {
+      current.checks = [...(current.checks ?? []), unquote(line.replace(/^    - /, ""))];
+      continue;
+    }
+    if (line.startsWith("  ")) {
+      assignAiEvalValue(current, line.trim());
+      inChecks = false;
+      continue;
+    }
+    throw new Error(`Invalid AI eval block line: ${line}`);
+  }
+
+  return evals.map((aiEval) => ({
+    id: String(aiEval.id ?? ""),
+    type: String(aiEval.type ?? ""),
+    input_set: String(aiEval.input_set ?? ""),
+    evaluator: String(aiEval.evaluator ?? ""),
+    pass_threshold: Number(aiEval.pass_threshold),
+    checks: aiEval.checks ?? []
+  }));
+}
+
+function assignAiEvalValue(target: Partial<ProductSpecAiEval>, line: string) {
+  const match = /^([A-Za-z0-9_]+):\s*(.*)$/.exec(line);
+  if (!match) throw new Error(`Invalid AI eval block line: ${line}`);
+  const key = match[1] as keyof ProductSpecAiEval;
+  if (key === "pass_threshold") {
+    target.pass_threshold = Number(unquote(match[2]));
+    return;
+  }
+  if (key === "checks") {
+    target.checks = [];
+    return;
+  }
+  target[key] = unquote(match[2]) as never;
 }
 
 function sectionIdForLabel(label: string, customSections: Array<{ id: string; label: string }>): string {

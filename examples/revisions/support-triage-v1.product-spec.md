@@ -30,7 +30,17 @@ Cut from this version: customer-tier lookup and audit-log export.
 - New tickets receive urgency, suggested owner, confidence score, and model version within 60 seconds.
 - Reviewers can override any urgency label before it changes downstream workflow state.
 - Labels below 0.70 confidence are marked `needs_review` and do not trigger escalation.
-- AI evals: on a 300-ticket golden set, urgency classification reaches at least 88% precision for `urgent`.
+
+```productspec-ai-evals
+- id: urgent_ticket_precision
+  type: rubric
+  input_set: evals/urgent-ticket-golden-set.jsonl
+  evaluator: llm_judge
+  pass_threshold: 0.88
+  checks:
+    - urgency classification identifies urgent tickets
+    - non-urgent tickets are not escalated
+```
 
 ## Success Metrics
 

@@ -58,7 +58,7 @@ npm exec --package @productspec/parser -- productspec validate examples/minimal.
 
 Full Product Spec files include frontmatter such as `title`, optional `spec_revision`, `author`, and timestamps. This shortened example shows the section body.
 
-```markdown
+````markdown
 ## Problem
 
 Support leads at B2B SaaS companies lose their morning planning window because urgent, account-risk tickets are buried among routine product questions.
@@ -75,12 +75,20 @@ Out: auto-replies, direct ticket reassignment, customer-visible status changes, 
 
 ## Acceptance Criteria
 
-- AI evals: on a 500-ticket golden set, urgency classification reaches at least 92% precision for `account_risk`.
+```productspec-ai-evals
+- id: account_risk_urgency
+  type: rubric
+  input_set: evals/account-risk-golden-set.jsonl
+  evaluator: llm_judge
+  pass_threshold: 0.92
+  checks:
+    - urgency classification identifies account-risk tickets
+```
 
 ## Success Metrics
 
 - Median time to first human response for account-risk tickets falls below 15 minutes during business hours.
-```
+````
 
 See `examples/ai-support-triage.product-spec.md` for the complete version.
 

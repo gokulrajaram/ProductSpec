@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5.0 - AI Evals
+
+ProductSpec v0.5.0 keeps the Product Spec document shape at `spec_format_version:
+"0.1"` and adds optional structured AI evals inside Acceptance Criteria.
+
+Added:
+
+- Optional structured `productspec-ai-evals` fenced blocks inside Acceptance Criteria.
+- Parser and JSON Schema support for extracting AI evals as structured data.
+- Validation for malformed AI eval blocks.
+
 ## v0.4.0 - Spec Revision
 
 ProductSpec v0.4.0 keeps the Product Spec document shape at `spec_format_version:

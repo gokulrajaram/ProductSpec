@@ -1,6 +1,6 @@
 # Validator Reference
 
-ProductSpec v0.4.0 ships a TypeScript reference validator and CLI.
+ProductSpec v0.5.0 ships a TypeScript reference validator and CLI.
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate path/to/file.product-spec.md
@@ -18,6 +18,7 @@ The validator returns errors for structurally invalid Product Specs and warnings
 - canonical section IDs
 - `custom-<kebab-name>` section IDs
 - presence of mandatory sections
+- structured AI evals inside Acceptance Criteria
 
 Some parser behavior is intentionally outside the JSON Schema:
 
@@ -75,6 +76,21 @@ Fix: choose one of the supported values.
 `spec_revision` is present but is not a positive integer.
 
 Fix: remove `spec_revision` or set it to `1` or higher.
+
+### `invalid_ai_eval`
+
+A `productspec-ai-evals` block is malformed or incomplete.
+
+Required fields:
+
+- `id`
+- `type`
+- `input_set`
+- `evaluator`
+- `pass_threshold`
+- `checks`
+
+Fix: place the block inside Acceptance Criteria, include every required field, set `pass_threshold` to a number greater than `0` and less than or equal to `1`, and include at least one check.
 
 ### `missing_required_section`
 

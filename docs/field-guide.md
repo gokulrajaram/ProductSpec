@@ -130,6 +130,23 @@ Hypothesis names the expected behavior change. Success Metrics quantify it.
 - Architecture details.
 - Specific table names, library choices, or implementation tasks unless the artifact itself is an API or integration contract.
 
+For AI products, use a structured eval block when the eval should be parsed by tools:
+
+````markdown
+```productspec-ai-evals
+- id: answer_faithfulness
+  type: rubric
+  input_set: evals/faithfulness-cases.jsonl
+  evaluator: llm_judge
+  pass_threshold: 0.9
+  checks:
+    - answer is supported by retrieved source text
+    - answer includes a citation for every factual claim
+```
+````
+
+Use plain bullets when the eval is still a rough human note. Use the structured block when the eval is part of the launch gate.
+
 **Example:**
 
 > Given a valid public YouTube URL, the user can create a transcript page.

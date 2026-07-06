@@ -108,10 +108,108 @@ In: optional positive integer revision in frontmatter.
     expect(parseProductSpecMarkdown(serialized).frontmatter.spec_revision).toBe(2);
   });
 
+  it("extracts structured AI evals from Acceptance Criteria", () => {
+    const markdown = `---
+spec_format_version: "0.1"
+title: "AI Quote Search"
+artifact_type: "prd"
+author: "ProductSpec"
+created_at: "2026-07-05T00:00:00Z"
+updated_at: "2026-07-05T00:00:00Z"
+---
+
+## Problem
+
+Researchers lose time finding exact quotes in long video transcripts.
+
+## Hypothesis
+
+If quote search returns cited transcript passages, researchers will trust the transcript as a source.
+
+## Scope
+
+In: transcript search, timestamp citations, and quote copy.
+
+## Acceptance Criteria
+
+- User can search a transcript by phrase.
+
+\`\`\`productspec-ai-evals
+- id: quote_relevance
+  type: rubric
+  input_set: evals/quote-search-cases.jsonl
+  evaluator: llm_judge
+  pass_threshold: 0.85
+  checks:
+    - returned passage answers the query
+    - citation links to the correct timestamp
+\`\`\`
+
+## Success Metrics
+
+- 40% of weekly active researchers copy at least one timestamped quote.
+`;
+
+    const parsed = parseProductSpecMarkdown(markdown);
+    const acceptanceCriteria = parsed.sections.find((section) => section.id === "acceptance_criteria");
+
+    expect(acceptanceCriteria?.ai_evals).toEqual([
+      {
+        id: "quote_relevance",
+        type: "rubric",
+        input_set: "evals/quote-search-cases.jsonl",
+        evaluator: "llm_judge",
+        pass_threshold: 0.85,
+        checks: ["returned passage answers the query", "citation links to the correct timestamp"]
+      }
+    ]);
+    expect(parseProductSpecMarkdown(serializeProductSpecMarkdown(parsed))).toEqual(parsed);
+  });
+
+  it("rejects malformed AI eval blocks", () => {
+    const result = validateProductSpecMarkdown(`---
+spec_format_version: "0.1"
+title: "Malformed AI Evals"
+artifact_type: "prd"
+author: "ProductSpec"
+created_at: "2026-07-05T00:00:00Z"
+updated_at: "2026-07-05T00:00:00Z"
+---
+
+## Problem
+
+Researchers lose time finding exact quotes in long video transcripts.
+
+## Hypothesis
+
+If quote search returns cited transcript passages, researchers will trust the transcript as a source.
+
+## Scope
+
+In: transcript search, timestamp citations, and quote copy.
+
+## Acceptance Criteria
+
+\`\`\`productspec-ai-evals
+- id: quote_relevance
+  type: rubric
+  pass_threshold: 0.85
+\`\`\`
+
+## Success Metrics
+
+- 40% of weekly active researchers copy at least one timestamped quote.
+`);
+
+    expect(result.valid).toBe(false);
+    if (!result.valid) expect(result.errors.map((error) => error.code)).toContain("invalid_ai_eval");
+  });
+
   it("ships conformance fixtures for valid and invalid Product Specs", () => {
     const fixtures = [
       "conformance/valid/minimal.product-spec.md",
       "conformance/valid/with-user-experience.product-spec.md",
+      "conformance/valid/with-ai-evals.product-spec.md",
       "conformance/valid/with-custom-section.product-spec.md",
       "conformance/invalid/missing-frontmatter.product-spec.md",
       "conformance/invalid/missing-required-section.product-spec.md",
@@ -127,6 +225,7 @@ In: optional positive integer revision in frontmatter.
     const validFixtures = [
       "conformance/valid/minimal.product-spec.md",
       "conformance/valid/with-user-experience.product-spec.md",
+      "conformance/valid/with-ai-evals.product-spec.md",
       "conformance/valid/with-custom-section.product-spec.md"
     ];
 
@@ -176,6 +275,14 @@ In: optional positive integer revision in frontmatter.
       type: "integer",
       minimum: 1
     });
+    expect(schema.properties.sections.items.properties.ai_evals.items.required).toEqual([
+      "id",
+      "type",
+      "input_set",
+      "evaluator",
+      "pass_threshold",
+      "checks"
+    ]);
   });
 
   it("rejects invalid spec revision values", () => {

@@ -35,8 +35,26 @@ https://example.com/support-triage-dashboard
 - Reviewers can override any label before it changes downstream workflow state.
 - Labels below 0.75 confidence are marked `needs_review` and do not trigger escalation.
 - Every AI-generated label stores ticket ID, model version, input redaction status, confidence, reviewer action, and timestamp.
-- AI evals: on a 500-ticket golden set, urgency classification reaches at least 92% precision for `account_risk` and at least 90% recall for `account_risk`.
-- AI evals: no PII-redaction regression test may fail before release.
+
+```productspec-ai-evals
+- id: account_risk_urgency
+  type: rubric
+  input_set: evals/account-risk-golden-set.jsonl
+  evaluator: llm_judge
+  pass_threshold: 0.92
+  checks:
+    - urgency classification identifies account-risk tickets
+    - owner recommendation matches the expected support queue
+    - confidence below threshold is marked needs_review
+- id: pii_redaction_regression
+  type: deterministic
+  input_set: evals/pii-redaction-regression.jsonl
+  evaluator: automated_test
+  pass_threshold: 1
+  checks:
+    - no private customer data appears in model-visible input
+    - redaction placeholders preserve enough context for classification
+```
 
 ## Success Metrics
 
