@@ -39,7 +39,7 @@ npm exec --package @productspec/parser -- productspec validate examples/minimal.
 
 ## Example
 
-Full Product Spec files include frontmatter such as `title`, `author`, and timestamps. This shortened example shows the section body.
+Full Product Spec files include frontmatter such as `title`, optional `spec_revision`, `author`, and timestamps. This shortened example shows the section body.
 
 ```markdown
 ## Problem
@@ -165,7 +165,12 @@ Custom sections use `custom-<kebab-name>`.
 
 Version `0.1` is intentionally small. It is stable enough for tooling experiments, but still pre-1.0 while implementers learn what needs to change. See `docs/versioning.md` for compatibility expectations.
 
-The v0.3 adoption milestone includes conformance fixtures, a structured validator, examples, and a CLI:
+ProductSpec distinguishes the standard version from the document revision:
+
+- `spec_format_version` tells tools which ProductSpec format the file uses.
+- `spec_revision` is an optional positive integer for this particular product decision. It starts at `1` and increments when intent materially changes.
+
+The v0.4 milestone includes conformance fixtures, a structured validator, examples, a CLI, and optional `spec_revision` frontmatter:
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate examples/minimal.product-spec.md

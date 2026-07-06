@@ -12,6 +12,7 @@
         "spec_format_version": { "const": "0.1" },
         "title": { "type": "string", "minLength": 1 },
         "artifact_type": { "enum": ["hypothesis", "prd", "openspec_proposal"] },
+        "spec_revision": { "type": "integer", "minimum": 1 },
         "author": { "type": "string" },
         "created_at": { "type": "string", "format": "date-time" },
         "updated_at": { "type": "string", "format": "date-time" },

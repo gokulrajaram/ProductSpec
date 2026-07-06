@@ -32,6 +32,7 @@ export interface ProductSpecFrontmatter {
   spec_format_version: "0.1";
   title: string;
   artifact_type: ArtifactType;
+  spec_revision?: number;
   author: string;
   created_at: string;
   updated_at: string;
@@ -148,6 +149,9 @@ function validationErrorFor(error: unknown): ProductSpecValidationError {
   if (message.includes("Unsupported artifact_type")) {
     return { code: "unsupported_artifact_type", message, path: "frontmatter.artifact_type" };
   }
+  if (message.includes("Invalid spec_revision")) {
+    return { code: "invalid_spec_revision", message, path: "frontmatter.spec_revision" };
+  }
   return { code: "invalid_product_spec", message };
 }
 
@@ -258,6 +262,13 @@ function parseFrontmatter(raw: string): ProductSpecFrontmatter {
   if (!["hypothesis", "prd", "openspec_proposal"].includes(String(result.artifact_type))) {
     throw new Error("Unsupported artifact_type.");
   }
+  if (result.spec_revision !== undefined) {
+    const revision = Number(result.spec_revision);
+    if (!Number.isInteger(revision) || revision < 1) {
+      throw new Error("Invalid spec_revision. Use a positive integer.");
+    }
+    result.spec_revision = revision;
+  }
 
   return result as unknown as ProductSpecFrontmatter;
 }
@@ -310,9 +321,10 @@ function sectionIdForLabel(label: string, customSections: Array<{ id: string; la
 
 function serializeFrontmatter(frontmatter: ProductSpecFrontmatter): string {
   let output = "";
-  for (const key of ["spec_format_version", "title", "artifact_type", "author", "created_at", "updated_at", "linked_github_repo"] as const) {
+  for (const key of ["spec_format_version", "title", "artifact_type", "spec_revision", "author", "created_at", "updated_at", "linked_github_repo"] as const) {
     const value = frontmatter[key];
-    if (value) output += `${key}: "${value}"\n`;
+    if (value === undefined || value === "") continue;
+    output += typeof value === "number" ? `${key}: ${value}\n` : `${key}: "${value}"\n`;
   }
   if (frontmatter.custom_sections?.length) {
     output += "custom_sections:\n";

@@ -24,6 +24,8 @@ These changes should still be documented clearly in the repo when they happen.
 
 Tools should check `spec_format_version`.
 
+Tools may also read `spec_revision` when present. `spec_revision` is separate from `spec_format_version`: it tracks the revision of one Product Spec's product intent, not the standard format. It should start at `1` and increment when product intent materially changes. It does not need to increment for typo fixes or formatting-only edits. Git remains the detailed history.
+
 At minimum, tools should:
 
 - Reject unsupported versions with a clear error.
@@ -70,6 +72,14 @@ v0.3 keeps the document shape at `spec_format_version: "0.1"` and improves adopt
 - `productspec init <file>` creates a starter Product Spec.
 - Additional examples show AI features, consumer UX, enterprise workflows, and internal APIs.
 - The README and "Why ProductSpec?" docs explain the intent layer more directly.
+
+## v0.4 Spec Revision Milestone
+
+v0.4 keeps the document shape at `spec_format_version: "0.1"` and adds optional document-level revision metadata:
+
+- `spec_revision` is an optional positive integer in frontmatter.
+- It starts at `1` and increments when product intent materially changes.
+- Downstream artifacts can reference the Product Spec revision they implement.
 
 ## v1.0 Bar
 

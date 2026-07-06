@@ -1,6 +1,6 @@
 # Validator Reference
 
-ProductSpec v0.2.0 ships a TypeScript reference validator and CLI.
+ProductSpec v0.4.0 ships a TypeScript reference validator and CLI.
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate path/to/file.product-spec.md
@@ -13,6 +13,7 @@ The validator returns errors for structurally invalid Product Specs and warnings
 `schema/product-spec.schema.json` mirrors the parser's structural contract where JSON Schema can express it:
 
 - required frontmatter fields
+- optional `spec_revision` positive integer
 - supported `artifact_type` values
 - canonical section IDs
 - `custom-<kebab-name>` section IDs
@@ -68,6 +69,12 @@ Supported values:
 - `openspec_proposal`
 
 Fix: choose one of the supported values.
+
+### `invalid_spec_revision`
+
+`spec_revision` is present but is not a positive integer.
+
+Fix: remove `spec_revision` or set it to `1` or higher.
 
 ### `missing_required_section`
 

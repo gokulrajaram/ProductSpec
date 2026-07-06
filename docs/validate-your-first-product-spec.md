@@ -54,11 +54,12 @@ global binary directory is on `PATH`.
 
 ## What Validation Checks
 
-The v0.2 validator checks:
+The current validator checks:
 
 - required frontmatter exists
 - `spec_format_version` is supported
 - required frontmatter fields are present
+- optional `spec_revision` is a positive integer when present
 - `artifact_type` is supported
 - all mandatory sections are present
 - duplicate sections are rejected

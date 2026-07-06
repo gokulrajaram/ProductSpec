@@ -68,6 +68,46 @@ In: CSV upload and row-level error responses.
     ]);
   });
 
+  it("round-trips optional spec revision frontmatter", () => {
+    const markdown = `---
+spec_format_version: "0.1"
+title: "Versioned Spec"
+artifact_type: "prd"
+spec_revision: 2
+author: "ProductSpec"
+created_at: "2026-07-05T00:00:00Z"
+updated_at: "2026-07-06T00:00:00Z"
+---
+
+## Problem
+
+Teams cannot tell which intent revision an engineering plan came from.
+
+## Hypothesis
+
+If specs carry a simple revision number, downstream plans can reference the exact intent they implement.
+
+## Scope
+
+In: optional positive integer revision in frontmatter.
+
+## Acceptance Criteria
+
+- Parser exposes spec revision as a number.
+
+## Success Metrics
+
+- Engineering handoffs can name the Product Spec revision they implement.
+`;
+
+    const parsed = parseProductSpecMarkdown(markdown);
+    const serialized = serializeProductSpecMarkdown(parsed);
+
+    expect(parsed.frontmatter.spec_revision).toBe(2);
+    expect(serialized).toContain("spec_revision: 2");
+    expect(parseProductSpecMarkdown(serialized).frontmatter.spec_revision).toBe(2);
+  });
+
   it("ships conformance fixtures for valid and invalid Product Specs", () => {
     const fixtures = [
       "conformance/valid/minimal.product-spec.md",
@@ -132,6 +172,46 @@ In: CSV upload and row-level error responses.
     expect(schema.properties.frontmatter.properties.custom_sections.items.properties.id.pattern).toBe(
       "^custom-[a-z0-9]+(-[a-z0-9]+)*$"
     );
+    expect(schema.properties.frontmatter.properties.spec_revision).toEqual({
+      type: "integer",
+      minimum: 1
+    });
+  });
+
+  it("rejects invalid spec revision values", () => {
+    const result = validateProductSpecMarkdown(`---
+spec_format_version: "0.1"
+title: "Invalid Revision"
+artifact_type: "prd"
+spec_revision: 0
+author: "ProductSpec"
+created_at: "2026-07-05T00:00:00Z"
+updated_at: "2026-07-06T00:00:00Z"
+---
+
+## Problem
+
+Teams cannot tell which intent revision an engineering plan came from.
+
+## Hypothesis
+
+If specs carry a simple revision number, downstream plans can reference the exact intent they implement.
+
+## Scope
+
+In: optional positive integer revision in frontmatter.
+
+## Acceptance Criteria
+
+- Parser exposes spec revision as a number.
+
+## Success Metrics
+
+- Engineering handoffs can name the Product Spec revision they implement.
+`);
+
+    expect(result.valid).toBe(false);
+    if (!result.valid) expect(result.errors.map((error) => error.code)).toContain("invalid_spec_revision");
   });
 
   it("warns when required sections are present but too thin", () => {

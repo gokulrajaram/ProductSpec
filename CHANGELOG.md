@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.4.0 - Spec Revision
+
+ProductSpec v0.4.0 keeps the Product Spec document shape at `spec_format_version:
+"0.1"` and adds an optional `spec_revision` frontmatter field.
+
+Added:
+
+- Optional `spec_revision` frontmatter for tracking the revision of one Product Spec's product intent.
+- Parser and JSON Schema support for positive integer `spec_revision` values.
+- Examples and conformance fixtures showing `spec_revision: 1`.
+
 ## v0.3.0 - Adoption Milestone
 
 ProductSpec v0.3.0 keeps the Product Spec document shape at `spec_format_version:

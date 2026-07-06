@@ -21,6 +21,7 @@ Start here if you want to see ProductSpec as a working artifact rather than a sc
 - `acceptance_criteria` defines the build contract. For AI products, eval thresholds live here.
 - `success_metrics` defines the market contract after launch.
 - `user_experience` is optional and points to the externally observable experience when one exists.
+- `spec_revision` in frontmatter tracks the revision of this Product Spec's intent, separate from `spec_format_version`.
 
 ## Validate An Example
 

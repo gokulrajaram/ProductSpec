@@ -32,9 +32,14 @@ Required fields:
 
 Optional fields:
 
+- `spec_revision`: positive integer for this Product Spec's own intent revision
 - `linked_github_repo`: string, such as `"owner/repo"`
 - `custom_sections`: array of `{ id, label, after }`
 - `tool_metadata`: map of tool-specific fields
+
+`spec_format_version` describes the version of the ProductSpec standard used by the file. `spec_revision` describes the revision of this particular product decision. Tools may display `spec_revision: 3` as `v3`.
+
+`spec_revision` should start at `1` and increment when product intent materially changes. It does not need to increment for typo fixes or formatting-only edits. Git remains the detailed history.
 
 Exports intended for public sharing should strip `tool_metadata` by default.
 
