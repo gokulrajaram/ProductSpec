@@ -123,6 +123,10 @@ created_at: "2026-07-04T00:00:00Z"
 - L2: implements portable review annotations.
 - L3: implements portable calibration serialization.
 
+## Versioning
+
+ProductSpec is pre-1.0. Tools should check `spec_format_version` and should not assume v0.x documents have the same compatibility guarantees as v1.0. See `docs/versioning.md`.
+
 ## Planned v0.2 Additions
 
 The next compatibility milestone is validation and conformance.

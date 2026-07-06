@@ -58,6 +58,7 @@ ProductSpec -> Engineering Spec -> Tasks -> Code -> Evaluation -> Learning
 - `ROADMAP.md`: the planned path from v0.1 to a stable semantic model.
 - `docs/vision.md`: the public vision for ProductSpec as the intent layer.
 - `docs/field-guide.md`: field-level guidance for writing each section.
+- `docs/versioning.md`: compatibility rules before v1.0.
 - `docs/decision-trace.md`: the future optional reasoning-trail extension.
 - `schema/product-spec.schema.json`: JSON Schema for parsed Product Spec documents.
 - `schema/review-annotation.schema.json`: JSON Schema for portable review annotations.
@@ -84,6 +85,6 @@ Custom sections use `custom-<kebab-name>`.
 
 ## Status
 
-Version `0.1` is intentionally small. It is stable enough for tooling experiments, but still pre-1.0 while implementers learn what needs to change.
+Version `0.1` is intentionally small. It is stable enough for tooling experiments, but still pre-1.0 while implementers learn what needs to change. See `docs/versioning.md` for compatibility expectations.
 
 The next milestone is `0.2`: validator CLI, conformance fixtures, review-annotation examples, and clearer versioning rules.
