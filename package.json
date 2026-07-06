@@ -1,0 +1,8 @@
+{
+  "name": "productspec-standard",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "validate": "npm --prefix parsers/ts install && npm --prefix parsers/ts run build && node parsers/ts/dist/cli.js validate"
+  }
+}

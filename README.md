@@ -91,5 +91,9 @@ Version `0.1` is intentionally small. It is stable enough for tooling experiment
 The v0.2 tooling milestone adds conformance fixtures, a structured validator, and a CLI:
 
 ```bash
-productspec validate path/to/file.product-spec.md
+npm run validate -- path/to/file.product-spec.md
 ```
+
+That command builds and runs the local reference parser. The package-level `productspec`
+binary exists under `parsers/ts`, but it is not a global shell command until the package
+is installed or linked.
