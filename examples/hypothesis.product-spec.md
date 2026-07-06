@@ -18,11 +18,20 @@ If calendar reminders can escalate to SMS for high-priority meetings, sales mana
 
 ## Scope
 
-In: Google Calendar connection, high-priority meeting rules, SMS reminder opt-in, and delivery logs.
-
-Out: calendar creation, full scheduling assistant, and team admin controls.
-
-Cut: WhatsApp reminders and custom reminder templates.
+```productspec-scope
+in:
+  - Google Calendar connection
+  - high-priority meeting rules
+  - SMS reminder opt-in
+  - delivery logs
+out:
+  - calendar creation
+  - full scheduling assistant
+  - team admin controls
+cut:
+  - WhatsApp reminders
+  - custom reminder templates
+```
 
 ## User Experience
 
@@ -37,6 +46,17 @@ https://example.com/calendar-reminder-prototype
 
 ## Success Metrics
 
-- 50% of activated users configure at least one high-priority reminder.
-- Missed-call self-reports decline by 25% among weekly active users.
-
+```productspec-success-metrics
+- id: high_priority_reminder_setup_rate
+  metric: activated_user_high_priority_reminder_setup_rate
+  target: ">= 50%"
+  window: within 7 days of activation
+  segment: activated users
+  source: product_analytics
+- id: missed_call_report_reduction
+  metric: missed_call_self_report_reduction
+  target: ">= 25%"
+  window: monthly
+  segment: weekly active users
+  source: user_survey
+```

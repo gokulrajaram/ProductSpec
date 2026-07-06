@@ -18,11 +18,21 @@ If the calendar warns parents when a new event conflicts with an existing family
 
 ## Scope
 
-In: shared calendar conflict detection, mobile push alert, conflict detail view, one-tap "ask partner" message, and dismiss state.
-
-Out: automatic rescheduling, childcare booking, school calendar import, and recurring-event cleanup.
-
-Cut from this version: location-aware travel-time conflicts.
+```productspec-scope
+in:
+  - shared calendar conflict detection
+  - mobile push alert
+  - conflict detail view
+  - one-tap ask partner message
+  - dismiss state
+out:
+  - automatic rescheduling
+  - childcare booking
+  - school calendar import
+  - recurring-event cleanup
+cut:
+  - location-aware travel-time conflicts
+```
 
 ## User Experience
 
@@ -38,7 +48,29 @@ https://example.com/family-calendar-conflict-prototype
 
 ## Success Metrics
 
-- 45% of detected conflicts receive an action: message partner, edit event, or dismiss.
-- Missed-event self-reports among weekly active families decline by 20%.
-- Fewer than 3% of weekly active users disable conflict alerts.
-- Median time from conflict creation to first action is under 30 minutes.
+```productspec-success-metrics
+- id: conflict_action_rate
+  metric: detected_conflict_action_rate
+  target: ">= 45%"
+  window: weekly
+  segment: detected conflicts
+  source: product_analytics
+- id: missed_event_report_reduction
+  metric: missed_event_self_report_reduction
+  target: ">= 20%"
+  window: monthly
+  segment: weekly active families
+  source: user_survey
+- id: alert_disable_rate
+  metric: conflict_alert_disable_rate
+  target: "< 3%"
+  window: weekly
+  segment: weekly active users
+  source: product_analytics
+- id: conflict_time_to_action
+  metric: median_time_from_conflict_creation_to_first_action
+  target: "< 30 minutes"
+  window: weekly
+  segment: detected conflicts
+  source: product_analytics
+```

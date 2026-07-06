@@ -19,11 +19,22 @@ If incoming tickets are automatically labeled by urgency and likely owner, suppo
 
 ## Scope
 
-In: ticket ingestion from the helpdesk API, urgency labels, owner recommendation, confidence score, and reviewer override.
-
-Out: auto-replies, direct ticket reassignment, customer-visible status changes, and custom routing rules.
-
-Cut from this version: customer-tier lookup and audit-log export.
+```productspec-scope
+in:
+  - ticket ingestion from the helpdesk API
+  - urgency labels
+  - owner recommendation
+  - confidence score
+  - reviewer override
+out:
+  - auto-replies
+  - direct ticket reassignment
+  - customer-visible status changes
+  - custom routing rules
+cut:
+  - customer-tier lookup
+  - audit-log export
+```
 
 ## Acceptance Criteria
 
@@ -44,6 +55,23 @@ Cut from this version: customer-tier lookup and audit-log export.
 
 ## Success Metrics
 
-- Median time to first human response for urgent tickets falls below 30 minutes during business hours.
-- At least 60% of urgent tickets are reviewed by the suggested owner without manual queue search.
-- False urgent escalations stay below 8% of escalated tickets.
+```productspec-success-metrics
+- id: urgent_response_time
+  metric: median_time_to_first_human_response
+  target: "< 30 minutes"
+  window: business hours
+  segment: urgent tickets
+  source: helpdesk_analytics
+- id: suggested_owner_review_rate
+  metric: suggested_owner_review_rate
+  target: ">= 60%"
+  window: weekly
+  segment: urgent tickets
+  source: helpdesk_analytics
+- id: false_urgent_escalation_rate
+  metric: false_urgent_escalation_rate
+  target: "< 8%"
+  window: weekly
+  segment: escalated tickets
+  source: reviewer_audit_log
+```

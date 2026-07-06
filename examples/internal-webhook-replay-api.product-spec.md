@@ -19,11 +19,23 @@ If support engineers have a permissioned internal API for replaying failed webho
 
 ## Scope
 
-In: internal API endpoint for replaying one failed webhook event by ID, permission check, replay audit log, idempotency guard, and structured success or failure response.
-
-Out: customer-facing UI, bulk replay, replay scheduling, editing payloads before replay, and replaying events older than 30 days.
-
-Cut from this version: automatic retry policy changes and customer self-serve replay.
+```productspec-scope
+in:
+  - internal API endpoint for replaying one failed webhook event by ID
+  - permission check
+  - replay audit log
+  - idempotency guard
+  - structured success or failure response
+out:
+  - customer-facing UI
+  - bulk replay
+  - replay scheduling
+  - editing payloads before replay
+  - replaying events older than 30 days
+cut:
+  - automatic retry policy changes
+  - customer self-serve replay
+```
 
 ## Acceptance Criteria
 
@@ -36,7 +48,29 @@ Cut from this version: automatic retry policy changes and customer self-serve re
 
 ## Success Metrics
 
-- Median time from customer webhook escalation to replay attempt falls below 10 minutes.
-- At least 70% of eligible failed webhook escalations are resolved without infrastructure engineering involvement.
-- Duplicate replay jobs remain below 0.5% of replay attempts.
-- No replay attempt is executed without an audit log entry.
+```productspec-success-metrics
+- id: escalation_to_replay_time
+  metric: median_time_from_customer_escalation_to_replay_attempt
+  target: "< 10 minutes"
+  window: monthly
+  segment: eligible failed webhook escalations
+  source: support_and_job_queue_analytics
+- id: no_infra_escalation_resolution_rate
+  metric: eligible_webhook_escalation_resolution_without_infra_rate
+  target: ">= 70%"
+  window: monthly
+  segment: eligible failed webhook escalations
+  source: support_analytics
+- id: duplicate_replay_rate
+  metric: duplicate_replay_job_rate
+  target: "< 0.5%"
+  window: monthly
+  segment: replay attempts
+  source: replay_audit_log
+- id: unaudited_replay_count
+  metric: unaudited_replay_attempt_count
+  target: "0"
+  window: monthly
+  segment: replay attempts
+  source: replay_audit_log
+```

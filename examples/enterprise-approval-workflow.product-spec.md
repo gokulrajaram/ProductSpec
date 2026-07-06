@@ -19,11 +19,23 @@ If discount approvals move into a visible workflow with owners, due dates, and e
 
 ## Scope
 
-In: approval request form, deal and customer context, approver chain, SLA clock, reminder emails, escalation to manager, and approval history export.
-
-Out: contract redlining, CPQ price calculation, billing-system updates, and legal clause approval.
-
-Cut from this version: custom approval policies by region.
+```productspec-scope
+in:
+  - approval request form
+  - deal and customer context
+  - approver chain
+  - SLA clock
+  - reminder emails
+  - escalation to manager
+  - approval history export
+out:
+  - contract redlining
+  - CPQ price calculation
+  - billing-system updates
+  - legal clause approval
+cut:
+  - custom approval policies by region
+```
 
 ## User Experience
 
@@ -40,7 +52,29 @@ https://example.com/contract-approval-flow
 
 ## Success Metrics
 
-- Median approval cycle time for eligible discount requests falls below 24 business hours.
-- 90% of requests have a visible next owner within 5 minutes of submission.
-- Fewer than 5% of eligible late-stage deals are delayed because approval ownership is unclear.
-- Sales operations spends 40% less time manually chasing approval status.
+```productspec-success-metrics
+- id: approval_cycle_time
+  metric: median_approval_cycle_time
+  target: "< 24 business hours"
+  window: monthly
+  segment: eligible discount requests
+  source: workflow_analytics
+- id: next_owner_visibility_rate
+  metric: visible_next_owner_rate
+  target: ">= 90%"
+  window: within 5 minutes of submission
+  segment: approval requests
+  source: workflow_analytics
+- id: ownership_delay_rate
+  metric: approval_ownership_delay_rate
+  target: "< 5%"
+  window: monthly
+  segment: eligible late-stage deals
+  source: sales_operations_review
+- id: manual_chasing_time_reduction
+  metric: sales_ops_manual_status_chasing_time_reduction
+  target: ">= 40%"
+  window: monthly
+  segment: sales operations
+  source: time_study
+```

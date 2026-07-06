@@ -23,11 +23,22 @@ If transcript search turns video into timestamped source text, researchers will 
 
 ## Scope
 
-In: single-video transcript generation, transcript search, timestamp navigation, and copyable citations.
-
-Out: team libraries, cross-video semantic search, uploaded video files, and paid usage controls.
-
-Cut: transcript editing, speaker labels, and folder organization.
+```productspec-scope
+in:
+  - single-video transcript generation
+  - transcript search
+  - timestamp navigation
+  - copyable citations
+out:
+  - team libraries
+  - cross-video semantic search
+  - uploaded video files
+  - paid usage controls
+cut:
+  - transcript editing
+  - speaker labels
+  - folder organization
+```
 
 ## User Experience
 
@@ -53,9 +64,26 @@ https://example.com/transcript-search-prototype
 
 ## Success Metrics
 
-- 60% of first-time transcript creators run search.
-- 35% copy at least one timestamped passage.
-- 20% return within 7 days to create another transcript.
+```productspec-success-metrics
+- id: first_session_search_rate
+  metric: first_session_transcript_search_rate
+  target: ">= 60%"
+  window: first session
+  segment: first-time transcript creators
+  source: product_analytics
+- id: timestamped_quote_copy_rate
+  metric: timestamped_quote_copy_rate
+  target: ">= 35%"
+  window: within 7 days of transcript creation
+  segment: first-time transcript creators
+  source: product_analytics
+- id: seven_day_return_rate
+  metric: seven_day_return_to_create_another_transcript_rate
+  target: ">= 20%"
+  window: within 7 days of first transcript creation
+  segment: first-time transcript creators
+  source: product_analytics
+```
 
 ## Customer Truth
 

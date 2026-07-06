@@ -19,11 +19,24 @@ If incoming tickets are automatically labeled by urgency, customer tier, and lik
 
 ## Scope
 
-In: ticket ingestion from the helpdesk API, urgency labels, customer-tier lookup, owner recommendation, confidence score, reviewer override, and audit log.
-
-Out: auto-replies, direct ticket reassignment, customer-visible status changes, and training on private ticket bodies outside the customer's workspace.
-
-Cut from this version: multi-language classification and custom team-specific routing rules.
+```productspec-scope
+in:
+  - ticket ingestion from the helpdesk API
+  - urgency labels
+  - customer-tier lookup
+  - owner recommendation
+  - confidence score
+  - reviewer override
+  - audit log
+out:
+  - auto-replies
+  - direct ticket reassignment
+  - customer-visible status changes
+  - training on private ticket bodies outside the customer's workspace
+cut:
+  - multi-language classification
+  - custom team-specific routing rules
+```
 
 ## User Experience
 
@@ -58,7 +71,29 @@ https://example.com/support-triage-dashboard
 
 ## Success Metrics
 
-- Median time to first human response for account-risk tickets falls below 15 minutes during business hours.
-- At least 80% of account-risk tickets are reviewed by the suggested owner without manual queue search.
-- False account-risk escalations stay below 5% of escalated tickets.
-- Weekly support lead planning time spent sorting queues drops by 50%.
+```productspec-success-metrics
+- id: account_risk_response_time
+  metric: median_time_to_first_human_response
+  target: "< 15 minutes"
+  window: business hours
+  segment: account-risk tickets
+  source: helpdesk_analytics
+- id: suggested_owner_review_rate
+  metric: suggested_owner_review_rate
+  target: ">= 80%"
+  window: weekly
+  segment: account-risk tickets
+  source: helpdesk_analytics
+- id: false_escalation_rate
+  metric: false_account_risk_escalation_rate
+  target: "< 5%"
+  window: weekly
+  segment: escalated tickets
+  source: reviewer_audit_log
+- id: queue_sorting_time_reduction
+  metric: support_lead_queue_sorting_time_reduction
+  target: ">= 50%"
+  window: weekly
+  segment: support leads
+  source: time_study
+```

@@ -2,6 +2,8 @@
 
 Start here if you want to see ProductSpec as a working artifact rather than a schema.
 
+`minimal.product-spec.md` stays plain Markdown by design. The richer examples use structured Scope, Success Metrics, and AI eval blocks where tools or agents benefit from parsed data.
+
 ## Which Example Should I Read?
 
 | Example | Use this when you want to see |
