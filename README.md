@@ -12,6 +12,14 @@ ProductSpec.io is one implementation of ProductSpec. ProductSpec itself is neutr
 - `Product Spec` is the artifact a person writes.
 - `ProductSpec.io` is a managed implementation of ProductSpec.
 
+## When To Use ProductSpec
+
+ProductSpec is not for every act of building. It is for consequential software work where intent needs to survive handoff.
+
+For an individual builder, a Product Spec is useful when the work is complex, risky, long-lived, or being handed to an AI agent loop. For quick experiments, one-off scripts, or throwaway prototypes, it may be faster to brainstorm, build, and iterate directly.
+
+For a team or organization, ProductSpec is most useful when coordination cost appears: multiple people, multiple agents, design and engineering handoffs, customer-facing launches, AI features with evals, or decisions that will need to be revisited later.
+
 ## Where This Sits
 
 ProductSpec operates at the software intent layer: the what and why that come before engineering specs are written. This is where a team commits to the problem, hypothesis, scope, user experience, acceptance criteria, and success metrics.

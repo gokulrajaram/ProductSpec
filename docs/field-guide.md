@@ -4,6 +4,8 @@ This guide explains the ProductSpec section vocabulary at the right altitude for
 
 It defines what each field is for, what belongs there, what does not belong there, and how adjacent fields differ. It is intentionally lighter than a reviewer rubric: ProductSpec defines interoperable structure, not taste.
 
+ProductSpec is not for every act of building. It is for consequential software work where intent needs to survive handoff. Individual builders may not need a Product Spec for quick experiments or throwaway prototypes. Teams and organizations benefit most when multiple people, multiple agents, or future reviewers need a shared record of what should be built and why.
+
 ## Problem
 
 **What it is:** the named user or group, the pain they experience, and why the pain matters.
@@ -206,4 +208,3 @@ Optional sections add depth when the work needs it. They are not required for ev
 - `ai`: deeper AI behavior contract, examples, risks, red-team cases, and fallback behavior.
 - `open_questions`: unresolved decisions, owners, and next learning steps.
 - `rollout`: exposure, segment, duration, and what learning closes the loop.
-
