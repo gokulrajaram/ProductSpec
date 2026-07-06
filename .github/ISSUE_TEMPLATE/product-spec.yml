@@ -1,0 +1,69 @@
+name: Product Spec
+description: Propose consequential software work using the ProductSpec format.
+title: "Product Spec: "
+labels:
+  - product-spec
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Product Spec title
+      placeholder: "Searchable transcript citations"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Who is hurting, what pain do they feel, and why does it matter?
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: What behavior will change if this ships, and why?
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Include what is in, what is out, and what is deliberately cut from this version.
+      render: markdown
+      placeholder: |
+        In:
+        Out:
+        Cut from this version:
+    validations:
+      required: true
+  - type: input
+    id: user_experience
+    attributes:
+      label: User Experience
+      description: Optional prototype, mockup, API docs, CLI demo, dashboard, or workflow link.
+      placeholder: "https://..."
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Pass/fail build checks before launch. AI eval thresholds belong here.
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: success_metrics
+    attributes:
+      label: Success Metrics
+      description: Real-user or business outcomes after launch.
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: links
+    attributes:
+      label: Related links
+      description: Link designs, issues, PRs, data, customer evidence, or engineering specs.
+      render: markdown

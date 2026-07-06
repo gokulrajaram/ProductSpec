@@ -113,6 +113,7 @@ ProductSpec -> Engineering Spec -> Tasks -> Code -> Evaluation -> Learning
 - `docs/why-productspec.md`: why the intent layer needs its own artifact.
 - `docs/adoption.md`: how teams can adopt ProductSpec across Git, Jira, Linear, Figma, CI, engineering specs, and agents.
 - `docs/handoff-example.md`: how ProductSpec interacts with Jira, Figma, Git, OpenSpec, Spec Kit, and coding agents.
+- `docs/end-to-end-handoff.md`: a concrete walkthrough from Product Spec to issue, design, engineering spec, agent loop, pull request, and launch learning.
 - `docs/vision.md`: the public vision for ProductSpec as the intent layer.
 - `docs/validator.md`: validator error and warning codes.
 - `docs/validate-your-first-product-spec.md`: the fastest local validation path.
@@ -122,6 +123,7 @@ ProductSpec -> Engineering Spec -> Tasks -> Code -> Evaluation -> Learning
 - `schema/product-spec.schema.json`: JSON Schema for parsed Product Spec documents.
 - `schema/review-annotation.schema.json`: JSON Schema for portable review annotations.
 - `conformance/*`: valid and invalid fixtures for implementers.
+- `examples/README.md`: guide to choosing the right example.
 - `examples/*.product-spec.md`: minimal and expanded examples.
 - `parsers/ts`: TypeScript reference parser, validator, and CLI.
 
