@@ -136,6 +136,8 @@ ProductSpec -> Engineering Spec -> Tasks -> Code -> Evaluation -> Learning
 - `CONTRIBUTING.md`: how to propose examples, validator changes, and section vocabulary changes.
 - `ROADMAP.md`: the planned path from v0.1 to a stable semantic model.
 - `docs/why-productspec.md`: why the intent layer needs its own artifact.
+- `docs/faq.md`: answers to common ProductSpec adoption questions.
+- `docs/use-in-your-repo.md`: copy-paste setup for using ProductSpec in an existing repository.
 - `docs/adoption.md`: how teams can adopt ProductSpec across Git, Jira, Linear, Figma, CI, engineering specs, and agents.
 - `docs/handoff-example.md`: how ProductSpec interacts with Jira, Figma, Git, OpenSpec, Spec Kit, and coding agents.
 - `docs/end-to-end-handoff.md`: a concrete walkthrough from Product Spec to issue, design, engineering spec, agent loop, pull request, and launch learning.
