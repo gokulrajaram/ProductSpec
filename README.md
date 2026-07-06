@@ -17,6 +17,23 @@ what / why      how / plan / tasks   implementation   outcome
 
 ProductSpec is neutral. It defines structure, section IDs, portable review annotations, calibration-example serialization, and eventually portable decision traces. It does not define what makes a Product Spec good.
 
+## Living Specs
+
+Product Specs are living documents. They should change when evidence, scope, design, acceptance criteria, or success metrics change.
+
+`spec_revision` gives each meaningful revision a portable handle:
+
+```yaml
+spec_format_version: "0.1" # ProductSpec standard version
+spec_revision: 1           # initial product intent
+spec_revision: 2           # scope changed after design review
+spec_revision: 3           # acceptance criteria updated before implementation
+```
+
+Git keeps the detailed history. `spec_revision` lets people and tools cite the intent revision they are using: a Jira ticket, an engineering spec, an AI agent loop, a pull request, or a future decision trace.
+
+See `examples/revisions/` for a Product Spec that evolves from revision 1 to revision 2.
+
 ## Quick Start
 
 Validate a Product Spec with the published CLI:

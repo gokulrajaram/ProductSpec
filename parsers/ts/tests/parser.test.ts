@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -426,14 +426,24 @@ Keep this around.
 
   it("keeps every example valid", () => {
     const exampleDir = `${root}/examples`;
-    const examples = readdirSync(exampleDir).filter((file) => file.endsWith(".product-spec.md"));
+    const examples = productSpecFiles(exampleDir);
 
-    expect(examples).toContain("minimal.product-spec.md");
+    expect(examples).toContain(`${exampleDir}/minimal.product-spec.md`);
+    expect(examples).toContain(`${exampleDir}/revisions/support-triage-v1.product-spec.md`);
+    expect(examples).toContain(`${exampleDir}/revisions/support-triage-v2.product-spec.md`);
     expect(examples.length).toBeGreaterThanOrEqual(5);
 
     for (const example of examples) {
-      const result = validateProductSpecMarkdown(readFileSync(`${exampleDir}/${example}`, "utf8"));
+      const result = validateProductSpecMarkdown(readFileSync(example, "utf8"));
       expect(result.valid, example).toBe(true);
     }
   });
 });
+
+function productSpecFiles(directory: string): string[] {
+  const entries = readdirSync(directory).map((entry) => `${directory}/${entry}`);
+  return entries.flatMap((entry) => {
+    if (statSync(entry).isDirectory()) return productSpecFiles(entry);
+    return entry.endsWith(".product-spec.md") ? [entry] : [];
+  });
+}
