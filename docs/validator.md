@@ -8,6 +8,24 @@ npm exec --package @productspec/parser -- productspec validate path/to/file.prod
 
 The validator returns errors for structurally invalid Product Specs and warnings for weak-but-parseable specs.
 
+## Schema Parity
+
+`schema/product-spec.schema.json` mirrors the parser's structural contract where JSON Schema can express it:
+
+- required frontmatter fields
+- supported `artifact_type` values
+- canonical section IDs
+- `custom-<kebab-name>` section IDs
+- presence of mandatory sections
+
+Some parser behavior is intentionally outside the JSON Schema:
+
+- duplicate section IDs
+- required-section relative ordering
+- warning heuristics for empty or thin required sections
+
+Use the TypeScript validator as the reference implementation when behavior differs.
+
 ## Errors
 
 Errors fail validation.

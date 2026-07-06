@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { existsSync } from "node:fs";
 import {
+  CANONICAL_SECTION_IDS,
+  MANDATORY_SECTION_IDS,
   parseProductSpecMarkdown,
   serializeProductSpecMarkdown,
   validateProductSpecMarkdown
@@ -104,6 +106,31 @@ In: CSV upload and row-level error responses.
       expect(result.valid, fixture).toBe(false);
       if (!result.valid) expect(result.errors.map((error) => error.code)).toContain(code);
     }
+  });
+
+  it("keeps the JSON Schema aligned with parser section rules", () => {
+    const schema = JSON.parse(readFileSync(`${root}/schema/product-spec.schema.json`, "utf8"));
+    const sectionIdSchema = schema.properties.sections.items.properties.id;
+
+    expect(sectionIdSchema.anyOf[0].enum).toEqual(CANONICAL_SECTION_IDS);
+    expect(sectionIdSchema.anyOf[1].pattern).toBe("^custom-[a-z0-9]+(-[a-z0-9]+)*$");
+
+    const requiredSectionIds = schema.properties.sections.allOf.map(
+      (rule: { contains: { properties: { id: { const: string } } } }) => rule.contains.properties.id.const
+    );
+    expect(requiredSectionIds).toEqual(MANDATORY_SECTION_IDS);
+
+    expect(schema.properties.frontmatter.required).toEqual([
+      "spec_format_version",
+      "title",
+      "artifact_type",
+      "author",
+      "created_at",
+      "updated_at"
+    ]);
+    expect(schema.properties.frontmatter.properties.custom_sections.items.properties.id.pattern).toBe(
+      "^custom-[a-z0-9]+(-[a-z0-9]+)*$"
+    );
   });
 
   it("warns when required sections are present but too thin", () => {

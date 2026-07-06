@@ -35,28 +35,71 @@
     },
     "sections": {
       "type": "array",
+      "minItems": 5,
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "properties": { "id": { "const": "problem" } },
+            "required": ["id"]
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": { "id": { "const": "hypothesis" } },
+            "required": ["id"]
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": { "id": { "const": "scope" } },
+            "required": ["id"]
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": { "id": { "const": "acceptance_criteria" } },
+            "required": ["id"]
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": { "id": { "const": "success_metrics" } },
+            "required": ["id"]
+          }
+        }
+      ],
       "items": {
         "type": "object",
         "required": ["id", "label", "content"],
         "properties": {
           "id": {
-            "enum": [
-              "problem",
-              "hypothesis",
-              "scope",
-              "user_experience",
-              "acceptance_criteria",
-              "success_metrics",
-              "customer_truth",
-              "solution_alternatives",
-              "solution",
-              "strategic_positioning",
-              "adoption",
-              "pricing",
-              "risks",
-              "ai",
-              "open_questions",
-              "rollout"
+            "anyOf": [
+              {
+                "enum": [
+                  "problem",
+                  "hypothesis",
+                  "scope",
+                  "acceptance_criteria",
+                  "success_metrics",
+                  "user_experience",
+                  "customer_truth",
+                  "solution_alternatives",
+                  "solution",
+                  "strategic_positioning",
+                  "adoption",
+                  "pricing",
+                  "risks",
+                  "ai",
+                  "open_questions",
+                  "rollout"
+                ]
+              },
+              { "type": "string", "pattern": "^custom-[a-z0-9]+(-[a-z0-9]+)*$" }
             ]
           },
           "label": { "type": "string", "minLength": 1 },

@@ -77,6 +77,7 @@ ProductSpec -> Engineering Spec -> Tasks -> Code -> Evaluation -> Learning
 - `CONTRIBUTING.md`: how to propose examples, validator changes, and section vocabulary changes.
 - `ROADMAP.md`: the planned path from v0.1 to a stable semantic model.
 - `docs/why-productspec.md`: why the intent layer needs its own artifact.
+- `docs/adoption.md`: how teams can adopt ProductSpec across Git, Jira, Linear, Figma, CI, engineering specs, and agents.
 - `docs/handoff-example.md`: how ProductSpec interacts with Jira, Figma, Git, OpenSpec, Spec Kit, and coding agents.
 - `docs/vision.md`: the public vision for ProductSpec as the intent layer.
 - `docs/validator.md`: validator error and warning codes.
@@ -150,3 +151,5 @@ After linking, `productspec validate examples/minimal.product-spec.md` works if 
 global binary directory is on `PATH`.
 
 See `docs/validate-your-first-product-spec.md` for the first-run path and current validator checks.
+
+See `docs/adoption.md` for a practical team setup across Git, Jira, Linear, Figma, CI, engineering specs, and AI coding agents.
