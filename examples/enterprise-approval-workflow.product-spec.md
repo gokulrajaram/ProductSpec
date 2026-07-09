@@ -43,29 +43,37 @@ https://example.com/contract-approval-flow
 
 ## Acceptance Criteria
 
-- A sales rep can submit an approval request with account, opportunity, requested discount, close date, and reason.
-- The system routes requests to the configured approver chain based on discount band.
-- Approvers can approve, reject, or request changes with a required comment.
-- SLA timers pause while the request is waiting on the sales rep for changes.
-- Escalation email sends to the approver's manager when an approval is more than 24 business hours overdue.
-- Approval history export includes every actor, action, timestamp, and comment.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: A sales rep can submit an approval request with account, opportunity, requested discount, close date, and reason.
+- id: AC-2
+  criterion: The system routes requests to the configured approver chain based on discount band.
+- id: AC-3
+  criterion: Approvers can approve, reject, or request changes with a required comment.
+- id: AC-4
+  criterion: SLA timers pause while the request is waiting on the sales rep for changes.
+- id: AC-5
+  criterion: Escalation email sends to the approver's manager when an approval is more than 24 business hours overdue.
+- id: AC-6
+  criterion: Approval history export includes every actor, action, timestamp, and comment.
+```
 
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: approval_cycle_time
+- id: SM-1
   metric: median_approval_cycle_time
   target: "< 24 business hours"
   window: monthly
-- id: next_owner_visibility_rate
+- id: SM-2
   metric: visible_next_owner_rate
   target: ">= 90%"
   window: within 5 minutes of submission
-- id: ownership_delay_rate
+- id: SM-3
   metric: approval_ownership_delay_rate
   target: "< 5%"
   window: monthly
-- id: manual_chasing_time_reduction
+- id: SM-4
   metric: sales_ops_manual_status_chasing_time_reduction
   target: ">= 40%"
   window: monthly

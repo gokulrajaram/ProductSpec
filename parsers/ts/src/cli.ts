@@ -32,11 +32,19 @@ Cut from this version: what is tempting but deliberately deferred.
 
 ## Acceptance Criteria
 
-- Given the intended user or system state, when the core action happens, then the expected result occurs.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: Given the intended user or system state, when the core action happens, then the expected result occurs.
+\`\`\`
 
 ## Success Metrics
 
-- What real-world user or business outcome would make this worth continuing?
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: meaningful_outcome
+  target: ">= target threshold"
+  window: measurement window
+\`\`\`
 `;
 
 if (command === "init" && filePath) {

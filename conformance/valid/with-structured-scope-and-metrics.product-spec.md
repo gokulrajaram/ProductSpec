@@ -30,12 +30,15 @@ cut:
 
 ## Acceptance Criteria
 
-- User can search one transcript by phrase.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search one transcript by phrase.
+```
 
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: quote_copy_rate
+- id: SM-1
   metric: copied_timestamped_quote_rate
   target: ">= 35%"
   window: within 7 days of transcript creation

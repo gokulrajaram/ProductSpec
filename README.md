@@ -114,8 +114,15 @@ cut:
 
 ## Acceptance Criteria
 
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: New tickets receive urgency, customer tier, suggested owner, confidence score, and model version within 60 seconds.
+- id: AC-2
+  criterion: Reviewers can override any label before it changes downstream workflow state.
+```
+
 ```productspec-ai-evals
-- id: account_risk_urgency
+- id: EVAL-1
   type: rubric
   cases:
     - input: "Representative input for this eval."
@@ -129,7 +136,7 @@ cut:
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: account_risk_response_time
+- id: SM-1
   metric: median_time_to_first_human_response
   target: "< 15 minutes"
   window: business hours
@@ -194,6 +201,8 @@ Current repo artifacts:
 - Valid and invalid conformance fixtures.
 - GitHub issue and pull request templates.
 - Examples for AI features, consumer UX, enterprise workflows, internal APIs, and revision history.
+
+Durable IDs are generated for the top-level items that tools execute or compare: `AC-1` for Acceptance Criteria, `SM-1` for Success Metrics, and `EVAL-1` for AI evals. Scope bullets, eval cases, eval checks, and prose/custom sections remain un-IDed. Tools that need to cite eval children should use positional references like `EVAL-1.case[2]`.
 
 Natural integration points:
 

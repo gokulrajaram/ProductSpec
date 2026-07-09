@@ -39,19 +39,25 @@ https://example.com/calendar-reminder-prototype
 
 ## Acceptance Criteria
 
-- Users can connect Google Calendar.
-- Users can mark meetings as high priority.
-- High-priority reminders send SMS 5 minutes before the meeting.
-- Users can disable SMS reminders at any time.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: Users can connect Google Calendar.
+- id: AC-2
+  criterion: Users can mark meetings as high priority.
+- id: AC-3
+  criterion: High-priority reminders send SMS 5 minutes before the meeting.
+- id: AC-4
+  criterion: Users can disable SMS reminders at any time.
+```
 
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: high_priority_reminder_setup_rate
+- id: SM-1
   metric: activated_user_high_priority_reminder_setup_rate
   target: ">= 50%"
   window: within 7 days of activation
-- id: missed_call_report_reduction
+- id: SM-2
   metric: missed_call_self_report_reduction
   target: ">= 25%"
   window: monthly

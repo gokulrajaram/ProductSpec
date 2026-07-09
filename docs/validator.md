@@ -92,7 +92,20 @@ Required fields:
 - `cases`
 - `checks`
 
-Fix: place the block inside Acceptance Criteria, include every required field, set `pass_threshold` to a number greater than `0` and less than or equal to `1`, include at least one inline case with `input` and `expected`, and include at least one check.
+Fix: place the block inside Acceptance Criteria, include every required field, use an ID in the form `EVAL-<number>`, set `pass_threshold` to a number greater than `0` and less than or equal to `1`, include at least one inline case with `input` and `expected`, and include at least one check.
+
+Eval cases and checks do not have their own IDs. If a tool needs to cite them, use positional references such as `EVAL-1.case[2]` or `EVAL-1.check[1]`.
+
+### `invalid_acceptance_criterion`
+
+A `productspec-acceptance-criteria` block is malformed, incomplete, missing from Acceptance Criteria, or placed outside Acceptance Criteria.
+
+Required fields:
+
+- `id`
+- `criterion`
+
+Fix: place the block inside Acceptance Criteria, include at least one item, include every required field, and use an ID in the form `AC-<number>`.
 
 ### `invalid_structured_scope`
 
@@ -108,7 +121,7 @@ Fix: place the block inside Scope, use only supported fields, and include at lea
 
 ### `invalid_success_metric`
 
-A `productspec-success-metrics` block is malformed or incomplete.
+A `productspec-success-metrics` block is malformed, incomplete, missing from Success Metrics, or placed outside Success Metrics.
 
 Required fields:
 
@@ -117,7 +130,7 @@ Required fields:
 - `target`
 - `window`
 
-Fix: place the block inside Success Metrics, include every required field, and use snake_case for `id`.
+Fix: place the block inside Success Metrics, include at least one item, include every required field, and use an ID in the form `SM-<number>`.
 
 ### `missing_required_section`
 

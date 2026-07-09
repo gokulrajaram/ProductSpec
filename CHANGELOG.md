@@ -10,6 +10,13 @@ Added:
 - ProductSpec comparison guide.
 - Repo starter kit for teams storing Product Specs beside code.
 - Additional examples for AI-agent handoff and platform migration work.
+- Structured `productspec-acceptance-criteria` blocks with generated durable `AC-<number>` IDs.
+- Generated durable IDs for structured Success Metrics (`SM-<number>`) and AI evals (`EVAL-<number>`).
+
+Changed:
+
+- Acceptance Criteria and Success Metrics are now represented as structured blocks in valid fixtures and examples.
+- Eval cases and checks remain un-IDed; tools should cite them positionally when needed.
 
 ## v0.7.0 - Decision Trace
 

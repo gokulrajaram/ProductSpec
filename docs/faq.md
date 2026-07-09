@@ -35,6 +35,8 @@ Acceptance Criteria are the build contract: what must be true before launch. Suc
 
 When an AI eval should be parsed by tools, write it as a fenced `productspec-ai-evals` block inside Acceptance Criteria. Keep post-launch usage, retention, revenue, or quality outcomes in Success Metrics.
 
+Acceptance Criteria, Success Metrics, and AI evals get durable generated IDs (`AC-1`, `SM-1`, `EVAL-1`) because downstream tools may cite them. Eval cases and checks stay un-IDed; cite them positionally if needed.
+
 ## What is `spec_revision`?
 
 `spec_revision` is an optional positive integer in frontmatter:

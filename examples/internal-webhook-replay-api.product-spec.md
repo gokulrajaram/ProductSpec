@@ -39,29 +39,37 @@ cut:
 
 ## Acceptance Criteria
 
-- Given a support engineer with `webhook_replay` permission, when they call the replay endpoint with a failed webhook event ID, the system enqueues exactly one replay job.
-- Given a user without `webhook_replay` permission, the endpoint returns `403` and does not enqueue a replay job.
-- Given an event that has already been replayed in the last 10 minutes, the endpoint returns the existing replay job ID instead of creating a duplicate job.
-- Given an event older than 30 days, the endpoint returns a clear `event_not_replayable` error.
-- Every replay attempt records actor ID, event ID, customer ID, replay job ID, timestamp, and result in the audit log.
-- API evals: on a fixture set covering success, permission failure, duplicate replay, expired event, and missing event, the endpoint returns the expected status code and machine-readable error code in 100% of cases.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: Given a support engineer with `webhook_replay` permission, when they call the replay endpoint with a failed webhook event ID, the system enqueues exactly one replay job.
+- id: AC-2
+  criterion: Given a user without `webhook_replay` permission, the endpoint returns `403` and does not enqueue a replay job.
+- id: AC-3
+  criterion: Given an event that has already been replayed in the last 10 minutes, the endpoint returns the existing replay job ID instead of creating a duplicate job.
+- id: AC-4
+  criterion: Given an event older than 30 days, the endpoint returns a clear `event_not_replayable` error.
+- id: AC-5
+  criterion: Every replay attempt records actor ID, event ID, customer ID, replay job ID, timestamp, and result in the audit log.
+- id: AC-6
+  criterion: API evals: on a fixture set covering success, permission failure, duplicate replay, expired event, and missing event, the endpoint returns the expected status code and machine-readable error code in 100% of cases.
+```
 
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: escalation_to_replay_time
+- id: SM-1
   metric: median_time_from_customer_escalation_to_replay_attempt
   target: "< 10 minutes"
   window: monthly
-- id: no_infra_escalation_resolution_rate
+- id: SM-2
   metric: eligible_webhook_escalation_resolution_without_infra_rate
   target: ">= 70%"
   window: monthly
-- id: duplicate_replay_rate
+- id: SM-3
   metric: duplicate_replay_job_rate
   target: "< 0.5%"
   window: monthly
-- id: unaudited_replay_count
+- id: SM-4
   metric: unaudited_replay_attempt_count
   target: "0"
   window: monthly

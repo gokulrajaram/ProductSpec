@@ -50,11 +50,19 @@ In: CSV upload and row-level error responses.
 
 ## Acceptance Criteria
 
-- Valid CSV files create import jobs.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: Valid CSV files create import jobs.
+\`\`\`
 
 ## Success Metrics
 
-- 80% of imports complete without support contact.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: import_completion_without_support_contact
+  target: ">= 80%"
+  window: per import
+\`\`\`
 `;
 
     const parsed = parseProductSpecMarkdown(markdown);
@@ -93,11 +101,19 @@ In: optional positive integer revision in frontmatter.
 
 ## Acceptance Criteria
 
-- Parser exposes spec revision as a number.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: Parser exposes spec revision as a number.
+\`\`\`
 
 ## Success Metrics
 
-- Engineering handoffs can name the Product Spec revision they implement.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: handoffs_with_named_spec_revision
+  target: ">= 90%"
+  window: per engineering handoff
+\`\`\`
 `;
 
     const parsed = parseProductSpecMarkdown(markdown);
@@ -132,10 +148,13 @@ In: transcript search, timestamp citations, and quote copy.
 
 ## Acceptance Criteria
 
-- User can search a transcript by phrase.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search a transcript by phrase.
+\`\`\`
 
 \`\`\`productspec-ai-evals
-- id: quote_relevance
+- id: EVAL-1
   type: rubric
   evaluator: llm_judge
   pass_threshold: 0.85
@@ -149,15 +168,26 @@ In: transcript search, timestamp citations, and quote copy.
 
 ## Success Metrics
 
-- 40% of weekly active researchers copy at least one timestamped quote.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: weekly_active_researchers_copying_timestamped_quote
+  target: ">= 40%"
+  window: weekly
+\`\`\`
 `;
 
     const parsed = parseProductSpecMarkdown(markdown);
     const acceptanceCriteria = parsed.sections.find((section) => section.id === "acceptance_criteria");
 
+    expect(acceptanceCriteria?.acceptance_criteria).toEqual([
+      {
+        id: "AC-1",
+        criterion: "User can search a transcript by phrase."
+      }
+    ]);
     expect(acceptanceCriteria?.ai_evals).toEqual([
       {
-        id: "quote_relevance",
+        id: "EVAL-1",
         type: "rubric",
         evaluator: "llm_judge",
         pass_threshold: 0.85,
@@ -197,19 +227,88 @@ In: transcript search, timestamp citations, and quote copy.
 
 ## Acceptance Criteria
 
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search one transcript by phrase.
+\`\`\`
+
 \`\`\`productspec-ai-evals
-- id: quote_relevance
+- id: EVAL-1
   type: rubric
   pass_threshold: 0.85
 \`\`\`
 
 ## Success Metrics
 
-- 40% of weekly active researchers copy at least one timestamped quote.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: weekly_active_researchers_copying_timestamped_quote
+  target: ">= 40%"
+  window: weekly
+\`\`\`
 `);
 
     expect(result.valid).toBe(false);
     if (!result.valid) expect(result.errors.map((error) => error.code)).toContain("invalid_ai_eval");
+  });
+
+  it("rejects semantic parent IDs and child IDs in AI evals", () => {
+    const result = validateProductSpecMarkdown(`---
+spec_format_version: "0.1"
+title: "Invalid AI Eval IDs"
+artifact_type: "prd"
+author: "ProductSpec"
+created_at: "2026-07-05T00:00:00Z"
+updated_at: "2026-07-05T00:00:00Z"
+---
+
+## Problem
+
+Researchers lose time finding exact quotes in long video transcripts.
+
+## Hypothesis
+
+If quote search returns cited transcript passages, researchers will trust the transcript as a source.
+
+## Scope
+
+In: transcript search, timestamp citations, and quote copy.
+
+## Acceptance Criteria
+
+\`\`\`productspec-acceptance-criteria
+- id: search_works
+  criterion: User can search one transcript by phrase.
+\`\`\`
+
+\`\`\`productspec-ai-evals
+- id: quote_relevance
+  type: rubric
+  evaluator: llm_judge
+  pass_threshold: 0.85
+  cases:
+    - input: "Find the passage where the speaker defines activation."
+      expected: "Returns the relevant timestamped transcript passage."
+  checks:
+    - id: check-1
+\`\`\`
+
+## Success Metrics
+
+\`\`\`productspec-success-metrics
+- id: quote_copy_rate
+  metric: weekly_active_researchers_copying_timestamped_quote
+  target: ">= 40%"
+  window: weekly
+\`\`\`
+`);
+
+    expect(result.valid).toBe(false);
+    if (!result.valid) {
+      expect(result.errors.map((error) => error.code)).toContain("invalid_acceptance_criterion");
+      expect(result.errors.map((error) => error.code)).toContain("invalid_ai_eval");
+      expect(result.errors.map((error) => error.code)).toContain("invalid_success_metric");
+    }
   });
 
   it("extracts structured scope and success metrics", () => {
@@ -244,12 +343,15 @@ cut:
 
 ## Acceptance Criteria
 
-- User can search one transcript by phrase.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search one transcript by phrase.
+\`\`\`
 
 ## Success Metrics
 
 \`\`\`productspec-success-metrics
-- id: quote_copy_rate
+- id: SM-1
   metric: copied_timestamped_quote_rate
   target: ">= 35%"
   window: within 7 days of transcript creation
@@ -267,7 +369,7 @@ cut:
     });
     expect(successMetrics?.success_metrics).toEqual([
       {
-        id: "quote_copy_rate",
+        id: "SM-1",
         metric: "copied_timestamped_quote_rate",
         target: ">= 35%",
         window: "within 7 days of transcript creation"
@@ -303,11 +405,19 @@ maybe:
 
 ## Acceptance Criteria
 
-- User can search one transcript by phrase.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search one transcript by phrase.
+\`\`\`
 
 ## Success Metrics
 
-- 35% copy a timestamped quote.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: copied_timestamped_quote_rate
+  target: ">= 35%"
+  window: within 7 days of transcript creation
+\`\`\`
 `);
     expect(malformedScope.valid).toBe(false);
     if (!malformedScope.valid) {
@@ -337,12 +447,15 @@ In: transcript search.
 
 ## Acceptance Criteria
 
-- User can search one transcript by phrase.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search one transcript by phrase.
+\`\`\`
 
 ## Success Metrics
 
 \`\`\`productspec-success-metrics
-- id: quote_copy_rate
+- id: SM-1
   metric: copied_timestamped_quote_rate
   target: ">= 35%"
 \`\`\`
@@ -375,12 +488,15 @@ In: transcript search.
 
 ## Acceptance Criteria
 
-- User can search one transcript by phrase.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search one transcript by phrase.
+\`\`\`
 
 ## Success Metrics
 
 \`\`\`productspec-success-metrics
-- id: quote_copy_rate
+- id: SM-1
   metric: copied_timestamped_quote_rate
   target: ">= 35%"
   window: within 7 days of transcript creation
@@ -467,6 +583,13 @@ In: transcript search.
       minimum: 1
     });
     expect(schema.properties.sections.items.properties.scope.required).toEqual(["in", "out", "cut"]);
+    expect(schema.properties.sections.items.properties.acceptance_criteria.items.required).toEqual([
+      "id",
+      "criterion"
+    ]);
+    expect(schema.properties.sections.items.properties.acceptance_criteria.items.properties.id.pattern).toBe(
+      "^AC-[1-9][0-9]*$"
+    );
     expect(schema.properties.sections.items.properties.ai_evals.items.required).toEqual([
       "id",
       "type",
@@ -475,12 +598,18 @@ In: transcript search.
       "cases",
       "checks"
     ]);
+    expect(schema.properties.sections.items.properties.ai_evals.items.properties.id.pattern).toBe(
+      "^EVAL-[1-9][0-9]*$"
+    );
     expect(schema.properties.sections.items.properties.success_metrics.items.required).toEqual([
       "id",
       "metric",
       "target",
       "window"
     ]);
+    expect(schema.properties.sections.items.properties.success_metrics.items.properties.id.pattern).toBe(
+      "^SM-[1-9][0-9]*$"
+    );
   });
 
   it("ships Decision Trace as an optional companion standard", () => {
@@ -546,11 +675,19 @@ In: optional positive integer revision in frontmatter.
 
 ## Acceptance Criteria
 
-- Parser exposes spec revision as a number.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: Parser exposes spec revision as a number.
+\`\`\`
 
 ## Success Metrics
 
-- Engineering handoffs can name the Product Spec revision they implement.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: handoffs_with_named_spec_revision
+  target: ">= 90%"
+  window: per engineering handoff
+\`\`\`
 `);
 
     expect(result.valid).toBe(false);
@@ -581,11 +718,19 @@ In: onboarding.
 
 ## Acceptance Criteria
 
-- Users can finish onboarding.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: Users can finish onboarding.
+\`\`\`
 
 ## Success Metrics
 
-Activation rises.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: activation_rate
+  target: ">= 10% lift"
+  window: within 14 days
+\`\`\`
 `;
 
     const result = validateProductSpecMarkdown(markdown);
@@ -625,11 +770,19 @@ In: CSV upload and row-level errors.
 
 ## Acceptance Criteria
 
-- Valid CSV files create import jobs.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: Valid CSV files create import jobs.
+\`\`\`
 
 ## Success Metrics
 
-- 80% of imports complete without support contact.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: imports_without_support_contact
+  target: ">= 80%"
+  window: per import
+\`\`\`
 `);
     expect(duplicate.valid).toBe(false);
     if (!duplicate.valid) expect(duplicate.errors.map((error) => error.code)).toContain("duplicate_section");
@@ -657,11 +810,19 @@ If imports expose a clear upload path, teams will trust onboarding.
 
 ## Acceptance Criteria
 
-- Valid CSV files create import jobs.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: Valid CSV files create import jobs.
+\`\`\`
 
 ## Success Metrics
 
-- 80% of imports complete without support contact.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: imports_without_support_contact
+  target: ">= 80%"
+  window: per import
+\`\`\`
 `);
     expect(outOfOrder.valid).toBe(false);
     if (!outOfOrder.valid) expect(outOfOrder.errors.map((error) => error.code)).toContain("invalid_section_order");
@@ -693,11 +854,19 @@ In: CSV upload and row-level errors.
 
 ## Acceptance Criteria
 
-- Valid CSV files create import jobs.
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: Valid CSV files create import jobs.
+\`\`\`
 
 ## Success Metrics
 
-- 80% of imports complete without support contact.
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: imports_without_support_contact
+  target: ">= 80%"
+  window: per import
+\`\`\`
 
 ## Notes
 

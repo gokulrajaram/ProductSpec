@@ -44,13 +44,19 @@ https://example.com/support-triage-dashboard
 
 ## Acceptance Criteria
 
-- New tickets receive urgency, customer tier, suggested owner, confidence score, and model version within 60 seconds.
-- Reviewers can override any label before it changes downstream workflow state.
-- Labels below 0.75 confidence are marked `needs_review` and do not trigger escalation.
-- Every AI-generated label stores ticket ID, model version, input redaction status, confidence, reviewer action, and timestamp.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: New tickets receive urgency, customer tier, suggested owner, confidence score, and model version within 60 seconds.
+- id: AC-2
+  criterion: Reviewers can override any label before it changes downstream workflow state.
+- id: AC-3
+  criterion: Labels below 0.75 confidence are marked `needs_review` and do not trigger escalation.
+- id: AC-4
+  criterion: Every AI-generated label stores ticket ID, model version, input redaction status, confidence, reviewer action, and timestamp.
+```
 
 ```productspec-ai-evals
-- id: account_risk_urgency
+- id: EVAL-1
   type: rubric
   cases:
     - input: "Representative input for this eval."
@@ -66,19 +72,19 @@ https://example.com/support-triage-dashboard
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: account_risk_response_time
+- id: SM-1
   metric: median_time_to_first_human_response
   target: "< 15 minutes"
   window: business hours
-- id: suggested_owner_review_rate
+- id: SM-2
   metric: suggested_owner_review_rate
   target: ">= 80%"
   window: weekly
-- id: false_escalation_rate
+- id: SM-3
   metric: false_account_risk_escalation_rate
   target: "< 5%"
   window: weekly
-- id: queue_sorting_time_reduction
+- id: SM-4
   metric: support_lead_queue_sorting_time_reduction
   target: ">= 50%"
   window: weekly

@@ -39,14 +39,21 @@ https://example.com/saved-search-alerts-prototype
 
 ## Acceptance Criteria
 
-- Users can save the current query from the transcript search results page.
-- Saved searches appear in account settings with created date, last run date, and unsubscribe control.
-- The weekly alert includes matching video title, passage excerpt, timestamp link, and query text.
-- Unsubscribed searches stop sending alerts within one hour.
-- The implementation pull request links back to this Product Spec revision.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: Users can save the current query from the transcript search results page.
+- id: AC-2
+  criterion: Saved searches appear in account settings with created date, last run date, and unsubscribe control.
+- id: AC-3
+  criterion: The weekly alert includes matching video title, passage excerpt, timestamp link, and query text.
+- id: AC-4
+  criterion: Unsubscribed searches stop sending alerts within one hour.
+- id: AC-5
+  criterion: The implementation pull request links back to this Product Spec revision.
+```
 
 ```productspec-ai-evals
-- id: passage_match_quality
+- id: EVAL-1
   type: rubric
   cases:
     - input: "Representative input for this eval."
@@ -62,11 +69,11 @@ https://example.com/saved-search-alerts-prototype
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: alert_return_rate
+- id: SM-1
   metric: weekly_alert_clickthrough_rate
   target: ">= 18%"
   window: first 4 weeks after saved search creation
-- id: repeat_search_reduction
+- id: SM-2
   metric: repeated_manual_search_rate
   target: "<= 60% of baseline"
   window: 30 days after launch

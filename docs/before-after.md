@@ -64,12 +64,17 @@ cut:
 
 ## Acceptance Criteria
 
-- Every ingested ticket receives urgency, customer tier, likely owner, confidence score, and rationale fields.
-- Low-confidence classifications require human review before they affect queue priority.
-- Reviewer overrides are written to the audit log.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: Every ingested ticket receives urgency, customer tier, likely owner, confidence score, and rationale fields.
+- id: AC-2
+  criterion: Low-confidence classifications require human review before they affect queue priority.
+- id: AC-3
+  criterion: Reviewer overrides are written to the audit log.
+```
 
 ```productspec-ai-evals
-- id: account_risk_urgency
+- id: EVAL-1
   type: rubric
   cases:
     - input: "Representative input for this eval."
@@ -84,7 +89,7 @@ cut:
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: account_risk_response_time
+- id: SM-1
   metric: median_time_to_first_human_response
   target: "< 15 minutes"
   window: business hours

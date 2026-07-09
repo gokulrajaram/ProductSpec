@@ -46,13 +46,19 @@ https://example.com/transcript-search-prototype
 
 ## Acceptance Criteria
 
-- Public YouTube URLs create transcript pages or return actionable errors.
-- Transcript pages show video metadata, search, timestamped passages, and copy controls.
-- Search highlights matching transcript text.
-- Copied passages include source URL and timestamp.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: Public YouTube URLs create transcript pages or return actionable errors.
+- id: AC-2
+  criterion: Transcript pages show video metadata, search, timestamped passages, and copy controls.
+- id: AC-3
+  criterion: Search highlights matching transcript text.
+- id: AC-4
+  criterion: Copied passages include source URL and timestamp.
+```
 
 ```productspec-ai-evals
-- id: quote_grounding
+- id: EVAL-1
   type: rubric
   cases:
     - input: "Representative input for this eval."
@@ -67,15 +73,15 @@ https://example.com/transcript-search-prototype
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: first_session_search_rate
+- id: SM-1
   metric: first_session_transcript_search_rate
   target: ">= 60%"
   window: first session
-- id: timestamped_quote_copy_rate
+- id: SM-2
   metric: timestamped_quote_copy_rate
   target: ">= 35%"
   window: within 7 days of transcript creation
-- id: seven_day_return_rate
+- id: SM-3
   metric: seven_day_return_to_create_another_transcript_rate
   target: ">= 20%"
   window: within 7 days of first transcript creation

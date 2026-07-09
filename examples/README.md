@@ -2,7 +2,7 @@
 
 Start here if you want to see ProductSpec as a working artifact rather than a schema.
 
-`minimal.product-spec.md` stays plain Markdown by design. The richer examples use structured Scope, Success Metrics, and AI eval blocks where tools or agents benefit from parsed data.
+`minimal.product-spec.md` shows the smallest complete Product Spec. Richer examples add structured Scope, AI eval blocks, optional sections, and revision history.
 
 ## Which Example Should I Read?
 
@@ -24,8 +24,9 @@ Start here if you want to see ProductSpec as a working artifact rather than a sc
 
 - `problem` and `hypothesis` explain the product bet.
 - `scope` separates what ships now from what is deliberately excluded. Use `productspec-scope` when tools should parse it.
-- `acceptance_criteria` defines the build contract. For AI products, structured eval thresholds live here.
-- `success_metrics` defines the market contract after launch. Use `productspec-success-metrics` when tools should compare targets to outcomes.
+- `acceptance_criteria` defines the build contract and uses generated `AC-<number>` IDs.
+- `success_metrics` defines the market contract after launch and uses generated `SM-<number>` IDs.
+- AI evals use generated `EVAL-<number>` IDs; eval cases and checks stay un-IDed.
 - `user_experience` is optional and points to the externally observable experience when one exists.
 - `spec_revision` in frontmatter tracks the revision of this Product Spec's intent, separate from `spec_format_version`.
 

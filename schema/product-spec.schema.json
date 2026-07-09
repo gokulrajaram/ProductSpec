@@ -124,13 +124,27 @@
             },
             "additionalProperties": false
           },
+          "acceptance_criteria": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "criterion"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^AC-[1-9][0-9]*$" },
+                "criterion": { "type": "string", "minLength": 1 }
+              },
+              "additionalProperties": false
+            }
+          },
           "ai_evals": {
             "type": "array",
+            "minItems": 1,
             "items": {
               "type": "object",
               "required": ["id", "type", "evaluator", "pass_threshold", "cases", "checks"],
               "properties": {
-                "id": { "type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$" },
+                "id": { "type": "string", "pattern": "^EVAL-[1-9][0-9]*$" },
                 "type": { "type": "string", "minLength": 1 },
                 "evaluator": { "type": "string", "minLength": 1 },
                 "pass_threshold": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
@@ -158,11 +172,12 @@
           },
           "success_metrics": {
             "type": "array",
+            "minItems": 1,
             "items": {
               "type": "object",
               "required": ["id", "metric", "target", "window"],
               "properties": {
-                "id": { "type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$" },
+                "id": { "type": "string", "pattern": "^SM-[1-9][0-9]*$" },
                 "metric": { "type": "string", "minLength": 1 },
                 "target": { "type": "string", "minLength": 1 },
                 "window": { "type": "string", "minLength": 1 }

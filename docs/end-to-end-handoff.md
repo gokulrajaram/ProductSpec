@@ -86,11 +86,18 @@ Loop:
 
 Acceptance Criteria are the build contract:
 
-- Given a valid public YouTube URL, the user can create a transcript page.
-- Search returns matching transcript passages with timestamps.
-- Clicking a result jumps the video to the matching timestamp.
-- Copy passage copies transcript text plus URL and timestamp.
-- Empty, private, or unsupported videos return a clear error.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: Given a valid public YouTube URL, the user can create a transcript page.
+- id: AC-2
+  criterion: Search returns matching transcript passages with timestamps.
+- id: AC-3
+  criterion: Clicking a result jumps the video to the matching timestamp.
+- id: AC-4
+  criterion: Copy passage copies transcript text plus URL and timestamp.
+- id: AC-5
+  criterion: Empty, private, or unsupported videos return a clear error.
+```
 
 Success Metrics are not the agent's completion condition. They are measured after launch.
 
@@ -102,11 +109,11 @@ The pull request points back to the Product Spec:
 Implements specs/searchable-transcript-citations.product-spec.md.
 
 Acceptance criteria:
-- [x] Valid URL creates transcript page.
-- [x] Search returns timestamped passages.
-- [x] Result click jumps video.
-- [x] Copy passage includes URL and timestamp.
-- [x] Unsupported videos return clear errors.
+- [x] AC-1 Valid URL creates transcript page.
+- [x] AC-2 Search returns timestamped passages.
+- [x] AC-3 Result click jumps video.
+- [x] AC-4 Copy passage includes URL and timestamp.
+- [x] AC-5 Unsupported videos return clear errors.
 ```
 
 Code review can now ask whether the implementation still matches the original product intent, not only whether the code is correct.

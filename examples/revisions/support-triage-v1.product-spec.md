@@ -38,12 +38,17 @@ cut:
 
 ## Acceptance Criteria
 
-- New tickets receive urgency, suggested owner, confidence score, and model version within 60 seconds.
-- Reviewers can override any urgency label before it changes downstream workflow state.
-- Labels below 0.70 confidence are marked `needs_review` and do not trigger escalation.
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: New tickets receive urgency, suggested owner, confidence score, and model version within 60 seconds.
+- id: AC-2
+  criterion: Reviewers can override any urgency label before it changes downstream workflow state.
+- id: AC-3
+  criterion: Labels below 0.70 confidence are marked `needs_review` and do not trigger escalation.
+```
 
 ```productspec-ai-evals
-- id: urgent_ticket_precision
+- id: EVAL-1
   type: rubric
   cases:
     - input: "Representative input for this eval."
@@ -58,15 +63,15 @@ cut:
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: urgent_response_time
+- id: SM-1
   metric: median_time_to_first_human_response
   target: "< 30 minutes"
   window: business hours
-- id: suggested_owner_review_rate
+- id: SM-2
   metric: suggested_owner_review_rate
   target: ">= 60%"
   window: weekly
-- id: false_urgent_escalation_rate
+- id: SM-3
   metric: false_urgent_escalation_rate
   target: "< 8%"
   window: weekly

@@ -100,11 +100,27 @@ Structured scope supports:
 - `out`: what is explicitly outside this version.
 - `cut`: what was considered and deliberately removed.
 
-Structured success metrics may be included in `success_metrics` with a fenced `productspec-success-metrics` block:
+Acceptance criteria are written in `acceptance_criteria` with a fenced `productspec-acceptance-criteria` block:
+
+````markdown
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search a transcript by phrase and get timestamped results.
+- id: AC-2
+  criterion: Copy passage includes transcript text, video URL, and timestamp.
+```
+````
+
+Each acceptance criterion item requires:
+
+- `id`: generated durable identifier using `AC-<number>`.
+- `criterion`: pass/fail build condition before launch.
+
+Success metrics are written in `success_metrics` with a fenced `productspec-success-metrics` block:
 
 ````markdown
 ```productspec-success-metrics
-- id: quote_copy_rate
+- id: SM-1
   metric: copied_timestamped_quote_rate
   target: ">= 35%"
   window: within 7 days of transcript creation
@@ -113,18 +129,18 @@ Structured success metrics may be included in `success_metrics` with a fenced `p
 
 Each success metric item requires:
 
-- `id`: stable snake_case metric identifier.
+- `id`: generated durable identifier using `SM-<number>`.
 - `metric`: metric name.
 - `target`: threshold or target value.
 - `window`: time window for reading the metric.
 
 For products with AI features, AI eval thresholds belong in `acceptance_criteria`, not `success_metrics`. Success metrics are post-launch product and business outcomes. Acceptance criteria are pre-launch build gates.
 
-Structured AI evals may be included in `acceptance_criteria` with a fenced `productspec-ai-evals` block:
+Structured AI evals may also be included in `acceptance_criteria` with a fenced `productspec-ai-evals` block:
 
 ````markdown
 ```productspec-ai-evals
-- id: quote_relevance
+- id: EVAL-1
   type: rubric
   cases:
     - input: "Representative input for this eval."
@@ -140,14 +156,16 @@ Structured AI evals may be included in `acceptance_criteria` with a fenced `prod
 
 Each AI eval item requires:
 
-- `id`: stable snake_case eval identifier.
+- `id`: generated durable identifier using `EVAL-<number>`.
 - `type`: eval type, for example `rubric`, `deterministic`, `regression`, or `human_review`.
 - `cases`: one or more inline test cases, each with `input` and `expected`.
 - `evaluator`: evaluator name or mechanism.
 - `pass_threshold`: number greater than `0` and less than or equal to `1`.
 - `checks`: one or more pass/fail checks.
 
-Tools should preserve the fenced block in Markdown and may expose parsed evals as structured data.
+Eval cases and checks do not get standalone IDs. If a tool needs to cite them, it should use positional references such as `EVAL-1.case[2]` or `EVAL-1.check[1]`.
+
+Tools should preserve fenced blocks in Markdown and may expose parsed criteria, metrics, and evals as structured data.
 
 ## Custom Sections
 

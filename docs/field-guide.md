@@ -149,7 +149,7 @@ For AI products, use a structured eval block when the eval should be parsed by t
 
 ````markdown
 ```productspec-ai-evals
-- id: answer_faithfulness
+- id: EVAL-1
   type: rubric
   cases:
     - input: "Representative input for this eval."
@@ -166,11 +166,18 @@ Use plain bullets when the eval is still a rough human note. Use the structured 
 
 **Example:**
 
-> Given a valid public YouTube URL, the user can create a transcript page.
->
-> Search returns matching transcript passages with timestamps.
->
-> Empty, private, or unsupported videos return a clear error.
+````markdown
+```productspec-acceptance-criteria
+- id: AC-1
+  criterion: Given a valid public YouTube URL, the user can create a transcript page.
+- id: AC-2
+  criterion: Search returns matching transcript passages with timestamps.
+- id: AC-3
+  criterion: Empty, private, or unsupported videos return a clear error.
+```
+````
+
+Acceptance Criteria use generated durable IDs (`AC-1`, `AC-2`) because agents, tickets, pull requests, and Decision Traces may need to cite the exact build condition. Eval cases and checks stay un-IDed; cite them positionally if needed, such as `EVAL-1.case[2]`.
 
 **Relationship to Success Metrics:**
 
@@ -202,11 +209,11 @@ If you can mark it pass/fail before launch by inspecting the built artifact, it 
 
 ````markdown
 ```productspec-success-metrics
-- id: first_session_search_rate
+- id: SM-1
   metric: first_session_transcript_search_rate
   target: ">= 60%"
   window: first session after transcript creation
-- id: timestamped_quote_copy_rate
+- id: SM-2
   metric: timestamped_quote_copy_rate
   target: ">= 35%"
   window: within 7 days of transcript creation

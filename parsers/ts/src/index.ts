@@ -46,6 +46,7 @@ export interface ProductSpecSection {
   label: string;
   content: string;
   scope?: ProductSpecScope;
+  acceptance_criteria?: ProductSpecAcceptanceCriterion[];
   ai_evals?: ProductSpecAiEval[];
   success_metrics?: ProductSpecSuccessMetric[];
 }
@@ -54,6 +55,11 @@ export interface ProductSpecScope {
   in: string[];
   out: string[];
   cut: string[];
+}
+
+export interface ProductSpecAcceptanceCriterion {
+  id: string;
+  criterion: string;
 }
 
 export interface ProductSpecAiEval {
@@ -183,6 +189,9 @@ function validationErrorFor(error: unknown): ProductSpecValidationError {
   if (message.includes("Invalid AI eval")) {
     return { code: "invalid_ai_eval", message, path: "sections.acceptance_criteria.ai_evals" };
   }
+  if (message.includes("Invalid acceptance criterion")) {
+    return { code: "invalid_acceptance_criterion", message, path: "sections.acceptance_criteria.acceptance_criteria" };
+  }
   if (message.includes("Invalid structured scope")) {
     return { code: "invalid_structured_scope", message, path: "sections.scope.scope" };
   }
@@ -278,6 +287,42 @@ function validateDocument(document: ProductSpecDocument): {
       }
     }
 
+    for (const [index, criterion] of (section.acceptance_criteria ?? []).entries()) {
+      const path = `sections.${section.id}.acceptance_criteria.${index}`;
+      if (section.id !== "acceptance_criteria") {
+        errors.push({
+          code: "invalid_acceptance_criterion",
+          message: "Structured acceptance criteria blocks belong in Acceptance Criteria.",
+          path
+        });
+      }
+      const missingFields = ["id", "criterion"].filter(
+        (field) => !String(criterion[field as keyof ProductSpecAcceptanceCriterion] ?? "").trim()
+      );
+      if (missingFields.length) {
+        errors.push({
+          code: "invalid_acceptance_criterion",
+          message: `Invalid acceptance criterion: missing ${missingFields.join(", ")}.`,
+          path
+        });
+      }
+      if (criterion.id && !/^AC-[1-9]\d*$/.test(criterion.id)) {
+        errors.push({
+          code: "invalid_acceptance_criterion",
+          message: "Invalid acceptance criterion: id must use AC-<number>.",
+          path
+        });
+      }
+    }
+
+    if (section.id === "acceptance_criteria" && !section.acceptance_criteria?.length) {
+      errors.push({
+        code: "invalid_acceptance_criterion",
+        message: "Invalid acceptance criterion: include at least one productspec-acceptance-criteria item.",
+        path: "sections.acceptance_criteria.acceptance_criteria"
+      });
+    }
+
     for (const [index, aiEval] of (section.ai_evals ?? []).entries()) {
       const path = `sections.${section.id}.ai_evals.${index}`;
       if (section.id !== "acceptance_criteria") {
@@ -294,6 +339,13 @@ function validateDocument(document: ProductSpecDocument): {
         errors.push({
           code: "invalid_ai_eval",
           message: `Invalid AI eval: missing ${missingFields.join(", ")}.`,
+          path
+        });
+      }
+      if (aiEval.id && !/^EVAL-[1-9]\d*$/.test(aiEval.id)) {
+        errors.push({
+          code: "invalid_ai_eval",
+          message: "Invalid AI eval: id must use EVAL-<number>.",
           path
         });
       }
@@ -321,6 +373,13 @@ function validateDocument(document: ProductSpecDocument): {
           path
         });
       }
+      if (aiEval.checks.some((check) => /^id\s*:/i.test(check.trim()))) {
+        errors.push({
+          code: "invalid_ai_eval",
+          message: "Invalid AI eval: checks do not use standalone IDs.",
+          path
+        });
+      }
     }
 
     for (const [index, metric] of (section.success_metrics ?? []).entries()) {
@@ -342,13 +401,21 @@ function validateDocument(document: ProductSpecDocument): {
           path
         });
       }
-      if (metric.id && !/^[a-z0-9]+(?:_[a-z0-9]+)*$/.test(metric.id)) {
+      if (metric.id && !/^SM-[1-9]\d*$/.test(metric.id)) {
         errors.push({
           code: "invalid_success_metric",
-          message: "Invalid success metric: id must use snake_case.",
+          message: "Invalid success metric: id must use SM-<number>.",
           path
         });
       }
+    }
+
+    if (section.id === "success_metrics" && !section.success_metrics?.length) {
+      errors.push({
+        code: "invalid_success_metric",
+        message: "Invalid success metric: include at least one productspec-success-metrics item.",
+        path: "sections.success_metrics.success_metrics"
+      });
     }
   }
 
@@ -434,6 +501,7 @@ function parseSections(
     const id = sectionIdForLabel(label, customSections);
     const content = body.slice(start, end).trim();
     const scope = parseScopeBlock(content);
+    const acceptance_criteria = parseAcceptanceCriterionBlocks(content);
     const ai_evals = parseAiEvalBlocks(content);
     const success_metrics = parseSuccessMetricBlocks(content);
     return {
@@ -441,6 +509,7 @@ function parseSections(
       label,
       content,
       ...(scope ? { scope } : {}),
+      ...(acceptance_criteria.length ? { acceptance_criteria } : {}),
       ...(ai_evals.length ? { ai_evals } : {}),
       ...(success_metrics.length ? { success_metrics } : {})
     };
@@ -470,6 +539,47 @@ function parseScopeBlock(content: string): ProductSpecScope | undefined {
     }
   }
   return scope;
+}
+
+function parseAcceptanceCriterionBlocks(content: string): ProductSpecAcceptanceCriterion[] {
+  const blockPattern = /```productspec-acceptance-criteria\n([\s\S]*?)\n```/g;
+  return [...content.matchAll(blockPattern)].flatMap((match) => parseAcceptanceCriterionList(match[1]));
+}
+
+function parseAcceptanceCriterionList(raw: string): ProductSpecAcceptanceCriterion[] {
+  const criteria: Array<Partial<ProductSpecAcceptanceCriterion>> = [];
+  let current: Partial<ProductSpecAcceptanceCriterion> | undefined;
+
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    if (line.startsWith("- ")) {
+      current = {};
+      criteria.push(current);
+      assignAcceptanceCriterionValue(current, line.slice(2));
+      continue;
+    }
+    if (!current) throw new Error("Invalid acceptance criterion block: expected list item.");
+    if (line.startsWith("  ")) {
+      assignAcceptanceCriterionValue(current, line.trim());
+      continue;
+    }
+    throw new Error(`Invalid acceptance criterion block line: ${line}`);
+  }
+
+  return criteria.map((criterion) => ({
+    id: String(criterion.id ?? ""),
+    criterion: String(criterion.criterion ?? "")
+  }));
+}
+
+function assignAcceptanceCriterionValue(target: Partial<ProductSpecAcceptanceCriterion>, line: string) {
+  const match = /^([A-Za-z0-9_]+):\s*(.*)$/.exec(line);
+  if (!match) throw new Error(`Invalid acceptance criterion block line: ${line}`);
+  const key = match[1] as keyof ProductSpecAcceptanceCriterion;
+  if (!["id", "criterion"].includes(key)) {
+    throw new Error(`Invalid acceptance criterion field: ${key}`);
+  }
+  target[key] = unquote(match[2]) as never;
 }
 
 function parseAiEvalBlocks(content: string): ProductSpecAiEval[] {
