@@ -98,6 +98,12 @@ The managed implementation can move faster on workflows: GitHub publishing, pull
 
 This split keeps the standard understandable while giving ProductSpec.io room to prove which workflows matter. When a managed convention becomes broadly useful, it can graduate into the open standard as a small interoperable field or schema.
 
+Traceability should use two shapes with a clear split.
+
+Stable document-level relationships belong in frontmatter: linked repository, default tracker, owning team, and broad code or component scope.
+
+Item-level traceability belongs in a structured Markdown section: an acceptance criterion linked to a GitHub issue or pull request, an AI eval linked to an eval run, a success metric linked to a dashboard, or a user experience section linked to a design artifact. This keeps the Product Spec readable while giving tools a portable graph to parse.
+
 The managed implementation should be Git-native, not Git-centric.
 
 PMs should be able to work in a polished ProductSpec editor. Engineers should be able to review clean Markdown, pull requests, commits, and linked implementation history in GitHub.
