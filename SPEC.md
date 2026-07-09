@@ -201,16 +201,10 @@ created_at: "2026-07-04T00:00:00Z"
 
 ProductSpec is pre-1.0. Tools should check `spec_format_version` and should not assume v0.x documents have the same compatibility guarantees as v1.0. See `docs/versioning.md`.
 
-## Planned v0.2 Additions
+## Tooling And Conformance
 
-The next compatibility milestone is validation and conformance.
-
-Planned v0.2 additions:
-
-- Validator behavior for `.product-spec.md` files.
-- Valid and invalid fixture corpus.
-- Round-trip conformance tests.
-- Review-annotation examples.
-- Versioning and compatibility rules.
+The ProductSpec repo includes a reference parser, validator, CLI, JSON Schemas, and conformance fixtures.
 
 Validators check structure and portability. They do not judge product quality.
+
+Decision Trace is defined as an optional companion standard for recording decisions, drift, revisions, outcomes, and learnings over time.

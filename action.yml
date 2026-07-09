@@ -1,0 +1,32 @@
+name: Validate ProductSpec files
+description: Validate ProductSpec Markdown files in a GitHub Actions workflow.
+
+inputs:
+  files:
+    description: "Space-separated ProductSpec files or globs to validate."
+    required: false
+    default: "**/*.product-spec.md"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - name: Validate ProductSpec files
+      shell: bash
+      run: |
+        set -euo pipefail
+        shopt -s globstar nullglob
+
+        files=(${{ inputs.files }})
+        if [ ${#files[@]} -eq 0 ]; then
+          echo "No ProductSpec files matched: ${{ inputs.files }}"
+          exit 0
+        fi
+
+        for file in "${files[@]}"; do
+          npm exec --yes --package @productspec/parser -- productspec validate "$file"
+        done

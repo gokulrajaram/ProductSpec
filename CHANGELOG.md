@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+Added:
+
+- GitHub Action wrapper for validating ProductSpec files in downstream repos.
+- Adoption levels guide.
+- Before-and-after ProductSpec example.
+- ProductSpec comparison guide.
+- Repo starter kit for teams storing Product Specs beside code.
+- Additional examples for AI-agent handoff and platform migration work.
+
 ## v0.7.0 - Decision Trace
 
 ProductSpec v0.7.0 adds Decision Trace as an optional companion standard.

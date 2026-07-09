@@ -105,6 +105,24 @@ Recommended policy:
 - Treat warnings as non-blocking until the team chooses a stricter policy.
 - Validate examples and templates in the same CI job.
 
+You can also use the ProductSpec GitHub Action:
+
+```yaml
+name: ProductSpec
+
+on:
+  pull_request:
+
+jobs:
+  validate-product-specs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gokulrajaram/ProductSpec@main
+        with:
+          files: "docs/product-specs/**/*.product-spec.md"
+```
+
 ## Suggested Team Convention
 
 For consequential work, require a Product Spec before creating implementation tickets.

@@ -10,9 +10,11 @@ Start here if you want to see ProductSpec as a working artifact rather than a sc
 | --- | --- |
 | [`minimal.product-spec.md`](minimal.product-spec.md) | The smallest complete Product Spec. |
 | [`ai-support-triage.product-spec.md`](ai-support-triage.product-spec.md) | Structured AI evals inside Acceptance Criteria. |
+| [`agent-coded-feature.product-spec.md`](agent-coded-feature.product-spec.md) | A feature intended to be handed to an AI coding agent. |
 | [`consumer-family-calendar.product-spec.md`](consumer-family-calendar.product-spec.md) | A consumer UX feature with a prototype link. |
 | [`enterprise-approval-workflow.product-spec.md`](enterprise-approval-workflow.product-spec.md) | A cross-functional enterprise workflow. |
 | [`internal-webhook-replay-api.product-spec.md`](internal-webhook-replay-api.product-spec.md) | A non-UI internal API. |
+| [`platform-cache-migration.product-spec.md`](platform-cache-migration.product-spec.md) | Platform work with no conventional user-facing UI. |
 | [`full-prd.product-spec.md`](full-prd.product-spec.md) | Optional sections and a richer PRD-style artifact. |
 | [`hypothesis.product-spec.md`](hypothesis.product-spec.md) | A smaller bet framed as a hypothesis artifact. |
 | [`revisions/`](revisions/) | A Product Spec evolving from `spec_revision: 1` to `spec_revision: 2`. |

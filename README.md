@@ -21,6 +21,10 @@ Design principle: structure the parts machines must execute or compare. Leave th
 
 Decision Trace is the optional companion standard for recording how consequential decisions, drift, revisions, and outcomes are handled over time.
 
+```text
+Intent -> Implementation -> Drift -> Decision Trace -> Revised Intent
+```
+
 ## Living Specs
 
 Product Specs are living documents. They should change when evidence, scope, design, acceptance criteria, or success metrics change.
@@ -56,6 +60,24 @@ Try an included example:
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate examples/minimal.product-spec.md
+```
+
+Use the GitHub Action in a repository:
+
+```yaml
+name: ProductSpec
+
+on:
+  pull_request:
+
+jobs:
+  validate-product-specs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gokulrajaram/ProductSpec@main
+        with:
+          files: "docs/product-specs/**/*.product-spec.md"
 ```
 
 ## Example
@@ -195,6 +217,10 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 - [docs/faq.md](docs/faq.md): answers to common ProductSpec adoption questions.
 - [docs/use-in-your-repo.md](docs/use-in-your-repo.md): copy-paste setup for using ProductSpec in an existing repository.
 - [docs/adoption.md](docs/adoption.md): how teams can adopt ProductSpec across Git, Jira, Linear, Figma, CI, engineering specs, and agents.
+- [docs/adoption-levels.md](docs/adoption-levels.md): a step-by-step maturity ladder for adopting ProductSpec.
+- [docs/before-after.md](docs/before-after.md): a loose PRD transformed into ProductSpec.
+- [docs/productspec-vs.md](docs/productspec-vs.md): how ProductSpec differs from PRDs, Jira, Git, Figma, engineering design docs, OpenSpec, Spec Kit, and ADRs.
+- [docs/repo-starter-kit.md](docs/repo-starter-kit.md): copy-paste conventions for using ProductSpec in an existing repo.
 - [docs/handoff-example.md](docs/handoff-example.md): how ProductSpec interacts with Jira, Figma, Git, OpenSpec, Spec Kit, and coding agents.
 - [docs/end-to-end-handoff.md](docs/end-to-end-handoff.md): a concrete walkthrough from Product Spec to issue, design, engineering spec, agent loop, pull request, and launch learning.
 - [docs/vision.md](docs/vision.md): the public vision for ProductSpec as the intent layer.
@@ -215,9 +241,11 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 Examples include AI features, consumer UX, enterprise workflows, internal APIs, and agent handoffs:
 
 - [examples/ai-support-triage.product-spec.md](examples/ai-support-triage.product-spec.md)
+- [examples/agent-coded-feature.product-spec.md](examples/agent-coded-feature.product-spec.md)
 - [examples/consumer-family-calendar.product-spec.md](examples/consumer-family-calendar.product-spec.md)
 - [examples/enterprise-approval-workflow.product-spec.md](examples/enterprise-approval-workflow.product-spec.md)
 - [examples/internal-webhook-replay-api.product-spec.md](examples/internal-webhook-replay-api.product-spec.md)
+- [examples/platform-cache-migration.product-spec.md](examples/platform-cache-migration.product-spec.md)
 - [examples/full-prd.product-spec.md](examples/full-prd.product-spec.md)
 
 ## Canonical Sections

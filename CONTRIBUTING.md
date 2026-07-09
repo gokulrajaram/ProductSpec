@@ -19,6 +19,14 @@ Useful contributions include:
 - schema clarifications
 - documentation improvements
 
+Good first contributions:
+
+- Add a real-world example Product Spec from a domain the repo does not cover yet.
+- File an issue explaining where the default sections do or do not match your team's product process.
+- Propose a small clarification to `docs/field-guide.md`.
+- Add a Decision Trace example showing how intent changed after implementation.
+- Try the validator on one of your own Product Specs and report confusing errors or warnings.
+
 You do not need to write parser code to shape ProductSpec. A clear issue with a real example is enough to move the standard forward.
 
 Good issues from PMs and product leaders often start with:
