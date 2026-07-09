@@ -48,12 +48,8 @@ cut:
   metric: cache_related_release_freeze_count
   target: "0"
   window: 30 days after migration launch
-  segment: services migrated to versioned cache keys
-  source: incident_review_log
 - id: migration_adoption
   metric: migrated_service_count
   target: ">= 5 services"
   window: 45 days after launch
-  segment: tier_1_backend_services
-  source: service_catalog
 ```

@@ -204,14 +204,10 @@ If you can mark it pass/fail before launch by inspecting the built artifact, it 
   metric: first_session_transcript_search_rate
   target: ">= 60%"
   window: first session after transcript creation
-  segment: first-time transcript creators
-  source: product_analytics
 - id: timestamped_quote_copy_rate
   metric: timestamped_quote_copy_rate
   target: ">= 35%"
   window: within 7 days of transcript creation
-  segment: first-time transcript creators
-  source: product_analytics
 ```
 ````
 

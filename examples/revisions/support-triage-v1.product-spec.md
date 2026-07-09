@@ -60,18 +60,12 @@ cut:
   metric: median_time_to_first_human_response
   target: "< 30 minutes"
   window: business hours
-  segment: urgent tickets
-  source: helpdesk_analytics
 - id: suggested_owner_review_rate
   metric: suggested_owner_review_rate
   target: ">= 60%"
   window: weekly
-  segment: urgent tickets
-  source: helpdesk_analytics
 - id: false_urgent_escalation_rate
   metric: false_urgent_escalation_rate
   target: "< 8%"
   window: weekly
-  segment: escalated tickets
-  source: reviewer_audit_log
 ```

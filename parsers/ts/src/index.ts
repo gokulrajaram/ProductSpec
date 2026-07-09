@@ -70,8 +70,6 @@ export interface ProductSpecSuccessMetric {
   metric: string;
   target: string;
   window: string;
-  segment: string;
-  source: string;
 }
 
 export interface ProductSpecDocument {
@@ -321,7 +319,7 @@ function validateDocument(document: ProductSpecDocument): {
           path
         });
       }
-      const missingFields = ["id", "metric", "target", "window", "segment", "source"].filter(
+      const missingFields = ["id", "metric", "target", "window"].filter(
         (field) => !String(metric[field as keyof ProductSpecSuccessMetric] ?? "").trim()
       );
       if (missingFields.length) {
@@ -552,9 +550,7 @@ function parseSuccessMetricList(raw: string): ProductSpecSuccessMetric[] {
     id: String(metric.id ?? ""),
     metric: String(metric.metric ?? ""),
     target: String(metric.target ?? ""),
-    window: String(metric.window ?? ""),
-    segment: String(metric.segment ?? ""),
-    source: String(metric.source ?? "")
+    window: String(metric.window ?? "")
   }));
 }
 

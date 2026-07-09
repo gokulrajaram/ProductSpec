@@ -246,8 +246,6 @@ cut:
   metric: copied_timestamped_quote_rate
   target: ">= 35%"
   window: within 7 days of transcript creation
-  segment: first-time transcript creators
-  source: product_analytics
 \`\`\`
 `;
 
@@ -265,9 +263,7 @@ cut:
         id: "quote_copy_rate",
         metric: "copied_timestamped_quote_rate",
         target: ">= 35%",
-        window: "within 7 days of transcript creation",
-        segment: "first-time transcript creators",
-        source: "product_analytics"
+        window: "within 7 days of transcript creation"
       }
     ]);
     expect(parseProductSpecMarkdown(serializeProductSpecMarkdown(parsed))).toEqual(parsed);
@@ -435,9 +431,7 @@ In: transcript search.
       "id",
       "metric",
       "target",
-      "window",
-      "segment",
-      "source"
+      "window"
     ]);
   });
 

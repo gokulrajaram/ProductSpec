@@ -51,12 +51,8 @@ https://example.com/calendar-reminder-prototype
   metric: activated_user_high_priority_reminder_setup_rate
   target: ">= 50%"
   window: within 7 days of activation
-  segment: activated users
-  source: product_analytics
 - id: missed_call_report_reduction
   metric: missed_call_self_report_reduction
   target: ">= 25%"
   window: monthly
-  segment: weekly active users
-  source: user_survey
 ```

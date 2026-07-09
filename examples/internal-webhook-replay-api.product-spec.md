@@ -53,24 +53,16 @@ cut:
   metric: median_time_from_customer_escalation_to_replay_attempt
   target: "< 10 minutes"
   window: monthly
-  segment: eligible failed webhook escalations
-  source: support_and_job_queue_analytics
 - id: no_infra_escalation_resolution_rate
   metric: eligible_webhook_escalation_resolution_without_infra_rate
   target: ">= 70%"
   window: monthly
-  segment: eligible failed webhook escalations
-  source: support_analytics
 - id: duplicate_replay_rate
   metric: duplicate_replay_job_rate
   target: "< 0.5%"
   window: monthly
-  segment: replay attempts
-  source: replay_audit_log
 - id: unaudited_replay_count
   metric: unaudited_replay_attempt_count
   target: "0"
   window: monthly
-  segment: replay attempts
-  source: replay_audit_log
 ```

@@ -148,14 +148,12 @@
             "type": "array",
             "items": {
               "type": "object",
-              "required": ["id", "metric", "target", "window", "segment", "source"],
+              "required": ["id", "metric", "target", "window"],
               "properties": {
                 "id": { "type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$" },
                 "metric": { "type": "string", "minLength": 1 },
                 "target": { "type": "string", "minLength": 1 },
-                "window": { "type": "string", "minLength": 1 },
-                "segment": { "type": "string", "minLength": 1 },
-                "source": { "type": "string", "minLength": 1 }
+                "window": { "type": "string", "minLength": 1 }
               },
               "additionalProperties": false
             }

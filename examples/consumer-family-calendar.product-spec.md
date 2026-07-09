@@ -53,24 +53,16 @@ https://example.com/family-calendar-conflict-prototype
   metric: detected_conflict_action_rate
   target: ">= 45%"
   window: weekly
-  segment: detected conflicts
-  source: product_analytics
 - id: missed_event_report_reduction
   metric: missed_event_self_report_reduction
   target: ">= 20%"
   window: monthly
-  segment: weekly active families
-  source: user_survey
 - id: alert_disable_rate
   metric: conflict_alert_disable_rate
   target: "< 3%"
   window: weekly
-  segment: weekly active users
-  source: product_analytics
 - id: conflict_time_to_action
   metric: median_time_from_conflict_creation_to_first_action
   target: "< 30 minutes"
   window: weekly
-  segment: detected conflicts
-  source: product_analytics
 ```

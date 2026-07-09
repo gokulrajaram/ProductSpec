@@ -86,8 +86,6 @@ cut:
   metric: median_time_to_first_human_response
   target: "< 15 minutes"
   window: business hours
-  segment: account-risk tickets
-  source: helpdesk_analytics
 ```
 ````
 

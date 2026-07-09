@@ -39,6 +39,4 @@ cut:
   metric: copied_timestamped_quote_rate
   target: ">= 35%"
   window: within 7 days of transcript creation
-  segment: first-time transcript creators
-  source: product_analytics
 ```

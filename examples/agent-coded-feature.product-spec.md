@@ -64,12 +64,8 @@ https://example.com/saved-search-alerts-prototype
   metric: weekly_alert_clickthrough_rate
   target: ">= 18%"
   window: first 4 weeks after saved search creation
-  segment: users with at least one saved search
-  source: product_analytics
 - id: repeat_search_reduction
   metric: repeated_manual_search_rate
   target: "<= 60% of baseline"
   window: 30 days after launch
-  segment: saved-search users
-  source: search_events
 ```

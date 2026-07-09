@@ -116,8 +116,6 @@ Required fields:
 - `metric`
 - `target`
 - `window`
-- `segment`
-- `source`
 
 Fix: place the block inside Success Metrics, include every required field, and use snake_case for `id`.
 

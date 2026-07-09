@@ -50,7 +50,7 @@ Recommended practice:
 
 - Link tickets to a specific `spec_revision`.
 - Link pull requests to acceptance criteria.
-- Link success metrics to analytics sources.
+- Link success metrics to launch reviews.
 - Link AI evals to their input sets and evaluator runs.
 
 ## Level 5: Record Decision Traces

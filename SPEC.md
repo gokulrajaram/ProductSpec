@@ -108,8 +108,6 @@ Structured success metrics may be included in `success_metrics` with a fenced `p
   metric: copied_timestamped_quote_rate
   target: ">= 35%"
   window: within 7 days of transcript creation
-  segment: first-time transcript creators
-  source: product_analytics
 ```
 ````
 
@@ -119,8 +117,6 @@ Each success metric item requires:
 - `metric`: metric name.
 - `target`: threshold or target value.
 - `window`: time window for reading the metric.
-- `segment`: user, account, or traffic segment.
-- `source`: analytics, warehouse, survey, or other measurement source.
 
 For products with AI features, AI eval thresholds belong in `acceptance_criteria`, not `success_metrics`. Success metrics are post-launch product and business outcomes. Acceptance criteria are pre-launch build gates.
 

@@ -69,20 +69,14 @@ https://example.com/transcript-search-prototype
   metric: first_session_transcript_search_rate
   target: ">= 60%"
   window: first session
-  segment: first-time transcript creators
-  source: product_analytics
 - id: timestamped_quote_copy_rate
   metric: timestamped_quote_copy_rate
   target: ">= 35%"
   window: within 7 days of transcript creation
-  segment: first-time transcript creators
-  source: product_analytics
 - id: seven_day_return_rate
   metric: seven_day_return_to_create_another_transcript_rate
   target: ">= 20%"
   window: within 7 days of first transcript creation
-  segment: first-time transcript creators
-  source: product_analytics
 ```
 
 ## Customer Truth

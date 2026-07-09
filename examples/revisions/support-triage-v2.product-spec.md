@@ -68,24 +68,16 @@ https://example.com/support-triage-dashboard
   metric: median_time_to_first_human_response
   target: "< 15 minutes"
   window: business hours
-  segment: account-risk tickets
-  source: helpdesk_analytics
 - id: suggested_owner_review_rate
   metric: suggested_owner_review_rate
   target: ">= 80%"
   window: weekly
-  segment: account-risk tickets
-  source: helpdesk_analytics
 - id: false_escalation_rate
   metric: false_account_risk_escalation_rate
   target: "< 5%"
   window: weekly
-  segment: escalated tickets
-  source: reviewer_audit_log
 - id: queue_sorting_time_reduction
   metric: support_lead_queue_sorting_time_reduction
   target: ">= 50%"
   window: weekly
-  segment: support leads
-  source: time_study
 ```
