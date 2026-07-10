@@ -46,6 +46,10 @@ See `examples/revisions/` for a Product Spec that evolves from revision 1 to rev
 
 ## Quick Start
 
+If you want to use ProductSpec with coding agents, start here:
+
+- [Get started with agents](docs/get-started-with-agents.md): install the skills, convert a PRD, validate in CI, implement from a Product Spec, and record drift.
+
 Validate a Product Spec with the published CLI:
 
 ```bash
@@ -255,6 +259,7 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 - [docs/launch-post.md](docs/launch-post.md): a draft launch post for sharing the project.
 - [docs/why-productspec.md](docs/why-productspec.md): why the intent layer needs its own artifact.
 - [docs/faq.md](docs/faq.md): answers to common ProductSpec adoption questions.
+- [docs/get-started-with-agents.md](docs/get-started-with-agents.md): the shortest path from existing docs to agent-authored and agent-implemented Product Specs.
 - [docs/use-in-your-repo.md](docs/use-in-your-repo.md): copy-paste setup for using ProductSpec in an existing repository.
 - [docs/agent-usage.md](docs/agent-usage.md): how to use ProductSpec as a control file for coding agents.
 - [docs/adoption.md](docs/adoption.md): how teams can adopt ProductSpec across Git, Jira, Linear, Figma, CI, engineering specs, and agents.
