@@ -56,6 +56,10 @@ Validate a Product Spec with the published CLI:
 npm exec --package @productspec/parser -- productspec validate path/to/file.product-spec.md
 ```
 
+Prefer an editor?
+
+You can also draft and validate Product Specs in the free browser editor at [ProductSpec.io](https://productspec.io). The open standard does not require the hosted editor.
+
 Create a starter Product Spec:
 
 ```bash

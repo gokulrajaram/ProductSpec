@@ -53,6 +53,8 @@ Then validate directly:
 npm exec --yes --package @productspec/parser -- productspec validate docs/product-specs/checkout-redesign.product-spec.md
 ```
 
+If you prefer a guided editor before committing Markdown to Git, use the free editor at [ProductSpec.io](https://productspec.io), then export or publish the resulting Product Spec.
+
 ## 3. Validate in CI
 
 Add the GitHub Action:

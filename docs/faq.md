@@ -21,6 +21,12 @@ OpenSpec and Spec Kit help turn intent into technical plans and tasks. ProductSp
 
 Markdown works in Git, pull requests, issues, docs, editors, and agent workflows. It is readable without a special app, easy to diff, and simple for tools to parse.
 
+## Do I need ProductSpec.io to use ProductSpec?
+
+No. ProductSpec is an open standard. You can write `.product-spec.md` files by hand, validate them with the CLI, and store them in Git.
+
+[ProductSpec.io](https://productspec.io) provides a free browser editor for teams that prefer a guided authoring experience. The editor is optional.
+
 ## Why not just use Jira or Linear?
 
 Jira and Linear are excellent work trackers. They are not the durable source of product intent.
