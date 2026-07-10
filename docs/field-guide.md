@@ -233,16 +233,16 @@ Acceptance Criteria say whether the artifact is ready to ship. Success Metrics s
 
 Use `target_status: committed` when the threshold is a real commitment. Use `target_status: provisional` when the metric is right but the target depends on a baseline that will be calibrated after launch; in that case, include `target_owner` so the uncertainty is owned.
 
-### 	arget_status: committed vs provisional
+### target_status: committed vs provisional
 
 | Status | When to use | Required fields |
 | --- | --- | --- |
-| committed | The team will treat the threshold as a real post-launch success bar. | metric, 	arget, window |
-| provisional | The *metric* is known, but the *number* needs a post-launch baseline or calibration step. | metric, 	arget (may be 	bd), 	arget_owner, window |
+| committed | The team will treat the threshold as a real post-launch success bar. | metric, target, window |
+| provisional | The *metric* is known, but the *number* needs a post-launch baseline or calibration step. | metric, target (may be tbd), target_owner, window |
 
-**Why provisional targets require 	arget_owner:** provisional status is not a free pass to ship without measurement. Someone must own when the baseline is taken, how the threshold is set, and when the status flips to committed.
+**Why provisional targets require target_owner:** provisional status is not a free pass to ship without measurement. Someone must own when the baseline is taken, how the threshold is set, and when the status flips to committed.
 
-**Do not invent a number just to pass validation.** If you only know *what* to measure, keep 	arget: tbd and 	arget_status: provisional with an owner. A fake threshold is worse than an honest provisional metric because it creates a false build/launch contract.
+**Do not invent a number just to pass validation.** If you only know *what* to measure, keep target: tbd and target_status: provisional with an owner. A fake threshold is worse than an honest provisional metric because it creates a false build/launch contract.
 
 **Unknown target vs unknown metric:**
 
@@ -251,24 +251,28 @@ Use `target_status: committed` when the threshold is a real commitment. Use `tar
 
 **Good example (provisional, owned):**
 
-`productspec-success-metrics
+````markdown
+```productspec-success-metrics
 - id: SM-2
   metric: timestamped_quote_copy_rate
   target: tbd
   target_status: provisional
   target_owner: Data lead
   window: within 7 days of transcript creation
-`
+```
+````
 
 **Bad example (fake commitment):**
 
-`productspec-success-metrics
+````markdown
+```productspec-success-metrics
 - id: SM-2
   metric: timestamped_quote_copy_rate
   target: ">= 37%"
   target_status: committed
   window: within 7 days of transcript creation
-`
+```
+````
 
 
 ## AI Evals
