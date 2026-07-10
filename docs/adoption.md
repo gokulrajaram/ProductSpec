@@ -2,6 +2,8 @@
 
 ProductSpec works best when intent needs to survive handoff across people, tools, and agents.
 
+For a ready-to-copy repository setup, use [`starter-kit/`](../starter-kit/). It includes a starter Product Spec, Decision Trace, AGENTS/CLAUDE instructions, the ProductSpec agent skill, a pull request template, and CI validation.
+
 This guide describes a practical team setup.
 
 ## Store Product Specs Near The Work

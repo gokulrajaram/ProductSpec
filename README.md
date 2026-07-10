@@ -295,7 +295,7 @@ ProductSpec distinguishes the standard version from the document revision:
 - `spec_format_version` tells tools which ProductSpec format the file uses.
 - `spec_revision` is an optional positive integer for this particular product decision. It starts at `1` and increments when intent materially changes.
 
-The v0.8 milestone includes conformance fixtures, a structured validator, examples, a CLI, optional `spec_revision` frontmatter, traceability fields, and a loadable agent skill:
+The v0.8 milestone includes conformance fixtures, a structured validator, examples, a CLI, optional `spec_revision` frontmatter, traceability fields, a loadable agent skill, and a copyable repo starter kit:
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate examples/minimal.product-spec.md

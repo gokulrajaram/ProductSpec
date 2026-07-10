@@ -232,6 +232,7 @@ Validate fixtures:
 npm run validate -- conformance/valid/minimal.product-spec.md
 npm run validate -- conformance/valid/with-user-experience.product-spec.md
 npm run validate -- conformance/valid/with-custom-section.product-spec.md
+npm run validate -- starter-kit/docs/product-specs/example.product-spec.md
 ```
 
 Run a package dry-run:

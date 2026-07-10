@@ -36,6 +36,7 @@ jobs:
           npm run validate -- examples/full-prd.product-spec.md
           npm run validate -- examples/hypothesis.product-spec.md
           npm run validate -- examples/internal-webhook-replay-api.product-spec.md
+          npm run validate -- starter-kit/docs/product-specs/example.product-spec.md
 
       - name: Verify package dry run
         working-directory: parsers/ts

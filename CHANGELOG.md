@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-No unreleased changes.
+Added:
+
+- Copyable `starter-kit/` with ProductSpec, Decision Trace, AGENTS/CLAUDE instructions, PR template, GitHub Actions validation, and the ProductSpec agent skill.
 
 ## v0.8.0 - Traceability And Agent Skill
 

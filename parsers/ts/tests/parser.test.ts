@@ -769,6 +769,7 @@ In: transcript search.
       "conformance/valid/with-ai-evals.product-spec.md",
       "conformance/valid/with-traceability.product-spec.md",
       "conformance/valid/with-custom-section.product-spec.md",
+      "starter-kit/docs/product-specs/example.product-spec.md",
       "conformance/invalid/missing-frontmatter.product-spec.md",
       "conformance/invalid/missing-required-section.product-spec.md",
       "conformance/invalid/unsupported-version.product-spec.md"
@@ -786,7 +787,8 @@ In: transcript search.
       "conformance/valid/with-structured-scope-and-metrics.product-spec.md",
       "conformance/valid/with-ai-evals.product-spec.md",
       "conformance/valid/with-traceability.product-spec.md",
-      "conformance/valid/with-custom-section.product-spec.md"
+      "conformance/valid/with-custom-section.product-spec.md",
+      "starter-kit/docs/product-specs/example.product-spec.md"
     ];
 
     for (const fixture of validFixtures) {
@@ -932,13 +934,18 @@ In: transcript search.
   it("ships loadable agent guidance and agent usage docs", () => {
     expect(existsSync(`${root}/skills/productspec/SKILL.md`)).toBe(true);
     expect(existsSync(`${root}/docs/agent-usage.md`)).toBe(true);
+    expect(existsSync(`${root}/starter-kit/AGENTS.md`)).toBe(true);
+    expect(existsSync(`${root}/starter-kit/CLAUDE.md`)).toBe(true);
+    expect(existsSync(`${root}/starter-kit/skills/productspec/SKILL.md`)).toBe(true);
 
     const skill = readFileSync(`${root}/skills/productspec/SKILL.md`, "utf8");
     const docs = readFileSync(`${root}/docs/agent-usage.md`, "utf8");
+    const starterSkill = readFileSync(`${root}/starter-kit/skills/productspec/SKILL.md`, "utf8");
 
     expect(skill).toContain("control file for the work");
     expect(skill).toContain("Acceptance Criteria are the build contract");
     expect(docs).toContain("Load `skills/productspec/SKILL.md`");
+    expect(starterSkill).toBe(skill);
   });
 
   it("rejects invalid spec revision values", () => {

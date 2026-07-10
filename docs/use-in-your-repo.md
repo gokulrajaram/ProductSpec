@@ -2,6 +2,8 @@
 
 This is the fastest path for trying ProductSpec inside an existing software repository.
 
+If you want a complete copyable setup, start with [`starter-kit/`](../starter-kit/). It includes Product Spec and Decision Trace examples, `AGENTS.md`, `CLAUDE.md`, the ProductSpec agent skill, a pull request template, and GitHub Actions validation.
+
 ## 1. Create A Spec Directory
 
 ```bash
@@ -64,6 +66,14 @@ Use `skills/productspec/SKILL.md` before planning or implementing work governed 
 ```
 
 Agents should cite Acceptance Criteria IDs in implementation plans and pull request summaries.
+
+For a ready-to-copy agent setup, use:
+
+```text
+starter-kit/AGENTS.md
+starter-kit/CLAUDE.md
+starter-kit/skills/productspec/SKILL.md
+```
 
 ## 8. Optional Traceability
 

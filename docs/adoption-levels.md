@@ -10,6 +10,8 @@ Store `.product-spec.md` files in a repo, shared docs folder, or product workspa
 
 This level is enough when the goal is to make the product decision readable, durable, and portable.
 
+Fastest setup: copy [`starter-kit/`](../starter-kit/) into a repository and rename the example Product Spec.
+
 Recommended practice:
 
 - Use the canonical sections.
@@ -64,6 +66,7 @@ Recommended practice:
 - Record meaningful scope, acceptance criteria, UX, eval, and success metric drift.
 - Record whether the team updated the Product Spec, changed implementation, accepted a tradeoff, or reopened work.
 - Link Decision Trace events back to Product Spec revisions, pull requests, issues, experiments, and outcome evidence.
+- Use `starter-kit/docs/decision-traces/example.decision-trace.json` as the smallest starting shape.
 
 ## Level 6: Reconcile Drift
 
