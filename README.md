@@ -19,7 +19,7 @@ ProductSpec is neutral. It defines structure, section IDs, portable review annot
 
 Design principle: structure the parts machines must execute or compare. Leave the parts humans must reason about readable.
 
-ProductSpec can also act as the control file for agent-led work. The repo includes `skills/productspec/SKILL.md`, a loadable agent skill that tells coding agents how to read Product Specs, cite Acceptance Criteria, respect scope, and propose a Decision Trace when implementation diverges from intent.
+ProductSpec can also act as the control file for agent-led work. The repo includes `skills/productspec/SKILL.md`, a loadable agent skill that tells coding agents how to read Product Specs, cite Acceptance Criteria, respect scope, and propose a Decision Trace when implementation diverges from intent. `skills/productspec-authoring/SKILL.md` covers the other direction: writing a Product Spec, validating it, and converting an existing PRD into one. Both are installable with `npx skills add gokulrajaram/ProductSpec`.
 
 Decision Trace is the optional companion standard for recording how consequential decisions, drift, revisions, and outcomes are handled over time.
 
@@ -219,6 +219,7 @@ ProductSpec is meant to be implemented by many tools.
 Current repo artifacts:
 
 - `@productspec/parser`: TypeScript parser, validator, and CLI.
+- `skills/productspec` and `skills/productspec-authoring`: loadable agent skills for implementing from a Product Spec and for writing one.
 - JSON Schema for parsed Product Spec documents.
 - Valid and invalid conformance fixtures.
 - `starter-kit/`: copyable repo setup with Product Specs, Decision Traces, agent instructions, PR template, and CI.
@@ -274,6 +275,7 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 - [schema/decision-trace.schema.json](schema/decision-trace.schema.json): JSON Schema for Decision Trace documents.
 - [schema/review-annotation.schema.json](schema/review-annotation.schema.json): JSON Schema for portable review annotations.
 - [skills/productspec/SKILL.md](skills/productspec/SKILL.md): loadable agent guidance for implementing from Product Specs.
+- [skills/productspec-authoring/SKILL.md](skills/productspec-authoring/SKILL.md): loadable agent guidance for writing, validating, and converting Product Specs.
 - [conformance/](conformance/): valid and invalid fixtures for implementers.
 - [examples/README.md](examples/README.md): guide to choosing the right example.
 - [examples/](examples/): minimal and expanded examples.
