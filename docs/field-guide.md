@@ -254,6 +254,8 @@ A provisional target is a scheduled decision, not a permanent state. Once the nu
 
 When the metric itself is undecided, that is not a provisional target. Leave the row out and record the open decision under `## Open Questions`, where a reviewer will see it.
 
+For a complete example, see [`examples/provisional-success-metric.product-spec.md`](../examples/provisional-success-metric.product-spec.md).
+
 
 ## AI Evals
 

@@ -98,6 +98,7 @@ Decision Trace supports these initial event types:
 
 - Schema: [`schema/decision-trace.schema.json`](../schema/decision-trace.schema.json)
 - Example: [`examples/decision-traces/transcript-search.decision-trace.json`](../examples/decision-traces/transcript-search.decision-trace.json)
+- Authoring checklist: [`docs/decision-trace-authoring-checklist.md`](decision-trace-authoring-checklist.md)
 
 ## Validate A Decision Trace
 
