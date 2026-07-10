@@ -99,6 +99,21 @@ Decision Trace supports these initial event types:
 - Schema: [`schema/decision-trace.schema.json`](../schema/decision-trace.schema.json)
 - Example: [`examples/decision-traces/transcript-search.decision-trace.json`](../examples/decision-traces/transcript-search.decision-trace.json)
 
+## Validate A Decision Trace
+
+Use the ProductSpec CLI:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-trace docs/decision-traces/my-feature.decision-trace.json
+```
+
+In a repo checkout:
+
+```bash
+npm run build
+node dist/cli.js validate-trace examples/decision-traces/transcript-search.decision-trace.json
+```
+
 ## Open Standard Boundary
 
 The open standard defines the portable trace format and link conventions.

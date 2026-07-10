@@ -111,6 +111,15 @@ done
 
 That check verifies structure and portability. It does not judge whether the product bet is good.
 
+You can also validate Product Specs and Decision Traces with the GitHub Action:
+
+```yaml
+- uses: gokulrajaram/ProductSpec@v0.9.0
+  with:
+    files: "docs/product-specs/**/*.product-spec.md"
+    decision_traces: "docs/decision-traces/**/*.decision-trace.json"
+```
+
 ## Suggested Pull Request Text
 
 ```md

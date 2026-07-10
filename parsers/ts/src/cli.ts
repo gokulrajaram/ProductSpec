@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { validateProductSpecMarkdown } from "./index.js";
+import { validateDecisionTraceJson, validateProductSpecMarkdown } from "./index.js";
 
 const [command, filePath] = process.argv.slice(2);
 
@@ -58,8 +58,21 @@ if (command === "init" && filePath) {
   process.exit(0);
 }
 
+if (command === "validate-trace" && filePath) {
+  const result = validateDecisionTraceJson(readFileSync(filePath, "utf8"));
+  if (result.valid) {
+    console.log(`${filePath}: valid`);
+    process.exit(0);
+  }
+
+  for (const error of result.errors) {
+    console.error(`${error.code}: ${error.message}`);
+  }
+  process.exit(1);
+}
+
 if (command !== "validate" || !filePath) {
-  console.error("Usage: productspec validate path/to/file.product-spec.md\n       productspec init path/to/file.product-spec.md");
+  console.error("Usage: productspec validate path/to/file.product-spec.md\n       productspec validate-trace path/to/file.decision-trace.json\n       productspec init path/to/file.product-spec.md");
   process.exit(1);
 }
 

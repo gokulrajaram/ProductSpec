@@ -9,6 +9,7 @@ import {
   MANDATORY_SECTION_IDS,
   parseProductSpecMarkdown,
   serializeProductSpecMarkdown,
+  validateDecisionTraceJson,
   validateProductSpecMarkdown
 } from "../src/index";
 
@@ -772,7 +773,10 @@ In: transcript search.
       "starter-kit/docs/product-specs/example.product-spec.md",
       "conformance/invalid/missing-frontmatter.product-spec.md",
       "conformance/invalid/missing-required-section.product-spec.md",
-      "conformance/invalid/unsupported-version.product-spec.md"
+      "conformance/invalid/unsupported-version.product-spec.md",
+      "conformance/invalid/malformed-applies-to.product-spec.md",
+      "conformance/invalid/malformed-related-artifact.product-spec.md",
+      "conformance/invalid/missing-required-decision-trace-field.decision-trace.json"
     ];
 
     for (const fixture of fixtures) {
@@ -800,7 +804,9 @@ In: transcript search.
     const invalidFixtures: Array<[string, string]> = [
       ["conformance/invalid/missing-frontmatter.product-spec.md", "missing_frontmatter"],
       ["conformance/invalid/missing-required-section.product-spec.md", "missing_required_section"],
-      ["conformance/invalid/unsupported-version.product-spec.md", "unsupported_version"]
+      ["conformance/invalid/unsupported-version.product-spec.md", "unsupported_version"],
+      ["conformance/invalid/malformed-applies-to.product-spec.md", "invalid_applies_to"],
+      ["conformance/invalid/malformed-related-artifact.product-spec.md", "invalid_related_artifact"]
     ];
 
     for (const [fixture, code] of invalidFixtures) {
@@ -1197,6 +1203,29 @@ Keep this around.
     expect(invalid.stderr).toContain("missing_required_section");
   });
 
+  it("provides a CLI validator for Decision Trace files", () => {
+    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
+    expect(build.status, build.stderr).toBe(0);
+
+    const valid = spawnSync("node", [
+      fileURLToPath(new URL("../dist/cli.js", import.meta.url)),
+      "validate-trace",
+      `${root}/examples/decision-traces/transcript-search.decision-trace.json`
+    ], { encoding: "utf8" });
+
+    expect(valid.status).toBe(0);
+    expect(valid.stdout).toContain("valid");
+
+    const invalid = spawnSync("node", [
+      fileURLToPath(new URL("../dist/cli.js", import.meta.url)),
+      "validate-trace",
+      `${root}/conformance/invalid/missing-required-decision-trace-field.decision-trace.json`
+    ], { encoding: "utf8" });
+
+    expect(invalid.status).toBe(1);
+    expect(invalid.stderr).toContain("missing_required_trace_field");
+  });
+
   it("initializes a starter Product Spec from the CLI", () => {
     const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
     expect(build.status, build.stderr).toBe(0);
@@ -1247,6 +1276,30 @@ Keep this around.
       const result = validateProductSpecMarkdown(readFileSync(example, "utf8"));
       expect(result.valid, example).toBe(true);
     }
+  });
+
+  it("validates Decision Trace examples and fixtures", () => {
+    const validTraceFiles = [
+      `${root}/examples/decision-traces/transcript-search.decision-trace.json`,
+      `${root}/starter-kit/docs/decision-traces/example.decision-trace.json`
+    ];
+
+    for (const traceFile of validTraceFiles) {
+      const result = validateDecisionTraceJson(readFileSync(traceFile, "utf8"));
+      expect(result.valid, traceFile).toBe(true);
+    }
+
+    const invalid = validateDecisionTraceJson(
+      readFileSync(`${root}/conformance/invalid/missing-required-decision-trace-field.decision-trace.json`, "utf8")
+    );
+    expect(invalid.valid).toBe(false);
+    if (!invalid.valid) expect(invalid.errors.map((error) => error.code)).toContain("missing_required_trace_field");
+  });
+
+  it("ships a GitHub Action that can validate Product Specs and Decision Traces", () => {
+    const action = readFileSync(`${root}/action.yml`, "utf8");
+    expect(action).toContain("decision_traces:");
+    expect(action).toContain("validate-trace");
   });
 });
 

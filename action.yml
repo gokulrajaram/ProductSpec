@@ -11,6 +11,10 @@ inputs:
     description: "Space-separated ProductSpec files or globs to validate."
     required: false
     default: "**/*.product-spec.md"
+  decision_traces:
+    description: "Optional space-separated Decision Trace JSON files or globs to validate."
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -35,3 +39,15 @@ runs:
         for file in "${files[@]}"; do
           npm exec --yes --package @productspec/parser -- productspec validate "$file"
         done
+
+        if [ -n "${{ inputs.decision_traces }}" ]; then
+          traces=(${{ inputs.decision_traces }})
+          if [ ${#traces[@]} -eq 0 ]; then
+            echo "No Decision Trace files matched: ${{ inputs.decision_traces }}"
+            exit 0
+          fi
+
+          for trace in "${traces[@]}"; do
+            npm exec --yes --package @productspec/parser -- productspec validate-trace "$trace"
+          done
+        fi

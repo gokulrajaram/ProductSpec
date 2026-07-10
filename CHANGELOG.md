@@ -2,9 +2,21 @@
 
 ## Unreleased
 
+No unreleased changes.
+
+## v0.9.0 - Decision Trace Validation
+
+ProductSpec v0.9.0 keeps the Product Spec document shape at `spec_format_version:
+"0.1"` and adds first-class Decision Trace validation.
+
 Added:
 
-- Copyable `starter-kit/` with ProductSpec, Decision Trace, AGENTS/CLAUDE instructions, PR template, GitHub Actions validation, and the ProductSpec agent skill.
+- `productspec validate-trace <file>` for validating Decision Trace JSON files.
+- Decision Trace validation errors for malformed JSON, missing required fields, unsupported versions, invalid event types, invalid outcomes, malformed links, and invalid revision values.
+- Optional `decision_traces` input in the GitHub Action.
+- Invalid conformance fixtures for malformed `applies_to`, malformed related artifacts, and missing required Decision Trace fields.
+- Clearer agent installation docs for Codex, Claude Code, Cursor, and repo agents.
+- README guidance for non-code contributions from product leaders and builders.
 
 ## v0.8.0 - Traceability And Agent Skill
 

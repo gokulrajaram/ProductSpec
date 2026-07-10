@@ -64,6 +64,12 @@ Try an included example:
 npm exec --package @productspec/parser -- productspec validate examples/minimal.product-spec.md
 ```
 
+Validate a Decision Trace:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-trace examples/decision-traces/transcript-search.decision-trace.json
+```
+
 Use the GitHub Action in a repository:
 
 ```yaml
@@ -80,7 +86,20 @@ jobs:
       - uses: gokulrajaram/ProductSpec@main
         with:
           files: "docs/product-specs/**/*.product-spec.md"
+          decision_traces: "docs/decision-traces/**/*.decision-trace.json"
 ```
+
+## How To Contribute Without Coding
+
+Product leaders and builders can shape ProductSpec without touching parser code:
+
+- open a `General spec discussion` issue with an example from your product process
+- propose a section vocabulary change when the default sections do not fit consequential work
+- contribute an anonymized Product Spec example
+- contribute a Decision Trace example showing how intent changed during implementation
+- report confusing validator errors or adoption friction
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for exact issue and pull request steps.
 
 ## Example
 
@@ -295,10 +314,16 @@ ProductSpec distinguishes the standard version from the document revision:
 - `spec_format_version` tells tools which ProductSpec format the file uses.
 - `spec_revision` is an optional positive integer for this particular product decision. It starts at `1` and increments when intent materially changes.
 
-The v0.8 milestone includes conformance fixtures, a structured validator, examples, a CLI, optional `spec_revision` frontmatter, traceability fields, a loadable agent skill, and a copyable repo starter kit:
+The v0.9 milestone includes conformance fixtures, a structured validator, examples, a CLI, optional `spec_revision` frontmatter, traceability fields, a loadable agent skill, a copyable repo starter kit, and first-class Decision Trace validation:
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate examples/minimal.product-spec.md
+```
+
+To validate a Decision Trace:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-trace examples/decision-traces/transcript-search.decision-trace.json
 ```
 
 To create a starter Product Spec:

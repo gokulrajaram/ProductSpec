@@ -1,12 +1,18 @@
 # Validator Reference
 
-ProductSpec v0.8.0 ships a TypeScript reference validator and CLI.
+ProductSpec v0.9.0 ships a TypeScript reference validator and CLI.
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate path/to/file.product-spec.md
 ```
 
-The validator returns errors for structurally invalid Product Specs and warnings for weak-but-parseable specs.
+Validate a Decision Trace:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-trace path/to/file.decision-trace.json
+```
+
+The validator returns errors for structurally invalid Product Specs and warnings for weak-but-parseable specs. Decision Trace validation returns errors for structurally invalid trace files.
 
 ## Schema Parity
 
@@ -35,6 +41,119 @@ Use the TypeScript validator as the reference implementation when behavior diffe
 ## Errors
 
 Errors fail validation.
+
+## Decision Trace Errors
+
+### `invalid_json`
+
+The Decision Trace file is not valid JSON.
+
+Fix: make the file valid JSON and run `productspec validate-trace` again.
+
+### `missing_required_trace_field`
+
+A required Decision Trace field is absent or empty.
+
+Required top-level fields:
+
+- `decision_trace_format_version`
+- `trace_id`
+- `title`
+- `created_at`
+- `updated_at`
+- `subject`
+- `events`
+
+Events require:
+
+- `event_id`
+- `event_type`
+- `occurred_at`
+- `summary`
+- `decision`
+
+Decisions require:
+
+- `outcome`
+- `rationale`
+
+Fix: add the missing field.
+
+### `unsupported_trace_version`
+
+`decision_trace_format_version` is not supported by this validator.
+
+Fix: use `"0.1"` or upgrade the validator when newer versions exist.
+
+### `invalid_trace_id`
+
+`trace_id` does not use the portable ID shape.
+
+Fix: use lowercase words separated by hyphens or underscores, such as `checkout-redesign-trace`.
+
+### `invalid_trace_subject`
+
+The Decision Trace subject is malformed or uses an unsupported type.
+
+Supported subject types:
+
+- `product_spec`
+- `engineering_spec`
+- `design`
+- `implementation`
+- `eval`
+- `experiment`
+- `incident`
+- `other`
+
+### `invalid_trace_events`
+
+The `events` array is absent, empty, or malformed.
+
+Fix: include at least one event.
+
+### `invalid_trace_event`
+
+An event is malformed or uses an unsupported `event_type`.
+
+Supported event types:
+
+- `intent_decision`
+- `scope_drift`
+- `acceptance_criteria_drift`
+- `ux_drift`
+- `ai_eval_drift`
+- `success_metric_review`
+- `implementation_tradeoff`
+- `spec_revision`
+- `outcome_review`
+
+### `invalid_trace_decision`
+
+An event's `decision` object is malformed or uses an unsupported `outcome`.
+
+Supported outcomes:
+
+- `update_spec`
+- `update_implementation`
+- `accept_tradeoff`
+- `reopen_work`
+- `record_learning`
+- `no_action`
+
+### `invalid_trace_link`
+
+A Decision Trace link is malformed or uses an unsupported type.
+
+Fix: include `type` and `url`, and use one of the ProductSpec related artifact types or `product_spec`.
+
+### `invalid_trace_revision`
+
+A Product Spec revision field is present but is not a positive integer.
+
+Fix: use `1` or higher.
+
+## Product Spec Errors
 
 ### `missing_frontmatter`
 

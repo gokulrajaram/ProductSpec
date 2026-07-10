@@ -8,13 +8,17 @@ A Product Spec tells an agent what should be built, why it matters, what is in s
 
 Load `skills/productspec/SKILL.md` before asking an agent to implement from a Product Spec.
 
-For Codex or Claude Code, reference the skill in the prompt or add it to the repository's agent instructions:
+For Codex, reference the skill directly in the prompt or keep it in the repo:
 
 ```md
 Use `skills/productspec/SKILL.md` before planning or implementing work governed by a `.product-spec.md` file.
 ```
 
-For repositories with an `AGENTS.md` or `CLAUDE.md`, add:
+For Claude Code, copy the same instruction into `CLAUDE.md`.
+
+For Cursor or other repo agents, copy the same instruction into the repository's agent rules or project instructions.
+
+For repositories with an `AGENTS.md`, add:
 
 ```md
 # ProductSpec

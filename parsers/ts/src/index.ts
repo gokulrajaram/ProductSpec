@@ -48,6 +48,38 @@ export const RELATED_ARTIFACT_TYPES = [
 export type AiEvalType = (typeof AI_EVAL_TYPES)[number];
 export type AiEvalEvaluator = (typeof AI_EVAL_EVALUATORS)[number];
 export type RelatedArtifactType = (typeof RELATED_ARTIFACT_TYPES)[number];
+export const DECISION_TRACE_SUBJECT_TYPES = [
+  "product_spec",
+  "engineering_spec",
+  "design",
+  "implementation",
+  "eval",
+  "experiment",
+  "incident",
+  "other"
+] as const;
+export const DECISION_TRACE_EVENT_TYPES = [
+  "intent_decision",
+  "scope_drift",
+  "acceptance_criteria_drift",
+  "ux_drift",
+  "ai_eval_drift",
+  "success_metric_review",
+  "implementation_tradeoff",
+  "spec_revision",
+  "outcome_review"
+] as const;
+export const DECISION_TRACE_OUTCOMES = [
+  "update_spec",
+  "update_implementation",
+  "accept_tradeoff",
+  "reopen_work",
+  "record_learning",
+  "no_action"
+] as const;
+export type DecisionTraceSubjectType = (typeof DECISION_TRACE_SUBJECT_TYPES)[number];
+export type DecisionTraceEventType = (typeof DECISION_TRACE_EVENT_TYPES)[number];
+export type DecisionTraceOutcome = (typeof DECISION_TRACE_OUTCOMES)[number];
 
 export interface ProductSpecFrontmatter {
   spec_format_version: "0.1";
@@ -63,7 +95,7 @@ export interface ProductSpecFrontmatter {
   tool_metadata?: Record<string, string>;
 }
 
-export type ProductSpecAppliesTo = { path: string } | { component: string };
+export type ProductSpecAppliesTo = { path?: string; component?: string };
 
 export interface ProductSpecSection {
   id: string;
@@ -135,6 +167,57 @@ export type ProductSpecValidationResult =
   | { valid: true; document: ProductSpecDocument; errors: []; warnings: ProductSpecValidationWarning[] }
   | { valid: false; errors: ProductSpecValidationError[]; warnings: ProductSpecValidationWarning[] };
 
+export interface DecisionTraceDocument {
+  decision_trace_format_version: "0.1";
+  trace_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  subject: {
+    type: DecisionTraceSubjectType;
+    id: string;
+    title?: string;
+    product_spec_path?: string;
+    product_spec_revision?: number;
+  };
+  events: DecisionTraceEvent[];
+}
+
+export interface DecisionTraceEvent {
+  event_id: string;
+  event_type: DecisionTraceEventType;
+  occurred_at: string;
+  summary: string;
+  source?: {
+    product_spec_revision?: number;
+    links?: DecisionTraceLink[];
+  };
+  drift?: {
+    spec_claim?: string;
+    observed_reality?: string;
+  };
+  decision: {
+    outcome: DecisionTraceOutcome;
+    rationale: string;
+    approved_by?: string[];
+  };
+  result?: {
+    new_product_spec_revision?: number;
+    linked_artifacts?: DecisionTraceLink[];
+    learning?: string;
+  };
+}
+
+export interface DecisionTraceLink {
+  type: RelatedArtifactType | "product_spec";
+  url: string;
+  title?: string;
+}
+
+export type DecisionTraceValidationResult =
+  | { valid: true; document: DecisionTraceDocument; errors: [] }
+  | { valid: false; errors: ProductSpecValidationError[] };
+
 const LABELS: Record<string, string> = {
   problem: "Problem",
   hypothesis: "Hypothesis",
@@ -185,6 +268,27 @@ export function validateProductSpecMarkdown(markdown: string): ProductSpecValida
       warnings: []
     };
   }
+}
+
+export function validateDecisionTraceJson(json: string): DecisionTraceValidationResult {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch (error) {
+    return {
+      valid: false,
+      errors: [
+        {
+          code: "invalid_json",
+          message: error instanceof Error ? error.message : "Invalid JSON."
+        }
+      ]
+    };
+  }
+
+  const errors = validateDecisionTraceValue(parsed);
+  if (errors.length) return { valid: false, errors };
+  return { valid: true, document: parsed as DecisionTraceDocument, errors: [] };
 }
 
 export function serializeProductSpecMarkdown(doc: ProductSpecDocument): string {
@@ -535,6 +639,239 @@ function validateDocument(document: ProductSpecDocument): {
   return { errors, warnings };
 }
 
+function validateDecisionTraceValue(value: unknown): ProductSpecValidationError[] {
+  const errors: ProductSpecValidationError[] = [];
+  if (!isRecord(value)) {
+    return [{ code: "invalid_decision_trace", message: "Decision Trace must be a JSON object." }];
+  }
+
+  const requiredFields = [
+    "decision_trace_format_version",
+    "trace_id",
+    "title",
+    "created_at",
+    "updated_at",
+    "subject",
+    "events"
+  ];
+  for (const field of requiredFields) {
+    if (value[field] === undefined || value[field] === null || value[field] === "") {
+      errors.push({
+        code: "missing_required_trace_field",
+        message: `Missing required Decision Trace field: ${field}`,
+        path: field
+      });
+    }
+  }
+
+  if (value.decision_trace_format_version !== "0.1") {
+    errors.push({
+      code: "unsupported_trace_version",
+      message: "Unsupported decision_trace_format_version.",
+      path: "decision_trace_format_version"
+    });
+  }
+  if (typeof value.trace_id === "string" && !/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/.test(value.trace_id)) {
+    errors.push({
+      code: "invalid_trace_id",
+      message: "Invalid trace_id. Use lowercase words separated by hyphens or underscores.",
+      path: "trace_id"
+    });
+  }
+  for (const field of ["trace_id", "title", "created_at", "updated_at"] as const) {
+    if (value[field] !== undefined && typeof value[field] !== "string") {
+      errors.push({
+        code: "invalid_trace_field",
+        message: `Invalid Decision Trace field: ${field} must be a string.`,
+        path: field
+      });
+    }
+  }
+
+  errors.push(...validateDecisionTraceSubject(value.subject));
+  if (!Array.isArray(value.events) || value.events.length === 0) {
+    errors.push({
+      code: "invalid_trace_events",
+      message: "Decision Trace events must include at least one event.",
+      path: "events"
+    });
+  } else {
+    for (const [index, event] of value.events.entries()) {
+      errors.push(...validateDecisionTraceEvent(event, `events.${index}`));
+    }
+  }
+  return errors;
+}
+
+function validateDecisionTraceSubject(value: unknown): ProductSpecValidationError[] {
+  const errors: ProductSpecValidationError[] = [];
+  if (!isRecord(value)) {
+    return [{ code: "invalid_trace_subject", message: "Decision Trace subject must be an object.", path: "subject" }];
+  }
+  for (const field of ["type", "id"] as const) {
+    if (!nonEmptyString(value[field])) {
+      errors.push({
+        code: "missing_required_trace_field",
+        message: `Missing required Decision Trace subject field: ${field}`,
+        path: `subject.${field}`
+      });
+    }
+  }
+  if (value.type && !DECISION_TRACE_SUBJECT_TYPES.includes(value.type as DecisionTraceSubjectType)) {
+    errors.push({
+      code: "invalid_trace_subject",
+      message: `Invalid Decision Trace subject type: ${String(value.type)}`,
+      path: "subject.type"
+    });
+  }
+  if (value.product_spec_revision !== undefined && !positiveInteger(value.product_spec_revision)) {
+    errors.push({
+      code: "invalid_trace_revision",
+      message: "Decision Trace product_spec_revision must be a positive integer.",
+      path: "subject.product_spec_revision"
+    });
+  }
+  return errors;
+}
+
+function validateDecisionTraceEvent(value: unknown, path: string): ProductSpecValidationError[] {
+  const errors: ProductSpecValidationError[] = [];
+  if (!isRecord(value)) {
+    return [{ code: "invalid_trace_event", message: "Decision Trace event must be an object.", path }];
+  }
+  for (const field of ["event_id", "event_type", "occurred_at", "summary", "decision"] as const) {
+    if (value[field] === undefined || value[field] === null || value[field] === "") {
+      errors.push({
+        code: "missing_required_trace_field",
+        message: `Missing required Decision Trace event field: ${field}`,
+        path: `${path}.${field}`
+      });
+    }
+  }
+  if (typeof value.event_id === "string" && !/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/.test(value.event_id)) {
+    errors.push({
+      code: "invalid_trace_event",
+      message: "Invalid event_id. Use lowercase words separated by hyphens or underscores.",
+      path: `${path}.event_id`
+    });
+  }
+  if (value.event_type && !DECISION_TRACE_EVENT_TYPES.includes(value.event_type as DecisionTraceEventType)) {
+    errors.push({
+      code: "invalid_trace_event",
+      message: `Invalid event_type: ${String(value.event_type)}`,
+      path: `${path}.event_type`
+    });
+  }
+  if (value.source !== undefined) errors.push(...validateDecisionTraceSource(value.source, `${path}.source`));
+  if (value.drift !== undefined && !isRecord(value.drift)) {
+    errors.push({ code: "invalid_trace_drift", message: "Decision Trace drift must be an object.", path: `${path}.drift` });
+  }
+  errors.push(...validateDecisionTraceDecision(value.decision, `${path}.decision`));
+  if (value.result !== undefined) errors.push(...validateDecisionTraceResult(value.result, `${path}.result`));
+  return errors;
+}
+
+function validateDecisionTraceSource(value: unknown, path: string): ProductSpecValidationError[] {
+  const errors: ProductSpecValidationError[] = [];
+  if (!isRecord(value)) return [{ code: "invalid_trace_source", message: "Decision Trace source must be an object.", path }];
+  if (value.product_spec_revision !== undefined && !positiveInteger(value.product_spec_revision)) {
+    errors.push({
+      code: "invalid_trace_revision",
+      message: "Decision Trace product_spec_revision must be a positive integer.",
+      path: `${path}.product_spec_revision`
+    });
+  }
+  if (value.links !== undefined) errors.push(...validateDecisionTraceLinks(value.links, `${path}.links`));
+  return errors;
+}
+
+function validateDecisionTraceDecision(value: unknown, path: string): ProductSpecValidationError[] {
+  const errors: ProductSpecValidationError[] = [];
+  if (!isRecord(value)) return [{ code: "invalid_trace_decision", message: "Decision Trace decision must be an object.", path }];
+  for (const field of ["outcome", "rationale"] as const) {
+    if (!nonEmptyString(value[field])) {
+      errors.push({
+        code: "missing_required_trace_field",
+        message: `Missing required Decision Trace decision field: ${field}`,
+        path: `${path}.${field}`
+      });
+    }
+  }
+  if (value.outcome && !DECISION_TRACE_OUTCOMES.includes(value.outcome as DecisionTraceOutcome)) {
+    errors.push({
+      code: "invalid_trace_decision",
+      message: `Invalid decision outcome: ${String(value.outcome)}`,
+      path: `${path}.outcome`
+    });
+  }
+  if (value.approved_by !== undefined && (!Array.isArray(value.approved_by) || value.approved_by.some((item) => !nonEmptyString(item)))) {
+    errors.push({
+      code: "invalid_trace_decision",
+      message: "Decision Trace approved_by must be an array of non-empty strings.",
+      path: `${path}.approved_by`
+    });
+  }
+  return errors;
+}
+
+function validateDecisionTraceResult(value: unknown, path: string): ProductSpecValidationError[] {
+  const errors: ProductSpecValidationError[] = [];
+  if (!isRecord(value)) return [{ code: "invalid_trace_result", message: "Decision Trace result must be an object.", path }];
+  if (value.new_product_spec_revision !== undefined && !positiveInteger(value.new_product_spec_revision)) {
+    errors.push({
+      code: "invalid_trace_revision",
+      message: "Decision Trace new_product_spec_revision must be a positive integer.",
+      path: `${path}.new_product_spec_revision`
+    });
+  }
+  if (value.linked_artifacts !== undefined) errors.push(...validateDecisionTraceLinks(value.linked_artifacts, `${path}.linked_artifacts`));
+  return errors;
+}
+
+function validateDecisionTraceLinks(value: unknown, path: string): ProductSpecValidationError[] {
+  const errors: ProductSpecValidationError[] = [];
+  const linkTypes = ["product_spec", ...RELATED_ARTIFACT_TYPES];
+  if (!Array.isArray(value)) {
+    return [{ code: "invalid_trace_link", message: "Decision Trace links must be an array.", path }];
+  }
+  for (const [index, link] of value.entries()) {
+    const linkPath = `${path}.${index}`;
+    if (!isRecord(link)) {
+      errors.push({ code: "invalid_trace_link", message: "Decision Trace link must be an object.", path: linkPath });
+      continue;
+    }
+    for (const field of ["type", "url"] as const) {
+      if (!nonEmptyString(link[field])) {
+        errors.push({
+          code: "missing_required_trace_field",
+          message: `Missing required Decision Trace link field: ${field}`,
+          path: `${linkPath}.${field}`
+        });
+      }
+    }
+    if (link.type && !linkTypes.includes(String(link.type))) {
+      errors.push({
+        code: "invalid_trace_link",
+        message: `Invalid Decision Trace link type: ${String(link.type)}`,
+        path: `${linkPath}.type`
+      });
+    }
+  }
+  return errors;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function nonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function positiveInteger(value: unknown): boolean {
+  return Number.isInteger(value) && Number(value) >= 1;
+}
+
 function parseFrontmatter(raw: string): ProductSpecFrontmatter {
   const lines = raw.split("\n");
   const result: Record<string, unknown> = {};
@@ -555,9 +892,10 @@ function parseFrontmatter(raw: string): ProductSpecFrontmatter {
           index += 1;
           assignKeyValue(item, lines[index].trim());
         }
-        if (item.path !== undefined) appliesTo.push({ path: item.path });
-        else if (item.component !== undefined) appliesTo.push({ component: item.component });
-        else appliesTo.push({ path: "" });
+        appliesTo.push({
+          ...(item.path !== undefined ? { path: item.path } : {}),
+          ...(item.component !== undefined ? { component: item.component } : {})
+        });
       }
       result.applies_to = appliesTo;
       continue;

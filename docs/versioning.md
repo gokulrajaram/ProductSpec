@@ -91,6 +91,15 @@ v0.8 keeps the document shape at `spec_format_version: "0.1"` and adds portable 
 - `docs/agent-usage.md` explains how teams can load the skill and ask agents to cite Acceptance Criteria.
 - `starter-kit/` gives teams a copyable repo setup with Product Specs, Decision Traces, AGENTS/CLAUDE instructions, a pull request template, and CI validation.
 
+## v0.9 Decision Trace Validation Milestone
+
+v0.9 keeps the document shape at `spec_format_version: "0.1"` and makes Decision Trace a first-class validated companion format:
+
+- `productspec validate-trace <file>` validates Decision Trace JSON files.
+- The GitHub Action accepts optional `decision_traces` globs.
+- Invalid conformance fixtures cover malformed traceability and Decision Trace files.
+- Agent setup docs explain Codex, Claude Code, Cursor, and repo-agent installation paths.
+
 ## v1.0 Bar
 
 v1.0 is the first compatibility promise.

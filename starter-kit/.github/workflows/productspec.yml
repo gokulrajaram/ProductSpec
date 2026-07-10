@@ -14,4 +14,4 @@ jobs:
       - uses: gokulrajaram/ProductSpec@main
         with:
           files: "docs/product-specs/**/*.product-spec.md"
-
+          decision_traces: "docs/decision-traces/**/*.decision-trace.json"
