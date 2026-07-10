@@ -233,6 +233,23 @@ Acceptance Criteria say whether the artifact is ready to ship. Success Metrics s
 
 Use `target_status: committed` when the threshold is a real commitment. Use `target_status: provisional` when the metric is right but the target depends on a baseline that will be calibrated after launch; in that case, include `target_owner` so the uncertainty is owned.
 
+**Committed targets:**
+
+`target_status` defaults to `committed`, so a metric with no status is a committed one. Use it when the number came from somewhere: a current baseline, a prior release, a contractual threshold, or a decision the team already made. `committed` is a claim about who agreed to the number, not about how confident anyone feels.
+
+**Provisional targets:**
+
+Use `provisional` when the metric is right but the number cannot exist yet, because the baseline arrives with the launch or the threshold needs a calibration pass. Write `target: tbd`, and name the person who will set it in `target_owner`.
+
+`target_owner` is required for provisional targets, and the requirement is the point. A provisional target with no owner is a number nobody will ever go back and set. The owner is the person who replaces `tbd` with a real value once the baseline exists, inside the `window` the metric already states.
+
+A provisional target is a scheduled decision, not a permanent state. Once the number is set, change `target_status` to `committed` in the same revision that records the number.
+
+**Common mistake:** marking a target `provisional` because the number feels uncertain. Provisional describes whether the baseline exists yet, not how sure the team is. A number the team has agreed to belongs in `committed` even when nobody is confident it will be hit. A number nobody has agreed to does not belong in the spec at all, and that is what `provisional` is for.
+
+When the metric itself is undecided, that is not a provisional target. Leave the row out and record the open decision under `## Open Questions`, where a reviewer will see it.
+
+
 ## AI Evals
 
 AI evals are not a separate mandatory section in ProductSpec.
