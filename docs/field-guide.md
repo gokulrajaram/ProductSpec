@@ -96,6 +96,11 @@ cut:
 
 **Common mistake:** treating scope as a feature wish list. Scope should help the team say no.
 
+Use this test when deciding between `cut` and `solution_alternatives`: would a user have noticed the difference?
+
+- If yes, it is a user-visible capability, channel, or workflow. Put it in `cut` with the rejection reason.
+- If no, it is usually a rejected way of building the same user-visible behavior. Put it in `solution_alternatives`.
+
 ## User Experience
 
 **What it is:** an optional externally observable experience of the work, when there is one.
@@ -246,6 +251,15 @@ For AI features, pre-launch eval thresholds belong in `acceptance_criteria` beca
 **Success Metrics example:**
 
 > Fewer than 2% of copied AI-generated citations are reported as incorrect by users.
+
+## Compliance and Policy Content
+
+Compliance, privacy, security, or legal content goes where its job belongs.
+
+- A concrete pre-launch pass/fail gate belongs in Acceptance Criteria.
+- An ongoing obligation, standing policy, or background rule belongs in a custom section.
+
+Example: "SOC 2 evidence exists before launch" is an acceptance criterion. "Quarterly access review policy" is usually a custom section.
 
 ## Optional Sections
 

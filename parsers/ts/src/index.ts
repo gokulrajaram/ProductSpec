@@ -936,6 +936,15 @@ function parseFrontmatter(raw: string): ProductSpecFrontmatter {
       result.custom_sections = customSections;
       continue;
     }
+    if (line.startsWith("tool_metadata:")) {
+      const metadata: Record<string, string> = {};
+      while (lines[index + 1]?.startsWith("  ")) {
+        index += 1;
+        assignKeyValue(metadata, lines[index].trim());
+      }
+      result.tool_metadata = metadata;
+      continue;
+    }
     assignKeyValue(result, line);
   }
 
@@ -1041,14 +1050,13 @@ function parseSections(
 }
 
 function parseScopeBlock(content: string): ProductSpecScope | undefined {
-  const blockPattern = /```productspec-scope\n([\s\S]*?)\n```/g;
-  const blocks = [...content.matchAll(blockPattern)];
+  const blocks = productSpecBlocks(content, "productspec-scope");
   if (!blocks.length) return undefined;
 
   const scope: ProductSpecScope = { in: [], out: [], cut: [] };
   for (const block of blocks) {
     let category: keyof ProductSpecScope | undefined;
-    for (const line of block[1].split("\n")) {
+    for (const line of block.split("\n")) {
       if (!line.trim()) continue;
       const categoryMatch = /^(in|out|cut):$/.exec(line.trim());
       if (categoryMatch) {
@@ -1066,8 +1074,9 @@ function parseScopeBlock(content: string): ProductSpecScope | undefined {
 }
 
 function parseAcceptanceCriterionBlocks(content: string): ProductSpecAcceptanceCriterion[] {
-  const blockPattern = /```productspec-acceptance-criteria\n([\s\S]*?)\n```/g;
-  return [...content.matchAll(blockPattern)].flatMap((match) => parseAcceptanceCriterionList(match[1]));
+  return productSpecBlocks(content, "productspec-acceptance-criteria").flatMap((block) =>
+    parseAcceptanceCriterionList(block)
+  );
 }
 
 function parseAcceptanceCriterionList(raw: string): ProductSpecAcceptanceCriterion[] {
@@ -1107,8 +1116,7 @@ function assignAcceptanceCriterionValue(target: Partial<ProductSpecAcceptanceCri
 }
 
 function parseAiEvalBlocks(content: string): ProductSpecAiEval[] {
-  const blockPattern = /```productspec-ai-evals\n([\s\S]*?)\n```/g;
-  return [...content.matchAll(blockPattern)].flatMap((match) => parseAiEvalList(match[1]));
+  return productSpecBlocks(content, "productspec-ai-evals").flatMap((block) => parseAiEvalList(block));
 }
 
 function parseAiEvalList(raw: string): ProductSpecAiEval[] {
@@ -1198,8 +1206,7 @@ function assignAiEvalValue(target: Partial<ProductSpecAiEval>, line: string) {
 }
 
 function parseSuccessMetricBlocks(content: string): ProductSpecSuccessMetric[] {
-  const blockPattern = /```productspec-success-metrics\n([\s\S]*?)\n```/g;
-  return [...content.matchAll(blockPattern)].flatMap((match) => parseSuccessMetricList(match[1]));
+  return productSpecBlocks(content, "productspec-success-metrics").flatMap((block) => parseSuccessMetricList(block));
 }
 
 function parseSuccessMetricList(raw: string): ProductSpecSuccessMetric[] {
@@ -1245,8 +1252,39 @@ function assignSuccessMetricValue(target: Partial<ProductSpecSuccessMetric>, lin
 }
 
 function parseRelatedArtifactBlocks(content: string): ProductSpecRelatedArtifact[] {
-  const blockPattern = /```productspec-related-artifacts\n([\s\S]*?)\n```/g;
-  return [...content.matchAll(blockPattern)].flatMap((match) => parseRelatedArtifactList(match[1]));
+  return productSpecBlocks(content, "productspec-related-artifacts").flatMap((block) =>
+    parseRelatedArtifactList(block)
+  );
+}
+
+function productSpecBlocks(content: string, info: string): string[] {
+  const blocks: string[] = [];
+  const lines = content.split("\n");
+  let openFence: string | undefined;
+  let body: string[] = [];
+
+  for (const line of lines) {
+    if (!openFence) {
+      const open = /^ {0,3}(`{3,}|~{3,})([A-Za-z0-9_-]+)[ \t]*$/.exec(line);
+      if (open?.[2] === info) {
+        openFence = open[1];
+        body = [];
+      }
+      continue;
+    }
+
+    const close = /^ {0,3}(`{3,}|~{3,})[ \t]*$/.exec(line);
+    if (close && close[1][0] === openFence[0] && close[1].length >= openFence.length) {
+      blocks.push(body.join("\n"));
+      openFence = undefined;
+      body = [];
+      continue;
+    }
+
+    body.push(line);
+  }
+
+  return blocks;
 }
 
 function parseRelatedArtifactList(raw: string): ProductSpecRelatedArtifact[] {
@@ -1318,6 +1356,12 @@ function serializeFrontmatter(frontmatter: ProductSpecFrontmatter): string {
       output += `  - id: "${section.id}"\n`;
       output += `    label: "${section.label}"\n`;
       output += `    after: "${section.after}"\n`;
+    }
+  }
+  if (frontmatter.tool_metadata && Object.keys(frontmatter.tool_metadata).length) {
+    output += "tool_metadata:\n";
+    for (const [key, value] of Object.entries(frontmatter.tool_metadata)) {
+      output += `  ${key}: "${value}"\n`;
     }
   }
   return output;

@@ -44,6 +44,8 @@ Optional fields:
 
 Exports intended for public sharing should strip `tool_metadata` by default.
 
+`custom_sections[].after` is advisory metadata for authoring tools. The reference parser preserves it, but section order follows the physical order of `##` headings in the Markdown body.
+
 ## Canonical Section Vocabulary
 
 Mandatory sections, in order:
@@ -101,6 +103,10 @@ Structured scope supports:
 - `in`: what ships in this version.
 - `out`: what is explicitly outside this version.
 - `cut`: what was considered and deliberately removed.
+
+Put a rejected user-visible capability, channel, or workflow in `cut`. Put a rejected way of building the same user-visible behavior in `solution_alternatives`. A practical test: would a user notice the difference? If yes, it is scope. If no, it is usually a solution alternative.
+
+ProductSpec structured fenced blocks may use CommonMark backtick fences or tilde fences.
 
 Acceptance criteria are written in `acceptance_criteria` with a fenced `productspec-acceptance-criteria` block:
 
@@ -176,6 +182,8 @@ Each AI eval item requires:
 Eval cases and optional checks do not get standalone IDs. If a tool needs to cite them, it should use positional references such as `EVAL-1.case[2]` or `EVAL-1.check[1]`.
 
 Tools should preserve fenced blocks in Markdown and may expose parsed criteria, metrics, and evals as structured data.
+
+Compliance, privacy, security, or legal content belongs in Acceptance Criteria when it is a concrete pre-launch pass/fail gate. Ongoing obligations, standing policy, or background context belong in a custom section.
 
 ## Traceability
 

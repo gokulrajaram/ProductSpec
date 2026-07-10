@@ -35,7 +35,7 @@ The repo also includes a complete copyable setup in [`starter-kit/`](../starter-
 Agents should:
 
 - find relevant `.product-spec.md` files before starting implementation
-- read `Problem`, `Hypothesis`, `Scope`, `Acceptance Criteria`, `AI Evals`, and `Success Metrics`
+- read `Problem`, `Hypothesis`, `Scope`, `Acceptance Criteria`, and `Success Metrics`
 - treat Acceptance Criteria as the build contract
 - cite `AC-<number>` IDs in plans, tasks, tests, and pull request summaries
 - treat `scope.out` and `scope.cut` as explicit non-goals
@@ -69,7 +69,7 @@ Acceptance Criteria covered:
 - AC-1: implemented by this PR
 - AC-2: implemented by this PR
 
-AI evals:
+AI evals inside Acceptance Criteria:
 
 - EVAL-1: added to the test suite
 

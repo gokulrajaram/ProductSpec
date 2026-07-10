@@ -40,7 +40,7 @@ Real-user behavior after launch, in a productspec-success-metrics block.
 
 Required: `spec_format_version`, `title`, `artifact_type`, `author`, `created_at`, `updated_at`.
 
-Optional: `spec_revision` (start at `1`), `linked_github_repo`, `applies_to`, `custom_sections`.
+Optional: `spec_revision` (start at `1`), `linked_github_repo`, `applies_to`, `custom_sections`, `tool_metadata`.
 
 Each `applies_to` entry carries exactly one of `path` or `component`. Two keys in one entry, or neither, fails with `invalid_applies_to`.
 
@@ -169,6 +169,6 @@ Frontmatter `applies_to` carries document-level scope. `related_artifacts` carri
 
 `user_experience`, `customer_truth`, `solution_alternatives`, `solution`, `strategic_positioning`, `adoption`, `pricing`, `risks`, `ai`, `open_questions`, `rollout`, `related_artifacts`. Write them as title-case headings: `open_questions` is `## Open Questions`. Add a section only when it sharpens the document.
 
-Any non-canonical `## Heading` becomes a custom section with a derived `custom-<kebab-name>` id. Declare it in frontmatter `custom_sections` (entries of `{ id, label, after }`) when you want to pin the id and label. Declared ids must match `custom-<kebab-name>` or validation fails with `invalid_custom_section_id`. `after` is preserved on round-trip, but the reference parser orders sections by their physical position in the file and never reads it. A misspelled optional-section heading silently becomes a custom section, so check spelling yourself.
+Any non-canonical `## Heading` becomes a custom section with a derived `custom-<kebab-name>` id. Declare it in frontmatter `custom_sections` (entries of `{ id, label, after }`) when you want to pin the id and label. Declared ids must match `custom-<kebab-name>` or validation fails with `invalid_custom_section_id`. `after` is advisory metadata for authoring tools. It is preserved on round-trip, but the reference parser orders sections by their physical position in the file. A misspelled optional-section heading silently becomes a custom section, so check spelling yourself.
 
 Full vocabulary and field definitions: https://github.com/gokulrajaram/ProductSpec/blob/main/SPEC.md. Worked example: https://github.com/gokulrajaram/ProductSpec/blob/main/examples/ai-support-triage.product-spec.md.

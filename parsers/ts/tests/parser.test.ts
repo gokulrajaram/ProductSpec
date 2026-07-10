@@ -204,6 +204,90 @@ In: transcript search, timestamp citations, and quote copy.
     expect(parseProductSpecMarkdown(serializeProductSpecMarkdown(parsed))).toEqual(parsed);
   });
 
+  it("extracts ProductSpec blocks written with tilde fences", () => {
+    const markdown = `---
+spec_format_version: "0.1"
+title: "Tilde Fences"
+artifact_type: "prd"
+author: "ProductSpec"
+created_at: "2026-07-10T00:00:00Z"
+updated_at: "2026-07-10T00:00:00Z"
+---
+
+## Problem
+
+Researchers lose time finding exact quotes in long video transcripts.
+
+## Hypothesis
+
+If transcript search returns timestamped passages, researchers will cite video sources more often.
+
+## Scope
+
+~~~productspec-scope
+in:
+  - transcript search
+out:
+  - team libraries
+cut:
+  - speaker labels
+~~~
+
+## Acceptance Criteria
+
+~~~productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search one transcript by phrase.
+~~~
+
+~~~productspec-ai-evals
+- id: EVAL-1
+  type: exact_match
+  cases:
+    - input: "Copy passage"
+      expected: "Copied"
+  evaluator: deterministic
+  pass_threshold: 1
+~~~
+
+## Success Metrics
+
+~~~productspec-success-metrics
+- id: SM-1
+  metric: copied_timestamped_quote_rate
+  target: ">= 35%"
+  window: within 7 days of transcript creation
+~~~
+
+## Related Artifacts
+
+~~~productspec-related-artifacts
+- type: github_issue
+  url: "https://github.com/acme/app/issues/123"
+  section_id: acceptance_criteria
+  item_id: AC-1
+~~~
+`;
+
+    const parsed = parseProductSpecMarkdown(markdown);
+    const scope = parsed.sections.find((section) => section.id === "scope");
+    const acceptanceCriteria = parsed.sections.find((section) => section.id === "acceptance_criteria");
+    const successMetrics = parsed.sections.find((section) => section.id === "success_metrics");
+    const relatedArtifacts = parsed.sections.find((section) => section.id === "related_artifacts");
+
+    expect(scope?.scope?.in).toEqual(["transcript search"]);
+    expect(acceptanceCriteria?.acceptance_criteria?.[0].id).toBe("AC-1");
+    expect(acceptanceCriteria?.ai_evals?.[0]).toMatchObject({
+      id: "EVAL-1",
+      type: "exact_match",
+      evaluator: "deterministic",
+      pass_threshold: 1
+    });
+    expect(successMetrics?.success_metrics?.[0].id).toBe("SM-1");
+    expect(relatedArtifacts?.related_artifacts?.[0].type).toBe("github_issue");
+    expect(validateProductSpecMarkdown(markdown).valid).toBe(true);
+  });
+
   it("accepts structured AI evals without optional checks", () => {
     const result = validateProductSpecMarkdown(`---
 spec_format_version: "0.1"
@@ -688,6 +772,120 @@ In: transcript search, timestamp citations, and quote copy.
       }
     ]);
     expect(parseProductSpecMarkdown(serializeProductSpecMarkdown(parsed))).toEqual(parsed);
+  });
+
+  it("preserves tool metadata on parse and serialize", () => {
+    const markdown = `---
+spec_format_version: "0.1"
+title: "Tool Metadata"
+artifact_type: "prd"
+author: "ProductSpec"
+created_at: "2026-07-10T00:00:00Z"
+updated_at: "2026-07-10T00:00:00Z"
+tool_metadata:
+  coach_doc_id: "abc123"
+  imported_from: "notion"
+---
+
+## Problem
+
+Researchers lose time finding exact quotes in long video transcripts.
+
+## Hypothesis
+
+If transcript search returns timestamped passages, researchers will cite video sources more often.
+
+## Scope
+
+In: transcript search.
+
+## Acceptance Criteria
+
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search one transcript by phrase.
+\`\`\`
+
+## Success Metrics
+
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: copied_timestamped_quote_rate
+  target: ">= 35%"
+  window: within 7 days of transcript creation
+\`\`\`
+`;
+
+    const parsed = parseProductSpecMarkdown(markdown);
+    const serialized = serializeProductSpecMarkdown(parsed);
+
+    expect(parsed.frontmatter.tool_metadata).toEqual({
+      coach_doc_id: "abc123",
+      imported_from: "notion"
+    });
+    expect(serialized).toContain("tool_metadata:");
+    expect(serialized).toContain('  coach_doc_id: "abc123"');
+    expect(parseProductSpecMarkdown(serialized).frontmatter.tool_metadata).toEqual(parsed.frontmatter.tool_metadata);
+  });
+
+  it("treats custom section after metadata as advisory while preserving physical order", () => {
+    const markdown = `---
+spec_format_version: "0.1"
+title: "Custom Order"
+artifact_type: "prd"
+author: "ProductSpec"
+created_at: "2026-07-10T00:00:00Z"
+updated_at: "2026-07-10T00:00:00Z"
+custom_sections:
+  - id: "custom-appendix"
+    label: "Appendix"
+    after: "hypothesis"
+---
+
+## Problem
+
+Researchers lose time finding exact quotes in long video transcripts.
+
+## Hypothesis
+
+If transcript search returns timestamped passages, researchers will cite video sources more often.
+
+## Scope
+
+In: transcript search.
+
+## Acceptance Criteria
+
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: User can search one transcript by phrase.
+\`\`\`
+
+## Success Metrics
+
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: copied_timestamped_quote_rate
+  target: ">= 35%"
+  window: within 7 days of transcript creation
+\`\`\`
+
+## Appendix
+
+Extra notes.
+`;
+
+    const parsed = parseProductSpecMarkdown(markdown);
+
+    expect(parsed.frontmatter.custom_sections?.[0].after).toBe("hypothesis");
+    expect(parsed.sections.map((section) => section.id)).toEqual([
+      "problem",
+      "hypothesis",
+      "scope",
+      "acceptance_criteria",
+      "success_metrics",
+      "custom-appendix"
+    ]);
   });
 
   it("rejects malformed traceability blocks", () => {

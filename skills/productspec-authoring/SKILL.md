@@ -17,7 +17,7 @@ This skill covers producing that file. Reading a finished spec and building agai
 - Files use the extension `.product-spec.md`: YAML frontmatter between `---` markers, then `## Section` headings.
 - Five sections are mandatory, in order: `problem`, `hypothesis`, `scope`, `acceptance_criteria`, `success_metrics`.
 - Headings match case- and separator-insensitively. `## Acceptance Criteria` and `## acceptance_criteria` are the same section. Title case is the convention.
-- Frontmatter requires `spec_format_version: "0.1"`, `title`, `artifact_type` (`hypothesis` | `prd` | `openspec_proposal`), `author`, `created_at`, `updated_at`. Optional: `spec_revision`, `linked_github_repo`, `applies_to`, `custom_sections`.
+- Frontmatter requires `spec_format_version: "0.1"`, `title`, `artifact_type` (`hypothesis` | `prd` | `openspec_proposal`), `author`, `created_at`, `updated_at`. Optional: `spec_revision`, `linked_github_repo`, `applies_to`, `custom_sections`, `tool_metadata`.
 - `acceptance_criteria` and `success_metrics` each carry a required fenced block. Prose alone fails validation. Structured scope, AI evals, and related artifacts are optional.
 - Structured items carry durable ids: `AC-<number>`, `SM-<number>`, `EVAL-<number>`. Other documents cite them.
 - AI evals live inside `## Acceptance Criteria`, never in a section of their own. Related artifacts live inside `## Related Artifacts`.

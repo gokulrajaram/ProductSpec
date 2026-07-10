@@ -4,6 +4,20 @@
 
 No unreleased changes.
 
+## v0.11.0 - Parser Round-Trip Fixes
+
+Fixed:
+
+- ProductSpec structured blocks now parse CommonMark tilde fences (`~~~productspec-*`) as well as backtick fences.
+- `tool_metadata` frontmatter now survives parse and serialize round-trips.
+- Agent-facing ProductSpec skill docs no longer describe AI evals as a standalone section.
+
+Clarified:
+
+- `custom_sections[].after` is advisory metadata for authoring tools; physical Markdown section order remains authoritative.
+- Scope guidance now distinguishes rejected user-visible capabilities (`cut`) from rejected implementation approaches (`solution_alternatives`).
+- Compliance, privacy, security, and legal content belongs in Acceptance Criteria when it is a concrete pre-launch gate, and in a custom section when it is an ongoing obligation.
+
 ## v0.10.0 - Parser Correctness And Provisional Targets
 
 Added:

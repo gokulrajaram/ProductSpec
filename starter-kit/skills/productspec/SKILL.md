@@ -23,14 +23,13 @@ Read these sections in order:
 1. `Problem`: who is hurting and why the work matters.
 2. `Hypothesis`: the causal bet behind the product.
 3. `Scope`: what is in, out, and deliberately cut.
-4. `Acceptance Criteria`: the build contract.
-5. `AI Evals`: launch gates for model behavior, when present.
-6. `Success Metrics`: post-launch outcome checks.
-7. `Related Artifacts`: issues, pull requests, eval runs, dashboards, designs, or engineering specs linked to the work.
+4. `Acceptance Criteria`: the build contract, including AI evals when present.
+5. `Success Metrics`: post-launch outcome checks.
+6. `Related Artifacts`: issues, pull requests, eval runs, dashboards, designs, or engineering specs linked to the work.
 
 Acceptance Criteria are the build contract. Plans, tasks, code changes, tests, and pull request summaries should cite the relevant `AC-<number>` IDs.
 
-AI evals are pre-launch gates. Cite `EVAL-<number>` when implementing or changing model behavior.
+AI evals are pre-launch gates inside Acceptance Criteria, not a separate `## AI Evals` section. Cite `EVAL-<number>` when implementing or changing model behavior.
 
 Success Metrics are post-launch outcomes. Do not treat `SM-<number>` items as implementation tasks.
 
@@ -66,4 +65,3 @@ When reporting progress or opening a pull request:
 - cite AI evals added or changed
 - name scope items intentionally deferred
 - link related issues, pull requests, eval runs, or dashboards when available
-

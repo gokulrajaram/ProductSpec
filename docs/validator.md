@@ -243,6 +243,8 @@ Supported fields:
 
 Fix: place the block inside Scope, use only supported fields, and include at least one non-empty item.
 
+Structured ProductSpec blocks may use either CommonMark backtick fences or tilde fences. For example, both ```productspec-scope and ~~~productspec-scope are valid fence openers.
+
 ### `invalid_success_metric`
 
 A `productspec-success-metrics` block is malformed, incomplete, missing from Success Metrics, or placed outside Success Metrics.
