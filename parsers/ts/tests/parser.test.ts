@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -8,9 +8,11 @@ import {
   CANONICAL_SECTION_IDS,
   MANDATORY_SECTION_IDS,
   parseProductSpecMarkdown,
+  resolveProductSpecGraph,
   serializeProductSpecMarkdown,
   validateDecisionTraceJson,
-  validateProductSpecMarkdown
+  validateProductSpecMarkdown,
+  type ProductSpecGraphInput
 } from "../src/index";
 
 const root = fileURLToPath(new URL("../../..", import.meta.url));
@@ -1726,3 +1728,278 @@ function productSpecFiles(directory: string): string[] {
     return entry.endsWith(".product-spec.md") ? [entry] : [];
   });
 }
+
+describe("resolveProductSpecGraph", () => {
+  function graphInput(
+    path: string,
+    links: Array<{ to: string; relation?: "depends_on" | "blocks" | "supersedes" | "relates_to"; revision?: number }> = []
+  ): ProductSpecGraphInput {
+    return {
+      path,
+      document: {
+        frontmatter: {
+          spec_format_version: "0.1",
+          title: path,
+          artifact_type: "prd",
+          author: "ProductSpec",
+          created_at: "2026-07-11T00:00:00Z",
+          updated_at: "2026-07-11T00:00:00Z"
+        },
+        sections: [
+          {
+            id: "related_artifacts",
+            label: "Related Artifacts",
+            content: "",
+            related_artifacts: links.map((link) => ({
+              type: "product_spec" as const,
+              product_spec_path: link.to,
+              ...(link.relation ? { relation: link.relation } : {}),
+              ...(link.revision !== undefined ? { product_spec_revision: link.revision } : {})
+            }))
+          }
+        ]
+      }
+    };
+  }
+
+  it("orders a linear depends_on chain and splits buildable from blocked", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("specs/inbox.product-spec.md", [{ to: "./handoff.product-spec.md", relation: "depends_on" }]),
+      graphInput("specs/handoff.product-spec.md", [{ to: "./signals.product-spec.md", relation: "depends_on" }]),
+      graphInput("specs/signals.product-spec.md")
+    ]);
+
+    expect(graph.buildable).toEqual(["specs/signals.product-spec.md"]);
+    expect(graph.blocked).toEqual([
+      { path: "specs/inbox.product-spec.md", waits_on: ["specs/handoff.product-spec.md"] },
+      { path: "specs/handoff.product-spec.md", waits_on: ["specs/signals.product-spec.md"] }
+    ]);
+    expect(graph.order).toEqual([
+      "specs/signals.product-spec.md",
+      "specs/handoff.product-spec.md",
+      "specs/inbox.product-spec.md"
+    ]);
+    expect(graph.warnings).toEqual([]);
+  });
+
+  it("inverts blocks so the target waits on the declaring spec", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [{ to: "b.product-spec.md", relation: "blocks" }]),
+      graphInput("b.product-spec.md")
+    ]);
+
+    expect(graph.buildable).toEqual(["a.product-spec.md"]);
+    expect(graph.blocked).toEqual([{ path: "b.product-spec.md", waits_on: ["a.product-spec.md"] }]);
+  });
+
+  it("records supersedes and relates_to edges without gating", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [
+        { to: "b.product-spec.md", relation: "supersedes" },
+        { to: "c.product-spec.md" }
+      ]),
+      graphInput("b.product-spec.md"),
+      graphInput("c.product-spec.md")
+    ]);
+
+    expect(graph.buildable).toHaveLength(3);
+    expect(graph.blocked).toEqual([]);
+    expect(graph.edges.map((edge) => edge.relation)).toEqual(["supersedes", "relates_to"]);
+  });
+
+  it("warns on a gating link whose target is not in the graph and does not block on it", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [{ to: "gone.product-spec.md", relation: "depends_on" }])
+    ]);
+
+    expect(graph.buildable).toEqual(["a.product-spec.md"]);
+    expect(graph.warnings).toEqual([
+      {
+        code: "missing_link_target",
+        message: "a.product-spec.md declares depends_on on gone.product-spec.md, which is not in the graph.",
+        path: "a.product-spec.md"
+      }
+    ]);
+  });
+
+  it("detects dependency cycles and keeps cycle members out of the order", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [{ to: "b.product-spec.md", relation: "depends_on" }]),
+      graphInput("b.product-spec.md", [{ to: "a.product-spec.md", relation: "depends_on" }]),
+      graphInput("c.product-spec.md")
+    ]);
+
+    expect(graph.order).toEqual(["c.product-spec.md"]);
+    expect(graph.warnings).toEqual([
+      {
+        code: "dependency_cycle",
+        message: "Dependency cycle among: a.product-spec.md, b.product-spec.md.",
+        path: "a.product-spec.md"
+      }
+    ]);
+  });
+
+  it("ignores self links with a warning", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [{ to: "./a.product-spec.md", relation: "depends_on" }])
+    ]);
+
+    expect(graph.buildable).toEqual(["a.product-spec.md"]);
+    expect(graph.edges).toEqual([]);
+    expect(graph.warnings[0].code).toBe("self_dependency");
+  });
+
+  it("keeps the first spec and warns when two inputs share a path", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md"),
+      graphInput("./a.product-spec.md")
+    ]);
+
+    expect(graph.buildable).toEqual(["a.product-spec.md"]);
+    expect(graph.warnings[0].code).toBe("duplicate_spec_path");
+  });
+
+  it("resolves relative links across folders", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("docs/channels/inbox.product-spec.md", [
+        { to: "../foundation/contacts.product-spec.md", relation: "depends_on" }
+      ]),
+      graphInput("docs/foundation/contacts.product-spec.md")
+    ]);
+
+    expect(graph.blocked).toEqual([
+      {
+        path: "docs/channels/inbox.product-spec.md",
+        waits_on: ["docs/foundation/contacts.product-spec.md"]
+      }
+    ]);
+  });
+
+  it("carries revision pins through to edges", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [{ to: "b.product-spec.md", relation: "depends_on", revision: 2 }]),
+      graphInput("b.product-spec.md")
+    ]);
+
+    expect(graph.edges).toEqual([
+      {
+        from: "a.product-spec.md",
+        to: "b.product-spec.md",
+        relation: "depends_on",
+        product_spec_revision: 2
+      }
+    ]);
+  });
+
+  it("reports each dependency cycle separately and leaves downstream specs out of it", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [{ to: "b.product-spec.md", relation: "depends_on" }]),
+      graphInput("b.product-spec.md", [{ to: "a.product-spec.md", relation: "depends_on" }]),
+      graphInput("d.product-spec.md", [{ to: "e.product-spec.md", relation: "depends_on" }]),
+      graphInput("e.product-spec.md", [{ to: "d.product-spec.md", relation: "depends_on" }]),
+      graphInput("downstream.product-spec.md", [{ to: "a.product-spec.md", relation: "depends_on" }])
+    ]);
+
+    const cycleWarnings = graph.warnings.filter((warning) => warning.code === "dependency_cycle");
+    expect(cycleWarnings).toHaveLength(2);
+    expect(cycleWarnings[0].message).toBe("Dependency cycle among: a.product-spec.md, b.product-spec.md.");
+    expect(cycleWarnings[1].message).toBe("Dependency cycle among: d.product-spec.md, e.product-spec.md.");
+    expect(cycleWarnings.some((warning) => warning.message.includes("downstream"))).toBe(false);
+    expect(graph.order).toEqual([]);
+  });
+
+  it("warns on absolute link paths and drops the edge", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [{ to: "/specs/b.product-spec.md", relation: "depends_on" }]),
+      graphInput("specs/b.product-spec.md")
+    ]);
+
+    expect(graph.edges).toEqual([]);
+    expect(graph.buildable).toHaveLength(2);
+    expect(graph.warnings[0].code).toBe("unsupported_link_path");
+  });
+
+  it("normalizes backslash separators in input paths", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("docs\\channels\\inbox.product-spec.md", [
+        { to: "../foundation/contacts.product-spec.md", relation: "depends_on" }
+      ]),
+      graphInput("docs/foundation/contacts.product-spec.md")
+    ]);
+
+    expect(graph.blocked).toEqual([
+      {
+        path: "docs/channels/inbox.product-spec.md",
+        waits_on: ["docs/foundation/contacts.product-spec.md"]
+      }
+    ]);
+  });
+
+  it("resolves the shipped graph fixtures end to end", () => {
+    const fixtureDir = `${root}/conformance/graph`;
+    const inputs = productSpecFiles(fixtureDir).map((file) => {
+      const result = validateProductSpecMarkdown(readFileSync(file, "utf8"));
+      expect(result.valid).toBe(true);
+      return { path: file.slice(root.length), document: result.document! };
+    });
+
+    const graph = resolveProductSpecGraph(inputs);
+
+    expect(graph.buildable).toEqual([
+      "conformance/graph/contact-profiles.product-spec.md",
+      "conformance/graph/signals.product-spec.md"
+    ]);
+    expect(graph.blocked.map((node) => node.path)).toEqual([
+      "conformance/graph/human-handoff.product-spec.md",
+      "conformance/graph/unified-inbox.product-spec.md"
+    ]);
+    expect(graph.order[graph.order.length - 1]).toBe("conformance/graph/unified-inbox.product-spec.md");
+    expect(graph.warnings).toEqual([]);
+  });
+
+  it("provides a CLI graph command with table and JSON output", () => {
+    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
+    expect(build.status, build.stderr).toBe(0);
+    const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
+
+    const table = spawnSync("node", [cli, "graph", `${root}/conformance/graph`], { encoding: "utf8" });
+    expect(table.status).toBe(0);
+    expect(table.stdout).toContain("buildable:");
+    expect(table.stdout).toContain("order:");
+
+    const json = spawnSync("node", [cli, "graph", "--json", `${root}/conformance/graph`], { encoding: "utf8" });
+    expect(json.status).toBe(0);
+    const graph = JSON.parse(json.stdout);
+    expect(graph.buildable).toHaveLength(2);
+    expect(graph.blocked).toHaveLength(2);
+
+    const missing = spawnSync("node", [cli, "graph", `${root}/conformance/definitely-missing`], { encoding: "utf8" });
+    expect(missing.status).toBe(1);
+    expect(missing.stderr).toContain("not a directory");
+  });
+
+  it("surfaces skipped invalid specs in graph JSON output and fails when nothing is valid", () => {
+    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
+    expect(build.status, build.stderr).toBe(0);
+    const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
+
+    const mixedDir = mkdtempSync(join(tmpdir(), "productspec-graph-"));
+    const validSpec = readFileSync(`${root}/conformance/graph/signals.product-spec.md`, "utf8");
+    writeFileSync(join(mixedDir, "valid.product-spec.md"), validSpec, "utf8");
+    writeFileSync(join(mixedDir, "broken.product-spec.md"), "no frontmatter here", "utf8");
+
+    const json = spawnSync("node", [cli, "graph", mixedDir, "--json"], { encoding: "utf8" });
+    expect(json.status).toBe(0);
+    const graph = JSON.parse(json.stdout);
+    expect(graph.warnings.some((warning: { code: string }) => warning.code === "skipped_invalid_spec")).toBe(true);
+
+    const brokenDir = mkdtempSync(join(tmpdir(), "productspec-graph-"));
+    writeFileSync(join(brokenDir, "broken.product-spec.md"), "no frontmatter here", "utf8");
+    const failed = spawnSync("node", [cli, "graph", brokenDir], { encoding: "utf8" });
+    expect(failed.status).toBe(1);
+    expect(failed.stderr).toContain("no valid .product-spec.md files");
+
+    rmSync(mixedDir, { recursive: true, force: true });
+    rmSync(brokenDir, { recursive: true, force: true });
+  });
+});

@@ -85,6 +85,12 @@ Start the ProductSpec MCP server:
 npx --yes -p @productspec/parser@latest productspec mcp
 ```
 
+Resolve a folder of specs into a build graph:
+
+```bash
+npm exec --package @productspec/parser -- productspec graph conformance/graph
+```
+
 Use the GitHub Action in a repository:
 
 ```yaml
@@ -273,6 +279,7 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 - [docs/get-started-with-agents.md](docs/get-started-with-agents.md): the shortest path from existing docs to agent-authored and agent-implemented Product Specs.
 - [docs/use-in-your-repo.md](docs/use-in-your-repo.md): copy-paste setup for using ProductSpec in an existing repository.
 - [docs/agent-usage.md](docs/agent-usage.md): how to use ProductSpec as a control file for coding agents.
+- [docs/graph.md](docs/graph.md): resolving a folder of Product Specs into buildable, blocked, and ordered work.
 - [docs/adoption.md](docs/adoption.md): how teams can adopt ProductSpec across Git, Jira, Linear, Figma, CI, engineering specs, and agents.
 - [docs/adoption-levels.md](docs/adoption-levels.md): a step-by-step maturity ladder for adopting ProductSpec.
 - [docs/before-after.md](docs/before-after.md): a loose PRD transformed into ProductSpec.

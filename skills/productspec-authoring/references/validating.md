@@ -14,6 +14,12 @@ Validate one Decision Trace:
 npm exec --yes --package @productspec/parser -- productspec validate-trace path/to/file.decision-trace.json
 ```
 
+Resolve a folder of specs into a build graph (buildable, blocked, order):
+
+```bash
+npm exec --yes --package @productspec/parser -- productspec graph path/to/spec-directory --json
+```
+
 Create a starter file:
 
 ```bash

@@ -6,6 +6,7 @@ import {
   getProductSpec,
   getRelatedArtifacts,
   getScope,
+  getSpecGraph,
   getSuccessMetrics,
   listProductSpecs,
   validateProductSpec
@@ -60,6 +61,11 @@ const tools: Record<string, { description: string; inputSchema: object; handler:
     description: "Return Related Artifacts from a Product Spec.",
     inputSchema: specPathSchema(),
     handler: (args) => getRelatedArtifacts(specPathArgs(args))
+  },
+  get_spec_graph: {
+    description: "Resolve product_spec links across all specs under a root into buildable, blocked, and ordered work.",
+    inputSchema: objectSchema({ root: stringProperty("Root directory. Defaults to current working directory.") }),
+    handler: (args) => getSpecGraph({ root: optionalString(args.root) })
   },
   check_completion_claim: {
     description: "Return the Acceptance Criteria and AI Evals an agent must verify before claiming implementation is complete.",

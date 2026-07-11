@@ -37,6 +37,7 @@ For MCP clients that support stdio servers:
 - `get_ai_evals`: returns AI Evals.
 - `get_success_metrics`: returns Success Metrics.
 - `get_related_artifacts`: returns Related Artifacts.
+- `get_spec_graph`: resolves `product_spec` links across all specs under a root into buildable, blocked, and ordered work.
 - `check_completion_claim`: returns the criteria and evals an agent must verify before claiming implementation is complete.
 
 ## Agent Prompt

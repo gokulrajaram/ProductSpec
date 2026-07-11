@@ -43,6 +43,7 @@ When creating an implementation plan:
 - Treat `scope.out` and `scope.cut` as explicit non-goals.
 - Use `applies_to` and `Related Artifacts` to find relevant code, issues, pull requests, designs, evals, and dashboards.
 - Resolve `product_spec` related artifacts before planning. A spec whose `depends_on` target is not built yet is blocked, not buildable, and the plan should say what it waits for.
+- For a folder of specs, run `productspec graph <dir> --json` (or the `get_spec_graph` MCP tool) to get the buildable set, the blocked set with what each spec waits for, and a dependency-respecting build order in one call, instead of re-reading every spec to derive it.
 
 ## Change Rules
 

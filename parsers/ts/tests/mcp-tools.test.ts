@@ -6,6 +6,7 @@ import {
   getAcceptanceCriteria,
   getAiEvals,
   getScope,
+  getSpecGraph,
   listProductSpecs,
   checkCompletionClaim
 } from "../src/mcp-tools";
@@ -132,5 +133,31 @@ describe("ProductSpec MCP tools", () => {
       ],
       ai_evals: [{ id: "EVAL-1", status: "not_run_by_productspec" }]
     });
+  });
+
+  it("resolves the spec graph across a root", () => {
+    const dir = writeFixture();
+    const dependentSpec = validSpec
+      .replace('title: "Transcript Search"', 'title: "Passage Sharing"')
+      .concat(`
+## Related Artifacts
+
+\`\`\`productspec-related-artifacts
+- type: product_spec
+  product_spec_path: "./search.product-spec.md"
+  relation: depends_on
+  title: "Transcript Search"
+\`\`\`
+`);
+    writeFileSync(join(dir, "sharing.product-spec.md"), dependentSpec, "utf8");
+
+    const graph = getSpecGraph({ root: dir });
+
+    expect(graph.buildable).toEqual(["search.product-spec.md"]);
+    expect(graph.blocked).toEqual([
+      { path: "sharing.product-spec.md", waits_on: ["search.product-spec.md"] }
+    ]);
+    expect(graph.order).toEqual(["search.product-spec.md", "sharing.product-spec.md"]);
+    expect(graph.warnings).toEqual([]);
   });
 });
