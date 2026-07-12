@@ -38,7 +38,7 @@ Warnings never fail the command. They surface graph problems a single-file valid
 
 | Warning | Cause |
 |---|---|
-| `missing_link_target` | A `depends_on` or `blocks` link points at a path that is not in the folder. The declaring spec stays buildable, because a target absent from the folder may simply live elsewhere. The warning is the signal to check. |
+| `missing_link_target` | A `depends_on` or `blocks` link points at a path that is not in the folder. A missing `depends_on` target blocks the declaring spec: the dependency is unresolved planning context, so the spec appears in `blocked` with the missing path in `waits_on`. A missing `blocks` target is warning-only, since nothing in the folder waits on it. |
 | `dependency_cycle` | A set of specs waits on each other in a loop. Each cycle gets its own warning naming exactly its members, and cycle members are excluded from `order`. |
 | `self_dependency` | A spec links to itself. The edge is ignored. |
 | `duplicate_spec_path` | Two files normalize to the same path. The first stays in the graph. |

@@ -1592,12 +1592,11 @@ export function resolveProductSpecGraph(inputs: ProductSpecGraphInput[]): Produc
     dependents.set(path, new Set());
   }
   for (const edge of edges) {
-    if (!nodes.has(edge.to)) continue;
     if (edge.relation === "depends_on") {
       waitsOn.get(edge.from)?.add(edge.to);
-      dependents.get(edge.to)?.add(edge.from);
+      if (nodes.has(edge.to)) dependents.get(edge.to)?.add(edge.from);
     }
-    if (edge.relation === "blocks") {
+    if (edge.relation === "blocks" && nodes.has(edge.to)) {
       waitsOn.get(edge.to)?.add(edge.from);
       dependents.get(edge.from)?.add(edge.to);
     }

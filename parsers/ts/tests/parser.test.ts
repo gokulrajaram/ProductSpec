@@ -1807,12 +1807,16 @@ describe("resolveProductSpecGraph", () => {
     expect(graph.edges.map((edge) => edge.relation)).toEqual(["supersedes", "relates_to"]);
   });
 
-  it("warns on a gating link whose target is not in the graph and does not block on it", () => {
+  it("blocks the declaring spec on a missing depends_on target and keeps the warning", () => {
     const graph = resolveProductSpecGraph([
       graphInput("a.product-spec.md", [{ to: "gone.product-spec.md", relation: "depends_on" }])
     ]);
 
-    expect(graph.buildable).toEqual(["a.product-spec.md"]);
+    expect(graph.buildable).toEqual([]);
+    expect(graph.blocked).toEqual([
+      { path: "a.product-spec.md", waits_on: ["gone.product-spec.md"] }
+    ]);
+    expect(graph.order).toEqual([]);
     expect(graph.warnings).toEqual([
       {
         code: "missing_link_target",
@@ -1820,6 +1824,16 @@ describe("resolveProductSpecGraph", () => {
         path: "a.product-spec.md"
       }
     ]);
+  });
+
+  it("keeps a missing blocks target warning-only", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [{ to: "gone.product-spec.md", relation: "blocks" }])
+    ]);
+
+    expect(graph.buildable).toEqual(["a.product-spec.md"]);
+    expect(graph.blocked).toEqual([]);
+    expect(graph.warnings[0].code).toBe("missing_link_target");
   });
 
   it("detects dependency cycles and keeps cycle members out of the order", () => {
