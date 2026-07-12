@@ -44,6 +44,8 @@ Optional fields:
 
 Exports intended for public sharing should strip `tool_metadata` by default.
 
+Files may contain frontmatter keys outside this list, such as Obsidian properties (`tags`, `aliases`, `cssclasses`). Tools should preserve unknown frontmatter keys on round-trip without treating them as portable standard behavior. The reference parser exposes them as `unknown_frontmatter`, an ordered list of raw frontmatter blocks, and re-emits them after the known keys when serializing.
+
 `custom_sections[].after` is advisory metadata for authoring tools. The reference parser preserves it, but section order follows the physical order of `##` headings in the Markdown body.
 
 ## Canonical Section Vocabulary

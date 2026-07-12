@@ -101,6 +101,7 @@ export interface ProductSpecFrontmatter {
   applies_to?: ProductSpecAppliesTo[];
   custom_sections?: Array<{ id: string; label: string; after: string }>;
   tool_metadata?: Record<string, string>;
+  unknown_frontmatter?: string[];
 }
 
 export type ProductSpecAppliesTo = { path?: string; component?: string };
@@ -942,9 +943,23 @@ function positiveInteger(value: unknown): boolean {
   return Number.isInteger(value) && Number(value) >= 1;
 }
 
+const SCALAR_FRONTMATTER_KEYS = [
+  "spec_format_version",
+  "title",
+  "artifact_type",
+  "spec_revision",
+  "author",
+  "created_at",
+  "updated_at",
+  "linked_github_repo"
+] as const;
+
+const KNOWN_SCALAR_FRONTMATTER_KEYS: ReadonlySet<string> = new Set(SCALAR_FRONTMATTER_KEYS);
+
 function parseFrontmatter(raw: string): ProductSpecFrontmatter {
   const lines = raw.split("\n");
   const result: Record<string, unknown> = {};
+  const unknownFrontmatter: string[] = [];
   let customSections: Array<{ id: string; label: string; after: string }> | undefined;
   let appliesTo: ProductSpecAppliesTo[] | undefined;
 
@@ -999,8 +1014,20 @@ function parseFrontmatter(raw: string): ProductSpecFrontmatter {
       result.tool_metadata = metadata;
       continue;
     }
+    const topLevelKey = /^([^\s:]+):/.exec(line);
+    if (topLevelKey && !KNOWN_SCALAR_FRONTMATTER_KEYS.has(topLevelKey[1])) {
+      const block = [line];
+      while (lines[index + 1] !== undefined && /^[ \t]/.test(lines[index + 1]) && lines[index + 1].trim()) {
+        index += 1;
+        block.push(lines[index]);
+      }
+      unknownFrontmatter.push(block.join("\n"));
+      continue;
+    }
     assignKeyValue(result, line);
   }
+
+  if (unknownFrontmatter.length) result.unknown_frontmatter = unknownFrontmatter;
 
   if (result.spec_format_version !== "0.1") throw new Error("Unsupported spec_format_version.");
   if (!result.title || !result.artifact_type || !result.author || !result.created_at || !result.updated_at) {
@@ -1401,7 +1428,7 @@ function sectionIdForLabel(label: string, customSections: Array<{ id: string; la
 
 function serializeFrontmatter(frontmatter: ProductSpecFrontmatter): string {
   let output = "";
-  for (const key of ["spec_format_version", "title", "artifact_type", "spec_revision", "author", "created_at", "updated_at", "linked_github_repo"] as const) {
+  for (const key of SCALAR_FRONTMATTER_KEYS) {
     const value = frontmatter[key];
     if (value === undefined || value === "") continue;
     output += typeof value === "number" ? `${key}: ${value}\n` : `${key}: "${value}"\n`;
@@ -1426,6 +1453,9 @@ function serializeFrontmatter(frontmatter: ProductSpecFrontmatter): string {
     for (const [key, value] of Object.entries(frontmatter.tool_metadata)) {
       output += `  ${key}: "${value}"\n`;
     }
+  }
+  for (const block of frontmatter.unknown_frontmatter ?? []) {
+    output += `${block}\n`;
   }
   return output;
 }

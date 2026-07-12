@@ -49,7 +49,11 @@
             "additionalProperties": false
           }
         },
-        "tool_metadata": { "type": "object" }
+        "tool_metadata": { "type": "object" },
+        "unknown_frontmatter": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
       },
       "additionalProperties": false
     },

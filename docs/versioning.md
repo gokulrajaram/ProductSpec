@@ -30,6 +30,7 @@ At minimum, tools should:
 
 - Reject unsupported versions with a clear error.
 - Preserve unknown custom sections when possible.
+- Preserve unknown frontmatter keys when possible.
 - Preserve `tool_metadata` without treating it as portable standard behavior.
 - Avoid assuming v0.x compatibility beyond what the current repo documents.
 
