@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+No unreleased changes.
+
+## v0.14.0 - Spec Graph
+
 Added:
 
 - `productspec graph <dir>`: resolves a folder of Product Specs into a build graph using `product_spec` related artifacts. Reports the buildable set, the blocked set with what each spec waits on, a dependency-respecting build order, and warnings for missing link targets, dependency cycles, self links, and duplicate paths. `--json` emits the machine-readable form.
