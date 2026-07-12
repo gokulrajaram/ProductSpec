@@ -1,9 +1,29 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { validateDecisionTraceJson, validateProductSpecMarkdown } from "./index.js";
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import {
+  resolveProductSpecGraph,
+  validateDecisionTraceJson,
+  validateProductSpecMarkdown,
+  type ProductSpecGraphInput,
+  type ProductSpecGraphWarning
+} from "./index.js";
 import { runProductSpecMcpServer } from "./mcp.js";
 
-const [command, filePath] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const positional = args.filter((arg) => !arg.startsWith("--"));
+const [command, filePath] = positional;
+const jsonOutput = args.includes("--json");
+
+function collectSpecFiles(dir: string): string[] {
+  const found: string[] = [];
+  const entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
+  for (const entry of entries) {
+    const entryPath = `${dir.replace(/\/$/, "")}/${entry.name}`;
+    if (entry.isDirectory()) found.push(...collectSpecFiles(entryPath));
+    else if (entry.name.endsWith(".product-spec.md")) found.push(entryPath);
+  }
+  return found;
+}
 
 const starterProductSpec = `---
 spec_format_version: "0.1"
@@ -73,8 +93,66 @@ if (command === "mcp") {
     console.error(`${error.code}: ${error.message}`);
   }
   process.exit(1);
+} else if (command === "graph" && filePath) {
+  if (!existsSync(filePath) || !statSync(filePath).isDirectory()) {
+    console.error(`${filePath}: not a directory`);
+    process.exit(1);
+  }
+
+  const specFiles = collectSpecFiles(filePath);
+  if (!specFiles.length) {
+    console.error(`${filePath}: no .product-spec.md files found`);
+    process.exit(1);
+  }
+
+  const inputs: ProductSpecGraphInput[] = [];
+  const skipped: ProductSpecGraphWarning[] = [];
+  for (const specFile of specFiles) {
+    const result = validateProductSpecMarkdown(readFileSync(specFile, "utf8"));
+    if (!result.valid || !result.document) {
+      skipped.push({
+        code: "skipped_invalid_spec",
+        message: `${specFile} fails validation and is not in the graph.`,
+        path: specFile
+      });
+      continue;
+    }
+    inputs.push({ path: specFile, document: result.document });
+  }
+
+  if (!inputs.length) {
+    for (const warning of skipped) console.warn(`warning ${warning.code}: ${warning.message}`);
+    console.error(`${filePath}: no valid .product-spec.md files`);
+    process.exit(1);
+  }
+
+  const graph = resolveProductSpecGraph(inputs);
+  graph.warnings.push(...skipped);
+
+  if (jsonOutput) {
+    console.log(JSON.stringify(graph, null, 2));
+    process.exit(0);
+  }
+
+  if (graph.buildable.length) {
+    console.log("buildable:");
+    for (const path of graph.buildable) console.log(`  ${path}`);
+  }
+  if (graph.blocked.length) {
+    console.log("blocked:");
+    for (const node of graph.blocked) {
+      console.log(`  ${node.path} (waits on: ${node.waits_on.join(", ")})`);
+    }
+  }
+  if (graph.order.length > 1) {
+    console.log(`order: ${graph.order.join(" -> ")}`);
+  }
+  for (const warning of graph.warnings) {
+    console.warn(`warning ${warning.code}: ${warning.message}`);
+  }
+  process.exit(0);
 } else if (command !== "validate" || !filePath) {
-  console.error("Usage: productspec validate path/to/file.product-spec.md\n       productspec validate-trace path/to/file.decision-trace.json\n       productspec init path/to/file.product-spec.md\n       productspec mcp");
+  console.error("Usage: productspec validate path/to/file.product-spec.md\n       productspec validate-trace path/to/file.decision-trace.json\n       productspec graph path/to/spec-directory [--json]\n       productspec init path/to/file.product-spec.md\n       productspec mcp");
   process.exit(1);
 } else {
   const result = validateProductSpecMarkdown(readFileSync(filePath, "utf8"));

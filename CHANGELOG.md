@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-No unreleased changes.
+Added:
+
+- `productspec graph <dir>`: resolves a folder of Product Specs into a build graph using `product_spec` related artifacts. Reports the buildable set, the blocked set with what each spec waits on, a dependency-respecting build order, and warnings for missing link targets, dependency cycles, self links, and duplicate paths. `--json` emits the machine-readable form.
+- `resolveProductSpecGraph(inputs)`: the pure resolver behind the command, exported from the parser for tools that already hold parsed documents.
+- `get_spec_graph`: the same graph as an MCP tool, so agents get buildable, blocked, and ordered work in one call.
+- Graph conformance fixtures under `conformance/graph/`.
+- `docs/graph.md`: command, semantics, warning taxonomy, and the purity boundary.
 
 ## v0.13.0 - MCP Server
 

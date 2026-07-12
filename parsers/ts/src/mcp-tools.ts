@@ -2,9 +2,13 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { isAbsolute, join, normalize, relative, resolve } from "node:path";
 import {
   parseProductSpecMarkdown,
+  resolveProductSpecGraph,
   type ProductSpecAcceptanceCriterion,
   type ProductSpecAiEval,
   type ProductSpecDocument,
+  type ProductSpecGraph,
+  type ProductSpecGraphInput,
+  type ProductSpecGraphWarning,
   type ProductSpecRelatedArtifact,
   type ProductSpecScope,
   type ProductSpecSuccessMetric,
@@ -136,6 +140,28 @@ function readProductSpecMarkdown(args: ProductSpecMcpArgs): string {
   const root = resolveRoot(args.root);
   const absolutePath = resolveSpecPath(root, args.path);
   return readFileSync(absolutePath, "utf8");
+}
+
+export function getSpecGraph(args: { root?: string } = {}): ProductSpecGraph {
+  const root = resolveRoot(args.root);
+  const inputs: ProductSpecGraphInput[] = [];
+  const skipped: ProductSpecGraphWarning[] = [];
+  for (const absolutePath of findProductSpecFiles(root)) {
+    const path = relative(root, absolutePath);
+    const result = validateProductSpecMarkdown(readFileSync(absolutePath, "utf8"));
+    if (!result.valid || !result.document) {
+      skipped.push({
+        code: "skipped_invalid_spec",
+        message: `${path} fails validation and is not in the graph.`,
+        path
+      });
+      continue;
+    }
+    inputs.push({ path, document: result.document });
+  }
+  const graph = resolveProductSpecGraph(inputs);
+  graph.warnings.push(...skipped);
+  return graph;
 }
 
 function resolveRoot(root?: string): string {

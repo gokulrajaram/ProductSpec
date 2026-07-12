@@ -1429,3 +1429,209 @@ function serializeFrontmatter(frontmatter: ProductSpecFrontmatter): string {
   }
   return output;
 }
+
+export interface ProductSpecGraphInput {
+  path: string;
+  document: ProductSpecDocument;
+}
+
+export interface ProductSpecGraphEdge {
+  from: string;
+  to: string;
+  relation: RelatedArtifactRelation;
+  product_spec_revision?: number;
+}
+
+export interface ProductSpecGraphBlockedNode {
+  path: string;
+  waits_on: string[];
+}
+
+export interface ProductSpecGraphWarning {
+  code: string;
+  message: string;
+  path: string;
+}
+
+export interface ProductSpecGraph {
+  buildable: string[];
+  blocked: ProductSpecGraphBlockedNode[];
+  order: string[];
+  edges: ProductSpecGraphEdge[];
+  warnings: ProductSpecGraphWarning[];
+}
+
+function normalizeSpecPath(path: string): string {
+  const segments: string[] = [];
+  for (const segment of path.split(/[\\/]+/)) {
+    if (!segment || segment === ".") continue;
+    if (segment === ".." && segments.length && segments[segments.length - 1] !== "..") {
+      segments.pop();
+      continue;
+    }
+    segments.push(segment);
+  }
+  return segments.join("/");
+}
+
+function resolveLinkTarget(fromPath: string, link: string): string {
+  const cleanLink = link.replace(/\\/g, "/");
+  if (cleanLink.startsWith("./") || cleanLink.startsWith("../")) {
+    const fromDir = normalizeSpecPath(fromPath).split("/").slice(0, -1).join("/");
+    return normalizeSpecPath(fromDir ? `${fromDir}/${cleanLink}` : cleanLink);
+  }
+  return normalizeSpecPath(cleanLink);
+}
+
+function findDependencyCycles(waitsOn: Map<string, Set<string>>): string[][] {
+  const index = new Map<string, number>();
+  const lowlink = new Map<string, number>();
+  const onStack = new Set<string>();
+  const stack: string[] = [];
+  const cycles: string[][] = [];
+  let counter = 0;
+
+  function connect(node: string): void {
+    index.set(node, counter);
+    lowlink.set(node, counter);
+    counter += 1;
+    stack.push(node);
+    onStack.add(node);
+
+    for (const next of waitsOn.get(node) ?? []) {
+      if (!waitsOn.has(next)) continue;
+      if (!index.has(next)) {
+        connect(next);
+        lowlink.set(node, Math.min(lowlink.get(node) as number, lowlink.get(next) as number));
+      } else if (onStack.has(next)) {
+        lowlink.set(node, Math.min(lowlink.get(node) as number, index.get(next) as number));
+      }
+    }
+
+    if (lowlink.get(node) === index.get(node)) {
+      const component: string[] = [];
+      let member: string;
+      do {
+        member = stack.pop() as string;
+        onStack.delete(member);
+        component.push(member);
+      } while (member !== node);
+      if (component.length > 1) cycles.push(component.reverse());
+    }
+  }
+
+  for (const node of waitsOn.keys()) {
+    if (!index.has(node)) connect(node);
+  }
+  return cycles;
+}
+
+export function resolveProductSpecGraph(inputs: ProductSpecGraphInput[]): ProductSpecGraph {
+  const warnings: ProductSpecGraphWarning[] = [];
+  const nodes = new Map<string, ProductSpecGraphInput>();
+
+  for (const input of inputs) {
+    const path = normalizeSpecPath(input.path);
+    if (nodes.has(path)) {
+      warnings.push({
+        code: "duplicate_spec_path",
+        message: `Duplicate spec path: ${path}. The first occurrence stays in the graph.`,
+        path
+      });
+      continue;
+    }
+    nodes.set(path, input);
+  }
+
+  const edges: ProductSpecGraphEdge[] = [];
+  for (const [path, input] of nodes) {
+    for (const section of input.document.sections) {
+      for (const artifact of section.related_artifacts ?? []) {
+        if (artifact.type !== "product_spec" || !artifact.product_spec_path) continue;
+        const relation = artifact.relation ?? "relates_to";
+        if (/^(?:[a-zA-Z]:)?[\\/]/.test(artifact.product_spec_path)) {
+          warnings.push({
+            code: "unsupported_link_path",
+            message: `${path} declares ${relation} on ${artifact.product_spec_path}. Absolute paths are not supported; use a path relative to the spec file.`,
+            path
+          });
+          continue;
+        }
+        const target = resolveLinkTarget(path, artifact.product_spec_path);
+        if (target === path) {
+          warnings.push({
+            code: "self_dependency",
+            message: `${path} declares a ${relation} link to itself. The edge is ignored.`,
+            path
+          });
+          continue;
+        }
+        edges.push({
+          from: path,
+          to: target,
+          relation,
+          ...(artifact.product_spec_revision !== undefined
+            ? { product_spec_revision: artifact.product_spec_revision }
+            : {})
+        });
+        if ((relation === "depends_on" || relation === "blocks") && !nodes.has(target)) {
+          warnings.push({
+            code: "missing_link_target",
+            message: `${path} declares ${relation} on ${target}, which is not in the graph.`,
+            path
+          });
+        }
+      }
+    }
+  }
+
+  const waitsOn = new Map<string, Set<string>>();
+  const dependents = new Map<string, Set<string>>();
+  for (const path of nodes.keys()) {
+    waitsOn.set(path, new Set());
+    dependents.set(path, new Set());
+  }
+  for (const edge of edges) {
+    if (edge.relation === "depends_on") {
+      waitsOn.get(edge.from)?.add(edge.to);
+      if (nodes.has(edge.to)) dependents.get(edge.to)?.add(edge.from);
+    }
+    if (edge.relation === "blocks" && nodes.has(edge.to)) {
+      waitsOn.get(edge.to)?.add(edge.from);
+      dependents.get(edge.from)?.add(edge.to);
+    }
+  }
+
+  const buildable: string[] = [];
+  const blocked: ProductSpecGraphBlockedNode[] = [];
+  for (const path of nodes.keys()) {
+    const waits = waitsOn.get(path) ?? new Set();
+    if (waits.size === 0) buildable.push(path);
+    else blocked.push({ path, waits_on: [...waits] });
+  }
+
+  const remaining = new Map<string, number>();
+  for (const [path, waits] of waitsOn) remaining.set(path, waits.size);
+  const queue = [...buildable];
+  const order: string[] = [];
+  while (queue.length) {
+    const path = queue.shift() as string;
+    order.push(path);
+    for (const dependent of dependents.get(path) ?? []) {
+      const left = (remaining.get(dependent) ?? 0) - 1;
+      remaining.set(dependent, left);
+      if (left === 0) queue.push(dependent);
+    }
+  }
+  if (order.length < nodes.size) {
+    for (const cycle of findDependencyCycles(waitsOn)) {
+      warnings.push({
+        code: "dependency_cycle",
+        message: `Dependency cycle among: ${cycle.join(", ")}.`,
+        path: cycle[0]
+      });
+    }
+  }
+
+  return { buildable, blocked, order, edges, warnings };
+}
