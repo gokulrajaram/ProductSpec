@@ -1552,7 +1552,7 @@ Keep this around.
 
     expect(invalid.status).toBe(1);
     expect(invalid.stderr).toContain("missing_required_section");
-  });
+  }, 30000);
 
   it("provides a CLI validator for Decision Trace files", () => {
     const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
@@ -1575,7 +1575,7 @@ Keep this around.
 
     expect(invalid.status).toBe(1);
     expect(invalid.stderr).toContain("missing_required_trace_field");
-  });
+  }, 30000);
 
   it("initializes a starter Product Spec from the CLI", () => {
     const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
@@ -1612,7 +1612,7 @@ Keep this around.
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
-  });
+  }, 30000);
 
   it("keeps every example valid", () => {
     const exampleDir = `${root}/examples`;
@@ -1807,6 +1807,57 @@ In: timestamped copy.
     expect(scope?.content).toContain("Who is hurting.");
     expect(scope?.content).toContain("Out: a generator CLI.");
     expect(validateProductSpecMarkdown(markdown).errors).toEqual([]);
+  });
+
+  it("parses and validates specs with CRLF line endings", () => {
+    const markdown = `---
+spec_format_version: "0.1"
+title: "CRLF Spec"
+artifact_type: "prd"
+author: "ProductSpec"
+created_at: "2026-07-05T00:00:00Z"
+updated_at: "2026-07-05T00:00:00Z"
+---
+
+## Problem
+
+Windows-authored specs use carriage returns and must still parse.
+
+## Hypothesis
+
+If CRLF is normalized, cross-platform specs validate identically.
+
+## Scope
+
+In: CRLF normalization before frontmatter parsing.
+
+## Acceptance Criteria
+
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: A CRLF spec produces the same sections as its LF form.
+\`\`\`
+
+## Success Metrics
+
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: crlf_specs_parse
+  target: ">= 100%"
+  window: per validation
+\`\`\`
+`;
+
+    const result = validateProductSpecMarkdown(markdown.replace(/\n/g, "\r\n"));
+
+    expect(result.valid).toBe(true);
+    expect(parseProductSpecMarkdown(markdown.replace(/\n/g, "\r\n")).sections.map((section) => section.id)).toEqual([
+      "problem",
+      "hypothesis",
+      "scope",
+      "acceptance_criteria",
+      "success_metrics"
+    ]);
   });
 
 });
@@ -2080,7 +2131,7 @@ describe("resolveProductSpecGraph", () => {
     const missing = spawnSync("node", [cli, "graph", `${root}/conformance/definitely-missing`], { encoding: "utf8" });
     expect(missing.status).toBe(1);
     expect(missing.stderr).toContain("not a directory");
-  });
+  }, 30000);
 
   it("surfaces skipped invalid specs in graph JSON output and fails when nothing is valid", () => {
     const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });

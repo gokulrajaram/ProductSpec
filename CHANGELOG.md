@@ -4,6 +4,22 @@
 
 No unreleased changes.
 
+## v0.18.0 - Tooling Hardening
+
+Fixed:
+
+- GitHub Action inputs now pass through environment variables before shell expansion, avoiding direct interpolation into the bash script.
+- MCP spec resolution now checks real paths and skips symlinks during discovery, so symlinks cannot escape the configured root.
+- The parser now accepts Product Specs with CRLF line endings.
+- The CLI now prints a clean one-line error when a target file cannot be read.
+- The MCP server now stays silent for JSON-RPC notifications and returns `-32601` for unknown tools.
+
+Changed:
+
+- The root build script uses `npm ci` for the parser package when a lockfile is present.
+- MCP tool schemas now mark required fields explicitly.
+- The parser npm package now publishes its README and includes repository, homepage, bugs, and Node engine metadata.
+
 ## v0.17.0 - Related Artifact Evidence Validation
 
 Changed:

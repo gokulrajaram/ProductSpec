@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -8,6 +8,7 @@ import {
   getAcceptanceCriteria,
   getAiEvals,
   getEvidenceChecklist,
+  getProductSpec,
   getScope,
   getSpecGraph,
   listProductSpecs,
@@ -276,5 +277,32 @@ describe("ProductSpec MCP tools", () => {
       current_valid: true,
       recommended_action: "replan_before_continuing"
     });
+  });
+
+  it("refuses to read a spec whose symlink resolves outside root", () => {
+    const base = mkdtempSync(join(tmpdir(), "productspec-confine-"));
+    const root = join(base, "root");
+    const outside = join(base, "outside");
+    mkdirSync(root);
+    mkdirSync(outside);
+    writeFileSync(join(outside, "leak.product-spec.md"), validSpec, "utf8");
+    symlinkSync(join(outside, "leak.product-spec.md"), join(root, "escape.product-spec.md"));
+
+    expect(() => getProductSpec({ root, path: "escape.product-spec.md" })).toThrow(
+      /must stay inside root/
+    );
+  });
+
+  it("does not discover specs through a symlinked directory outside root", () => {
+    const base = mkdtempSync(join(tmpdir(), "productspec-confine-"));
+    const root = join(base, "root");
+    const outside = join(base, "outside");
+    mkdirSync(root);
+    mkdirSync(outside);
+    writeFileSync(join(root, "own.product-spec.md"), validSpec, "utf8");
+    writeFileSync(join(outside, "leak.product-spec.md"), validSpec, "utf8");
+    symlinkSync(outside, join(root, "outside-link"));
+
+    expect(listProductSpecs({ root }).map((item) => item.path)).toEqual(["own.product-spec.md"]);
   });
 });

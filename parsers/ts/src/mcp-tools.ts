@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { isAbsolute, join, normalize, relative, resolve } from "node:path";
 import {
   parseProductSpecMarkdown,
@@ -387,6 +387,11 @@ function resolveSpecPath(root: string, filePath: string): string {
     throw new Error(`Product Spec path must stay inside root: ${filePath}`);
   }
   if (!existsSync(absolutePath)) throw new Error(`Product Spec not found: ${filePath}`);
+
+  const realRelativePath = relative(realpathSync(root), realpathSync(absolutePath));
+  if (realRelativePath.startsWith("..") || isAbsolute(realRelativePath)) {
+    throw new Error(`Product Spec path must stay inside root: ${filePath}`);
+  }
   return absolutePath;
 }
 
@@ -396,15 +401,14 @@ function findProductSpecFiles(root: string): string[] {
   return results.sort((a, b) => relative(root, a).localeCompare(relative(root, b)));
 
   function visit(dir: string) {
-    for (const entry of readdirSync(dir)) {
-      if (shouldSkip(entry)) continue;
-      const absolutePath = join(dir, entry);
-      const stat = statSync(absolutePath);
-      if (stat.isDirectory()) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (shouldSkip(entry.name) || entry.isSymbolicLink()) continue;
+      const absolutePath = join(dir, entry.name);
+      if (entry.isDirectory()) {
         visit(absolutePath);
         continue;
       }
-      if (entry.endsWith(".product-spec.md")) results.push(absolutePath);
+      if (entry.isFile() && entry.name.endsWith(".product-spec.md")) results.push(absolutePath);
     }
   }
 }

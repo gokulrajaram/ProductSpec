@@ -103,7 +103,7 @@ const tools: Record<string, { description: string; inputSchema: object; handler:
       root: stringProperty("Root directory. Defaults to current working directory."),
       path: requiredStringProperty("Path to a .product-spec.md file."),
       claim: stringProperty("The implementation completion claim to check.")
-    }),
+    }, ["path"]),
     handler: (args) => checkCompletionClaim({
       ...specPathArgs(args),
       claim: optionalString(args.claim)
@@ -111,7 +111,7 @@ const tools: Record<string, { description: string; inputSchema: object; handler:
   }
 };
 
-const SERVER_VERSION = "0.16.0";
+const SERVER_VERSION = "0.18.0";
 
 export function runProductSpecMcpServer() {
   const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
@@ -129,6 +129,7 @@ export function runProductSpecMcpServer() {
 }
 
 export function handleRequest(request: JsonRpcRequest) {
+  if (request.id === undefined) return null;
   if (!request.method) return errorResponse(request.id ?? null, -32600, "method is required");
 
   try {
@@ -164,7 +165,7 @@ function callTool(request: JsonRpcRequest) {
   const name = params.name;
   if (typeof name !== "string") throw new Error("tools/call requires a string name");
   const tool = tools[name];
-  if (!tool) throw new Error(`Unknown tool: ${name}`);
+  if (!tool) return errorResponse(request.id, -32601, `Unknown tool: ${name}`);
   const args = asRecord(params.arguments);
   return resultResponse(request.id, {
     content: [
@@ -208,16 +209,20 @@ function messageFor(error: unknown): string {
 }
 
 function specPathSchema() {
-  return objectSchema({
-    root: stringProperty("Root directory. Defaults to current working directory."),
-    path: requiredStringProperty("Path to a .product-spec.md file.")
-  });
+  return objectSchema(
+    {
+      root: stringProperty("Root directory. Defaults to current working directory."),
+      path: requiredStringProperty("Path to a .product-spec.md file.")
+    },
+    ["path"]
+  );
 }
 
-function objectSchema(properties: Record<string, object>) {
+function objectSchema(properties: Record<string, object>, required: string[] = []) {
   return {
     type: "object",
     properties,
+    ...(required.length ? { required } : {}),
     additionalProperties: false
   };
 }

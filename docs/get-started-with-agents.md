@@ -70,13 +70,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: gokulrajaram/ProductSpec@v0.10.0
+      - uses: gokulrajaram/ProductSpec@main
         with:
           files: "docs/product-specs/**/*.product-spec.md"
           decision_traces: "docs/decision-traces/**/*.decision-trace.json"
 ```
 
-Use `@main` if you want the newest pre-1.0 validator behavior. Use `@v0.10.0` when you want a pinned release.
+Use `@main` if you want the newest pre-1.0 validator behavior. Pin a release tag when you want repeatable CI behavior.
 
 ## 4. Build from the Product Spec
 

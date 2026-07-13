@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 
@@ -8,7 +9,8 @@ function run(command, args) {
   }
 }
 
-run("npm", ["--prefix", "parsers/ts", "install"]);
+const installCommand = existsSync("parsers/ts/package-lock.json") ? "ci" : "install";
+run("npm", ["--prefix", "parsers/ts", installCommand]);
 run("npm", ["--prefix", "parsers/ts", "run", "build"]);
 
 await mkdir("dist", { recursive: true });
