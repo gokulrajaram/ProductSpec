@@ -2,11 +2,19 @@
 
 ## Unreleased
 
+## v0.23.0 - Parser Fidelity And Harness Demo
+
 Changed:
 
 - README Quick Start now leads with the ProductSpec intent harness flow: validate intent, expose specs through MCP, run the agent, validate Agent Run, and trace drift.
 - GitHub Action now accepts optional `agent_runs` globs and validates Agent Run files.
 - Starter kit now includes an Agent Run example and validates it in CI.
+
+Added:
+
+- 5-minute agent harness demo.
+- Harness demo example with Product Spec, Agent Run, and Decision Trace.
+- Contributor guidance for adding example Product Specs.
 
 Fixed:
 
