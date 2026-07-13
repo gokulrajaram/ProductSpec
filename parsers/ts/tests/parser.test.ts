@@ -877,11 +877,12 @@ In: transcript search.
 
     const parsed = parseProductSpecMarkdown(markdown);
 
-    expect(parsed.frontmatter.unknown_frontmatter).toEqual([
+    expect(parsed.unknown_frontmatter).toEqual([
       "tags:\n  - product\n  - search",
       "aliases:\n  - Transcript Search PRD",
       "publish: false"
     ]);
+    expect(parsed.frontmatter).not.toHaveProperty("unknown_frontmatter");
 
     const serialized = serializeProductSpecMarkdown(parsed);
 
@@ -898,7 +899,7 @@ In: transcript search.
     );
     const parsed = parseProductSpecMarkdown(markdown);
 
-    expect(parsed.frontmatter.unknown_frontmatter).toBeUndefined();
+    expect(parsed).not.toHaveProperty("unknown_frontmatter");
   });
 
   it("round-trips the unknown frontmatter conformance fixture", () => {
@@ -907,7 +908,7 @@ In: transcript search.
 
     expect(result.valid).toBe(true);
     if (!result.valid) return;
-    expect(result.document.frontmatter.unknown_frontmatter).toHaveLength(4);
+    expect(result.document.unknown_frontmatter).toHaveLength(4);
     expect(parseProductSpecMarkdown(serializeProductSpecMarkdown(result.document))).toEqual(result.document);
   });
 

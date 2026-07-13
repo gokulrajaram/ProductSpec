@@ -4,7 +4,8 @@
 
 Fixed:
 
-- The parser now preserves unknown frontmatter keys on parse and serialize round-trips instead of silently dropping them. Unknown keys — for example Obsidian properties such as `tags`, `aliases`, and `cssclasses` — are exposed as `unknown_frontmatter` (an ordered list of raw frontmatter blocks) and re-emitted after known keys when serializing.
+- The reference parser now preserves unknown frontmatter keys on parse and serialize round-trips instead of silently dropping them. Unknown keys — for example Obsidian properties such as `tags`, `aliases`, and `cssclasses` — are carried as parser-only round-trip metadata on the parsed document (`document.unknown_frontmatter`, an ordered list of raw frontmatter blocks), kept separate from the portable `frontmatter` contract, and re-emitted verbatim after the known keys when serializing. The ProductSpec frontmatter schema is unchanged.
+- SPEC.md now says consumers should ignore unknown frontmatter keys and tools that rewrite Product Spec files should preserve them when possible.
 - Conformance fixture `conformance/valid/with-unknown-frontmatter.product-spec.md` covers a Product Spec authored with Obsidian properties.
 
 ## v0.14.0 - Spec Graph

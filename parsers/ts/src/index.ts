@@ -101,7 +101,6 @@ export interface ProductSpecFrontmatter {
   applies_to?: ProductSpecAppliesTo[];
   custom_sections?: Array<{ id: string; label: string; after: string }>;
   tool_metadata?: Record<string, string>;
-  unknown_frontmatter?: string[];
 }
 
 export type ProductSpecAppliesTo = { path?: string; component?: string };
@@ -163,6 +162,15 @@ export interface ProductSpecRelatedArtifact {
 export interface ProductSpecDocument {
   frontmatter: ProductSpecFrontmatter;
   sections: ProductSpecSection[];
+  /**
+   * Parser-only round-trip metadata: raw frontmatter blocks for keys the
+   * parser does not recognize, in source order. Not part of the portable
+   * ProductSpec frontmatter contract; absent when the source contains no
+   * unknown keys. Serialization re-emits the blocks verbatim after the
+   * known frontmatter keys and never emits `unknown_frontmatter` itself
+   * as a document frontmatter key.
+   */
+  unknown_frontmatter?: string[];
 }
 
 export interface ProductSpecValidationError {
@@ -256,7 +264,7 @@ export function parseProductSpecMarkdown(markdown: string): ProductSpecDocument 
   const frontmatterMatch = /^---\n([\s\S]*?)\n---\n?/.exec(markdown);
   if (!frontmatterMatch) throw new Error("Product Spec frontmatter is required.");
 
-  const frontmatter = parseFrontmatter(frontmatterMatch[1]);
+  const { frontmatter, unknownFrontmatter } = parseFrontmatter(frontmatterMatch[1]);
   const body = markdown.slice(frontmatterMatch[0].length);
   const sections = parseSections(body, frontmatter.custom_sections ?? []);
 
@@ -266,6 +274,7 @@ export function parseProductSpecMarkdown(markdown: string): ProductSpecDocument 
     }
   }
 
+  if (unknownFrontmatter.length) return { frontmatter, sections, unknown_frontmatter: unknownFrontmatter };
   return { frontmatter, sections };
 }
 
@@ -306,7 +315,7 @@ export function validateDecisionTraceJson(json: string): DecisionTraceValidation
 }
 
 export function serializeProductSpecMarkdown(doc: ProductSpecDocument): string {
-  const frontmatter = serializeFrontmatter(doc.frontmatter);
+  const frontmatter = serializeFrontmatter(doc.frontmatter, doc.unknown_frontmatter);
   const body = doc.sections
     .map((section) => `## ${section.label}\n\n${section.content.trim()}`)
     .join("\n\n");
@@ -956,7 +965,10 @@ const SCALAR_FRONTMATTER_KEYS = [
 
 const KNOWN_SCALAR_FRONTMATTER_KEYS: ReadonlySet<string> = new Set(SCALAR_FRONTMATTER_KEYS);
 
-function parseFrontmatter(raw: string): ProductSpecFrontmatter {
+function parseFrontmatter(raw: string): {
+  frontmatter: ProductSpecFrontmatter;
+  unknownFrontmatter: string[];
+} {
   const lines = raw.split("\n");
   const result: Record<string, unknown> = {};
   const unknownFrontmatter: string[] = [];
@@ -1027,8 +1039,6 @@ function parseFrontmatter(raw: string): ProductSpecFrontmatter {
     assignKeyValue(result, line);
   }
 
-  if (unknownFrontmatter.length) result.unknown_frontmatter = unknownFrontmatter;
-
   if (result.spec_format_version !== "0.1") throw new Error("Unsupported spec_format_version.");
   if (!result.title || !result.artifact_type || !result.author || !result.created_at || !result.updated_at) {
     throw new Error("Missing required Product Spec frontmatter.");
@@ -1044,7 +1054,7 @@ function parseFrontmatter(raw: string): ProductSpecFrontmatter {
     result.spec_revision = revision;
   }
 
-  return result as unknown as ProductSpecFrontmatter;
+  return { frontmatter: result as unknown as ProductSpecFrontmatter, unknownFrontmatter };
 }
 
 function assignKeyValue(target: Record<string, unknown>, line: string) {
@@ -1426,7 +1436,7 @@ function sectionIdForLabel(label: string, customSections: Array<{ id: string; la
   return `custom-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
 }
 
-function serializeFrontmatter(frontmatter: ProductSpecFrontmatter): string {
+function serializeFrontmatter(frontmatter: ProductSpecFrontmatter, unknownFrontmatter?: string[]): string {
   let output = "";
   for (const key of SCALAR_FRONTMATTER_KEYS) {
     const value = frontmatter[key];
@@ -1454,7 +1464,7 @@ function serializeFrontmatter(frontmatter: ProductSpecFrontmatter): string {
       output += `  ${key}: "${value}"\n`;
     }
   }
-  for (const block of frontmatter.unknown_frontmatter ?? []) {
+  for (const block of unknownFrontmatter ?? []) {
     output += `${block}\n`;
   }
   return output;
