@@ -14,6 +14,12 @@ Validate one Decision Trace:
 npm exec --yes --package @productspec/parser -- productspec validate-trace path/to/file.decision-trace.json
 ```
 
+Validate one Agent Run:
+
+```bash
+npm exec --yes --package @productspec/parser -- productspec validate-run path/to/file.agent-run.json
+```
+
 Resolve a folder of specs into a build graph (buildable, blocked, order):
 
 ```bash
@@ -35,9 +41,10 @@ CI, via the GitHub Action:
   with:
     files: "docs/product-specs/**/*.product-spec.md"
     decision_traces: "docs/decision-traces/**/*.decision-trace.json"
+    agent_runs: "docs/agent-runs/**/*.agent-run.json"
 ```
 
-`decision_traces` is optional and defaults to empty. Pin a commit SHA in place of `@main` when CI needs to be reproducible.
+`decision_traces` and `agent_runs` are optional and default to empty. Pin a commit SHA in place of `@main` when CI needs to be reproducible.
 
 ## Reading validator output
 
@@ -72,6 +79,8 @@ Warnings, which never block:
 | `empty_required_section` | A mandatory section has no body |
 
 Decision Trace errors, from `validate-trace`: `invalid_json`, `unsupported_trace_version`, `missing_required_trace_field`, `invalid_trace_id`, `invalid_trace_subject`, `invalid_trace_events`, `invalid_trace_event`, `invalid_trace_decision`, `invalid_trace_link`, `invalid_trace_revision`.
+
+Agent Run errors, from `validate-run`: `invalid_json`, `invalid_agent_run`, `unsupported_agent_run_version`, `missing_required_agent_run_field`, `invalid_agent_run_id`, `invalid_agent_run_status`, `invalid_agent_run_item`, `duplicate_agent_run_item_id`, `invalid_agent_run_revision`, `invalid_agent_run_agent`, `invalid_agent_run_product_spec`, `invalid_agent_run_drift`.
 
 ## Fixing without distorting
 

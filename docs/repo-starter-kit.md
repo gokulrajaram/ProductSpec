@@ -2,7 +2,7 @@
 
 Use this setup when you want Product Specs to live beside code.
 
-For a ready-to-copy version, use [`starter-kit/`](../starter-kit/). It includes a starter Product Spec, Decision Trace, `AGENTS.md`, `CLAUDE.md`, the ProductSpec agent skill, a pull request template, and GitHub Actions validation.
+For a ready-to-copy version, use [`starter-kit/`](../starter-kit/). It includes a starter Product Spec, Agent Run, Decision Trace, `AGENTS.md`, `CLAUDE.md`, the ProductSpec agent skill, a pull request template, and GitHub Actions validation.
 
 ## Suggested Folders
 
@@ -10,6 +10,8 @@ For a ready-to-copy version, use [`starter-kit/`](../starter-kit/). It includes 
 docs/
   product-specs/
     checkout-redesign.product-spec.md
+  agent-runs/
+    checkout-redesign.agent-run.json
   decision-traces/
     checkout-redesign.decision-trace.json
 ```
@@ -20,7 +22,7 @@ Use different folders if your repo already has a convention. The important part 
 
 Create `PRODUCTSPEC.md` in your repo:
 
-```md
+````md
 # Product Specs
 
 This repo uses ProductSpec for consequential software work where intent needs to survive handoff.
@@ -28,6 +30,8 @@ This repo uses ProductSpec for consequential software work where intent needs to
 Product Specs live in `docs/product-specs/`.
 
 Decision Traces live in `docs/decision-traces/` when intent changes, implementation drifts, or launch outcomes create a learning.
+
+Agent Runs live in `docs/agent-runs/` when an agent leaves a receipt for one execution against a pinned Product Spec revision.
 
 Before implementation begins, the Product Spec should answer:
 
@@ -42,7 +46,13 @@ Validate a Product Spec:
 ```bash
 npm exec --package @productspec/parser -- productspec validate docs/product-specs/my-feature.product-spec.md
 ```
+
+Validate an Agent Run:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-run docs/agent-runs/my-feature.agent-run.json
 ```
+````
 
 ## Suggested Pull Request Text
 
@@ -97,7 +107,7 @@ CLAUDE.md
 skills/productspec/SKILL.md
 ```
 
-This gives coding agents the same instruction: Product Specs are the control file for consequential work, Acceptance Criteria are the build contract, Success Metrics are post-launch outcomes, and Decision Traces should be proposed when implementation diverges from intent.
+This gives coding agents the same instruction: Product Specs are the intent harness for consequential work, Acceptance Criteria are the build contract, Success Metrics are post-launch outcomes, Agent Runs record execution receipts, and Decision Traces should be proposed when implementation diverges from intent.
 
 ## Suggested Decision Trace Setup
 

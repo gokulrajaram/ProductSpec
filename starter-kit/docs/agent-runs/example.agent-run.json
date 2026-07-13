@@ -1,0 +1,36 @@
+{
+  "agent_run_format_version": "0.1",
+  "run_id": "example-run",
+  "agent": {
+    "name": "Codex",
+    "version": "cli"
+  },
+  "product_spec": {
+    "path": "docs/product-specs/example.product-spec.md",
+    "spec_revision": 1,
+    "content_hash": "sha256:replace-with-session-hash"
+  },
+  "started_at": "2026-07-13T00:00:00Z",
+  "completed_at": "2026-07-13T00:15:00Z",
+  "status": "completed",
+  "checked_items": [
+    {
+      "item_id": "AC-1",
+      "status": "passed",
+      "evidence": [
+        {
+          "type": "github_pr",
+          "url": "https://github.com/example/repo/pull/1"
+        }
+      ]
+    },
+    {
+      "item_id": "SM-1",
+      "status": "not_checked"
+    }
+  ],
+  "drift": {
+    "detected": false
+  },
+  "completion_claim": "AC-1 is satisfied. SM-1 is post-launch and not checked by this run."
+}

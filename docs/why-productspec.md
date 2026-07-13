@@ -38,7 +38,7 @@ A Product Spec has two readers:
 
 ProductSpec is intentionally Markdown-first because the artifact should remain readable in normal product and engineering workflows. It is also structured enough for parsers, validators, review tools, imports, exports, and agent handoffs.
 
-That is the difference from a classic PRD. A PRD was mostly a human handoff. A Product Spec is a human-readable control file for downstream software work.
+That is the difference from a classic PRD. A PRD was mostly a human handoff. A Product Spec is a human-readable intent harness for downstream software work.
 
 ## Acceptance Criteria vs. Success Metrics
 

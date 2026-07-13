@@ -15,3 +15,4 @@ jobs:
         with:
           files: "docs/product-specs/**/*.product-spec.md"
           decision_traces: "docs/decision-traces/**/*.decision-trace.json"
+          agent_runs: "docs/agent-runs/**/*.agent-run.json"

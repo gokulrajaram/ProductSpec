@@ -87,9 +87,9 @@ v0.8 keeps the document shape at `spec_format_version: "0.1"` and adds portable 
 
 - `applies_to` is optional frontmatter for broad path or component scope.
 - `related_artifacts` is an optional section for links from Product Spec sections or item IDs to issues, pull requests, eval runs, dashboards, design artifacts, releases, engineering specs, or other durable records.
-- `skills/productspec/SKILL.md` gives agents a loadable instruction file for using a Product Spec as the control file for the work.
+- `skills/productspec/SKILL.md` gives agents a loadable instruction file for using a Product Spec as the intent harness for the work.
 - `docs/agent-usage.md` explains how teams can load the skill and ask agents to cite Acceptance Criteria.
-- `starter-kit/` gives teams a copyable repo setup with Product Specs, Decision Traces, AGENTS/CLAUDE instructions, a pull request template, and CI validation.
+- `starter-kit/` gives teams a copyable repo setup with Product Specs, Agent Runs, Decision Traces, AGENTS/CLAUDE instructions, a pull request template, and CI validation.
 
 ## v0.9 Decision Trace Validation Milestone
 
@@ -97,6 +97,7 @@ v0.9 keeps the document shape at `spec_format_version: "0.1"` and makes Decision
 
 - `productspec validate-trace <file>` validates Decision Trace JSON files.
 - The GitHub Action accepts optional `decision_traces` globs.
+- Later v0.x tooling also accepts optional `agent_runs` globs for Agent Run validation.
 - Invalid conformance fixtures cover malformed traceability and Decision Trace files.
 - Agent setup docs explain Codex, Claude Code, Cursor, and repo-agent installation paths.
 
@@ -107,6 +108,15 @@ v0.10 keeps the document shape at `spec_format_version: "0.1"` and tightens pars
 - Section parsing ignores `##` headings inside fenced code blocks.
 - Structured Success Metrics may include `target_status: committed | provisional`.
 - Provisional Success Metric targets require `target_owner`.
+
+## v0.21 Agent Harness Milestone
+
+v0.21 keeps the Product Spec document shape at `spec_format_version: "0.1"` and adds a validated companion artifact for agent execution:
+
+- ProductSpec is positioned as the intent harness contract for AI-native software work.
+- `productspec validate-run <file>` validates Agent Run JSON files.
+- Agent Run records the pinned Product Spec revision, checked `AC-`, `EVAL-`, and `SM-` IDs, evidence links, drift state, and completion claim.
+- The GitHub Action accepts optional `agent_runs` globs.
 
 ## v1.0 Bar
 

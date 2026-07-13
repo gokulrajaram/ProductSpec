@@ -53,7 +53,7 @@ Before claiming done, or after any long-running pause, call `check_spec_session`
 
 - If `changed` is `false`, continue against the pinned Product Spec.
 - If `changed` is `true`, re-read the Product Spec and re-plan before continuing.
-- If `current_valid` is `false`, resolve the Product Spec validation errors before using it as the control file.
+- If `current_valid` is `false`, resolve the Product Spec validation errors before using it as the intent harness.
 
 The MCP server stores session ids in memory for the life of the server process. For clients that restart MCP servers between calls, `check_spec_session` can also be called statelessly with the `path`, `started_revision`, and `started_hash` returned by `begin_spec_session`.
 
@@ -78,4 +78,4 @@ Use ProductSpec MCP before coding:
 
 The MCP server is deterministic. It does not judge whether code is correct and it does not call an LLM.
 
-It gives agents a structured control file. The agent, tests, evals, reviewer, or managed ProductSpec implementation still decides whether the work satisfies the Product Spec.
+It gives agents a structured intent harness. The agent, tests, evals, reviewer, or managed ProductSpec implementation still decides whether the work satisfies the Product Spec.

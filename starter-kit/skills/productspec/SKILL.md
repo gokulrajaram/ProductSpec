@@ -1,11 +1,11 @@
 ---
 name: productspec
-description: Use when implementing, reviewing, planning, or changing work governed by a Product Spec. Treat `.product-spec.md` files as the control file for the work.
+description: Use when implementing, reviewing, planning, or changing work governed by a Product Spec. Treat `.product-spec.md` files as the intent harness for the work.
 ---
 
 # ProductSpec Agent Skill
 
-Product Specs are the control file for consequential software work.
+Product Specs are the intent harness for consequential software work.
 
 When a repo uses Agent Run files, treat them as the receipt for one agent execution against a pinned Product Spec revision.
 

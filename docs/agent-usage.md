@@ -1,6 +1,6 @@
 # Use ProductSpec With Agents
 
-ProductSpec gives agents a control file for the work.
+ProductSpec gives agents an intent harness for the work.
 
 A Product Spec tells an agent what should be built, why it matters, what is in scope, what must pass before launch, and how the outcome will be measured later.
 
@@ -23,7 +23,7 @@ For repositories with an `AGENTS.md`, add:
 ```md
 # ProductSpec
 
-Product Specs are control files for consequential software work.
+Product Specs are intent harnesses for consequential software work.
 
 Before planning, coding, testing, or changing scope, load `skills/productspec/SKILL.md` and read the relevant `.product-spec.md` file.
 ```
@@ -43,6 +43,7 @@ Agents should:
 - resolve `product_spec` related artifacts across the repo before planning, so build order follows the dependency graph. `productspec graph <dir> --json` resolves a whole folder in one call: buildable set, blocked set with reasons, and build order
 - treat `RESOLVE-IN-PLAN:` markers as planning questions to answer against the codebase before coding
 - propose a Product Spec revision or Decision Trace when implementation diverges from intent
+- leave an Agent Run receipt when the repo uses `*.agent-run.json` files
 
 Agents should not:
 
@@ -61,7 +62,7 @@ Implement the work in specs/example.product-spec.md.
 
 If ProductSpec MCP is available, call begin_spec_session before planning and check_spec_session before claiming done.
 
-Create a plan that maps tasks to Acceptance Criteria. Keep scope.out and scope.cut out of the implementation. If you need to change product intent, stop and propose a Product Spec revision or Decision Trace.
+Create a plan that maps tasks to Acceptance Criteria. Keep scope.out and scope.cut out of the implementation. If you need to change product intent, stop and propose a Product Spec revision or Decision Trace. If the repo uses Agent Run files, leave a run receipt before claiming done.
 
 Resolve every `RESOLVE-IN-PLAN:` marker with a source citation before coding. Do not implement guessed table names, fields, endpoints, services, or file paths as if they were binding.
 ```
@@ -90,4 +91,4 @@ Out of scope:
 
 The Product Spec should remain the current committed intent.
 
-Agents can write code quickly. ProductSpec keeps them attached to the product decision the team actually made.
+Agents can write code quickly. ProductSpec keeps them attached to the product decision the team actually made, and Agent Run records what they checked against it.

@@ -40,6 +40,8 @@ jobs:
           npm run build
           node dist/cli.js validate-trace examples/decision-traces/transcript-search.decision-trace.json
           node dist/cli.js validate-trace starter-kit/docs/decision-traces/example.decision-trace.json
+          node dist/cli.js validate-run examples/agent-ready-repo/docs/agent-runs/transcript-search.agent-run.json
+          node dist/cli.js validate-run starter-kit/docs/agent-runs/example.agent-run.json
 
       - name: Verify package dry run
         working-directory: parsers/ts

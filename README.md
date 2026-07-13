@@ -4,13 +4,11 @@
 [![npm](https://img.shields.io/npm/v/@productspec/parser.svg)](https://www.npmjs.com/package/@productspec/parser)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-ProductSpec is the open standard for software intent in the AI agent era.
+ProductSpec is the open standard for AI-native software intent: a harness that tells agents what to build, what not to build, how to prove completion, and when to stop.
 
-It gives teams a portable Markdown format for defining what should be built, what evidence proves it worked, and what changed when reality disagreed.
+It gives teams and agents a portable way to define what should be built, what should not be built, what evidence proves it worked, and what changed when reality disagreed.
 
 Use it when consequential software work needs intent to survive handoff: from product to engineering, from humans to agents, and from implementation back to learning.
-
-ProductSpec can also act as the intent harness contract for Claude, Codex, Cursor, and other coding agents. The Product Spec tells the agent what to build, what not to build, how to prove completion, and when to stop and re-plan.
 
 ```text
 Product Spec -> Engineering Spec -> Code -> Evaluation -> Learning
@@ -21,7 +19,7 @@ ProductSpec is neutral. It defines structure, section IDs, portable review annot
 
 Design principle: structure the parts machines must execute or compare. Leave the parts humans must reason about readable.
 
-ProductSpec can also act as the control file for agent-led work. The repo includes `skills/productspec/SKILL.md`, a loadable agent skill that tells coding agents how to read Product Specs, cite Acceptance Criteria, respect scope, and propose a Decision Trace when implementation diverges from intent. `skills/productspec-authoring/SKILL.md` covers the other direction: writing a Product Spec, validating it, and converting an existing PRD into one. Both are installable with `npx skills add gokulrajaram/ProductSpec`.
+ProductSpec can act as the intent harness for agent-led work. The Product Spec tells Claude, Codex, Cursor, and other coding agents what to build, what not to build, how to prove completion, and when to stop and re-plan. The repo includes `skills/productspec/SKILL.md`, a loadable agent skill that tells coding agents how to read Product Specs, cite Acceptance Criteria, respect scope, and propose a Decision Trace when implementation diverges from intent. `skills/productspec-authoring/SKILL.md` covers the other direction: writing a Product Spec, validating it, and converting an existing PRD into one. Both are installable with `npx skills add gokulrajaram/ProductSpec`.
 
 Agent Run is the optional companion artifact for recording what happened when an agent used ProductSpec as a harness: the pinned spec revision, checked criteria and evals, linked evidence, drift status, and completion claim.
 
@@ -66,22 +64,44 @@ See `examples/revisions/` for a Product Spec that evolves from revision 1 to rev
 
 ## Quick Start
 
-If you want to use ProductSpec with coding agents, start here:
+If you want to use ProductSpec as an intent harness for coding agents, start here:
 
 - [Get started with agents](docs/get-started-with-agents.md): install the skills, convert a PRD, validate in CI, implement from a Product Spec, and record drift.
 - [Use the MCP server](docs/agent-mcp.md): expose Product Specs to coding agents as structured tools.
 - [Evidence loop](docs/evidence-loop.md): connect Product Specs to implementation, evals, metrics, and Decision Trace.
 - [Agent Run](docs/agent-run.md): record one Claude, Codex, Cursor, or other agent execution against a pinned Product Spec.
 
-Validate a Product Spec with the published CLI:
+1. Validate the intent:
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate path/to/file.product-spec.md
 ```
 
-Prefer an editor?
+2. Expose Product Specs to agents:
 
-You can also draft and validate Product Specs in the free browser editor at [ProductSpec.io](https://productspec.io). The open standard does not require the hosted editor.
+```bash
+npx --yes -p @productspec/parser@latest productspec mcp
+```
+
+3. Ask Claude, Codex, Cursor, or another agent to implement against the Product Spec:
+
+```text
+Use ProductSpec MCP before coding.
+Validate the Product Spec, call begin_spec_session, load Scope, Acceptance Criteria, AI Evals, Success Metrics, and Related Artifacts.
+Stay inside scope.in, avoid scope.out and scope.cut, verify every AC- and EVAL- item, call check_spec_session before claiming done, and leave an Agent Run receipt.
+```
+
+4. Validate the run receipt:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-run path/to/file.agent-run.json
+```
+
+5. If intent changed, validate the Decision Trace:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-trace path/to/file.decision-trace.json
+```
 
 Create a starter Product Spec:
 
@@ -89,31 +109,9 @@ Create a starter Product Spec:
 npm exec --package @productspec/parser -- productspec init my-feature.product-spec.md
 ```
 
-Try an included example:
+Prefer an editor?
 
-```bash
-npm exec --package @productspec/parser -- productspec validate examples/minimal.product-spec.md
-```
-
-Validate a Decision Trace:
-
-```bash
-npm exec --package @productspec/parser -- productspec validate-trace examples/decision-traces/transcript-search.decision-trace.json
-```
-
-Validate an Agent Run:
-
-```bash
-npm exec --package @productspec/parser -- productspec validate-run examples/agent-ready-repo/docs/agent-runs/transcript-search.agent-run.json
-```
-
-Start the ProductSpec MCP server:
-
-```bash
-npx --yes -p @productspec/parser@latest productspec mcp
-```
-
-The MCP server exposes tools for agents to pin a Product Spec at the start of work and check whether the `spec_revision` or content changed before claiming completion.
+You can also draft and validate Product Specs in the free browser editor at [ProductSpec.io](https://productspec.io). The open standard does not require the hosted editor.
 
 Resolve a folder of specs into a build graph:
 
@@ -138,6 +136,7 @@ jobs:
         with:
           files: "docs/product-specs/**/*.product-spec.md"
           decision_traces: "docs/decision-traces/**/*.decision-trace.json"
+          agent_runs: "docs/agent-runs/**/*.agent-run.json"
 ```
 
 ## How To Contribute Without Coding
@@ -273,7 +272,7 @@ Current repo artifacts:
 - `skills/productspec` and `skills/productspec-authoring`: loadable agent skills for implementing from a Product Spec and for writing one.
 - JSON Schema for parsed Product Spec documents.
 - Valid and invalid conformance fixtures.
-- `starter-kit/`: copyable repo setup with Product Specs, Decision Traces, agent instructions, PR template, and CI.
+- `starter-kit/`: copyable repo setup with Product Specs, Agent Runs, Decision Traces, agent instructions, PR template, and CI.
 - GitHub issue and pull request templates.
 - Examples for AI features, consumer UX, enterprise workflows, internal APIs, and revision history.
 
@@ -308,7 +307,8 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 - [docs/faq.md](docs/faq.md): answers to common ProductSpec adoption questions.
 - [docs/get-started-with-agents.md](docs/get-started-with-agents.md): the shortest path from existing docs to agent-authored and agent-implemented Product Specs.
 - [docs/use-in-your-repo.md](docs/use-in-your-repo.md): copy-paste setup for using ProductSpec in an existing repository.
-- [docs/agent-usage.md](docs/agent-usage.md): how to use ProductSpec as a control file for coding agents.
+- [docs/agent-usage.md](docs/agent-usage.md): how to use ProductSpec as an intent harness for coding agents.
+- [docs/agent-run.md](docs/agent-run.md): how to record one agent execution against a pinned Product Spec.
 - [docs/graph.md](docs/graph.md): resolving a folder of Product Specs into buildable, blocked, and ordered work.
 - [docs/adoption.md](docs/adoption.md): how teams can adopt ProductSpec across Git, Jira, Linear, Figma, CI, engineering specs, and agents.
 - [docs/productspec-to-tickets.md](docs/productspec-to-tickets.md): how to project a Product Spec into Jira or Linear tickets without forking intent.
@@ -316,7 +316,7 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 - [docs/before-after.md](docs/before-after.md): a loose PRD transformed into ProductSpec.
 - [docs/productspec-vs.md](docs/productspec-vs.md): how ProductSpec differs from PRDs, Jira, Git, Figma, engineering design docs, OpenSpec, Spec Kit, and ADRs.
 - [docs/repo-starter-kit.md](docs/repo-starter-kit.md): copy-paste conventions for using ProductSpec in an existing repo.
-- [starter-kit/](starter-kit/): a copyable repo starter kit with ProductSpec, Decision Trace, AGENTS/CLAUDE instructions, and CI.
+- [starter-kit/](starter-kit/): a copyable repo starter kit with ProductSpec, Agent Run, Decision Trace, AGENTS/CLAUDE instructions, and CI.
 - [docs/handoff-example.md](docs/handoff-example.md): how ProductSpec interacts with Jira, Figma, Git, OpenSpec, Spec Kit, and coding agents.
 - [docs/end-to-end-handoff.md](docs/end-to-end-handoff.md): a concrete walkthrough from Product Spec to issue, design, engineering spec, agent loop, pull request, and launch learning.
 - [docs/vision.md](docs/vision.md): the public vision for ProductSpec as the intent layer.
@@ -327,6 +327,7 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 - [docs/decision-trace.md](docs/decision-trace.md): the optional companion standard for decisions, drift, and revisions.
 - [schema/product-spec.schema.json](schema/product-spec.schema.json): JSON Schema for parsed Product Spec documents.
 - [schema/decision-trace.schema.json](schema/decision-trace.schema.json): JSON Schema for Decision Trace documents.
+- [schema/agent-run.schema.json](schema/agent-run.schema.json): JSON Schema for Agent Run documents.
 - [schema/review-annotation.schema.json](schema/review-annotation.schema.json): JSON Schema for portable review annotations.
 - [skills/productspec/SKILL.md](skills/productspec/SKILL.md): loadable agent guidance for implementing from Product Specs.
 - [skills/productspec-authoring/SKILL.md](skills/productspec-authoring/SKILL.md): loadable agent guidance for writing, validating, and converting Product Specs.
@@ -334,6 +335,7 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 - [examples/README.md](examples/README.md): guide to choosing the right example.
 - [examples/](examples/): minimal and expanded examples.
 - [examples/decision-traces/](examples/decision-traces/): companion Decision Trace examples.
+- [examples/agent-ready-repo/](examples/agent-ready-repo/): ProductSpec as an intent harness in a small repo layout.
 - [parsers/ts](parsers/ts): TypeScript reference parser, validator, and CLI.
 
 Examples include AI features, consumer UX, enterprise workflows, internal APIs, and agent handoffs:
@@ -373,7 +375,7 @@ ProductSpec distinguishes the standard version from the document revision:
 - `spec_format_version` tells tools which ProductSpec format the file uses.
 - `spec_revision` is an optional positive integer for this particular product decision. It starts at `1` and increments when intent materially changes.
 
-The v0.9 milestone includes conformance fixtures, a structured validator, examples, a CLI, optional `spec_revision` frontmatter, traceability fields, a loadable agent skill, a copyable repo starter kit, and first-class Decision Trace validation:
+The current v0.x standard includes conformance fixtures, a structured validator, examples, a CLI, optional `spec_revision` frontmatter, traceability fields, an MCP server, a loadable agent skill, a copyable repo starter kit, Decision Trace validation, and Agent Run validation:
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate examples/minimal.product-spec.md
@@ -383,6 +385,12 @@ To validate a Decision Trace:
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate-trace examples/decision-traces/transcript-search.decision-trace.json
+```
+
+To validate an Agent Run:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-run examples/agent-ready-repo/docs/agent-runs/transcript-search.agent-run.json
 ```
 
 To create a starter Product Spec:

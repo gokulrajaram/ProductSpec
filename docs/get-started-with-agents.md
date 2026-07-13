@@ -1,6 +1,6 @@
 # Get Started With Agents
 
-This is the shortest path from a repo with product docs to agents using ProductSpec as the control file for consequential work.
+This is the shortest path from a repo with product docs to agents using ProductSpec as the intent harness for consequential work.
 
 Use this when you want to:
 
@@ -75,6 +75,7 @@ jobs:
         with:
           files: "docs/product-specs/**/*.product-spec.md"
           decision_traces: "docs/decision-traces/**/*.decision-trace.json"
+          agent_runs: "docs/agent-runs/**/*.agent-run.json"
 ```
 
 Use `@main` if you want the newest pre-1.0 validator behavior. Pin a release tag when you want repeatable CI behavior.

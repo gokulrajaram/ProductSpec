@@ -15,6 +15,8 @@ PRODUCTSPEC.md
 docs/
   product-specs/
     example.product-spec.md
+  agent-runs/
+    example.agent-run.json
   decision-traces/
     example.decision-trace.json
 skills/
@@ -26,9 +28,10 @@ skills/
 
 1. Copy the contents of this folder into your repository.
 2. Rename `docs/product-specs/example.product-spec.md`.
-3. Rename `docs/decision-traces/example.decision-trace.json` when you record the first decision.
-4. Update `linked_github_repo`, `applies_to`, and Related Artifacts in the Product Spec.
-5. Keep `AGENTS.md`, `CLAUDE.md`, and `skills/productspec/SKILL.md` together so coding agents know how to treat Product Specs as control files.
+3. Rename `docs/agent-runs/example.agent-run.json` when an agent leaves the first run receipt.
+4. Rename `docs/decision-traces/example.decision-trace.json` when you record the first decision.
+5. Update `linked_github_repo`, `applies_to`, and Related Artifacts in the Product Spec.
+6. Keep `AGENTS.md`, `CLAUDE.md`, and `skills/productspec/SKILL.md` together so coding agents know how to treat Product Specs as intent harnesses.
 
 Validate the starter Product Spec:
 
@@ -36,10 +39,16 @@ Validate the starter Product Spec:
 npm exec --package @productspec/parser -- productspec validate docs/product-specs/example.product-spec.md
 ```
 
+Validate the starter Agent Run:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-run docs/agent-runs/example.agent-run.json
+```
+
 ## Working Pattern
 
 1. Write or revise a Product Spec before consequential implementation.
 2. Open a pull request with the Product Spec or with code that cites the Product Spec.
 3. Map code, tests, issues, eval runs, and dashboards back to Acceptance Criteria, AI Evals, and Success Metrics.
-4. Record a Decision Trace when intent changes, implementation drifts, or outcomes create a learning.
-
+4. Record an Agent Run when an agent implements against a pinned Product Spec revision.
+5. Record a Decision Trace when intent changes, implementation drifts, or outcomes create a learning.

@@ -2,7 +2,7 @@
 
 ProductSpec works best when intent needs to survive handoff across people, tools, and agents.
 
-For a ready-to-copy repository setup, use [`starter-kit/`](../starter-kit/). It includes a starter Product Spec, Decision Trace, AGENTS/CLAUDE instructions, the ProductSpec agent skill, a pull request template, and CI validation.
+For a ready-to-copy repository setup, use [`starter-kit/`](../starter-kit/). It includes a starter Product Spec, Agent Run, Decision Trace, AGENTS/CLAUDE instructions, the ProductSpec agent skill, a pull request template, and CI validation.
 
 This guide describes a practical team setup.
 
@@ -120,7 +120,7 @@ This gives agents and reviewers a portable way to see which work, tests, evals, 
 
 Load `skills/productspec/SKILL.md` before asking an agent to implement work governed by a Product Spec.
 
-The skill tells agents to treat the Product Spec as the control file for the work, cite Acceptance Criteria IDs, respect `scope.out` and `scope.cut`, and propose a Product Spec revision or Decision Trace when implementation diverges from intent.
+The skill tells agents to treat the Product Spec as the intent harness for the work, cite Acceptance Criteria IDs, respect `scope.out` and `scope.cut`, leave an Agent Run receipt when the repo uses them, and propose a Product Spec revision or Decision Trace when implementation diverges from intent.
 
 ## Validate In CI
 

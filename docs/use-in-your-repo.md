@@ -2,7 +2,7 @@
 
 This is the fastest path for trying ProductSpec inside an existing software repository.
 
-If you want a complete copyable setup, start with [`starter-kit/`](../starter-kit/). It includes Product Spec and Decision Trace examples, `AGENTS.md`, `CLAUDE.md`, the ProductSpec agent skill, a pull request template, and GitHub Actions validation.
+If you want a complete copyable setup, start with [`starter-kit/`](../starter-kit/). It includes Product Spec, Agent Run, and Decision Trace examples, `AGENTS.md`, `CLAUDE.md`, the ProductSpec agent skill, a pull request template, and GitHub Actions validation.
 
 ## 1. Create A Spec Directory
 
@@ -111,13 +111,14 @@ done
 
 That check verifies structure and portability. It does not judge whether the product bet is good.
 
-You can also validate Product Specs and Decision Traces with the GitHub Action:
+You can also validate Product Specs, Decision Traces, and Agent Runs with the GitHub Action:
 
 ```yaml
 - uses: gokulrajaram/ProductSpec@main
   with:
     files: "docs/product-specs/**/*.product-spec.md"
     decision_traces: "docs/decision-traces/**/*.decision-trace.json"
+    agent_runs: "docs/agent-runs/**/*.agent-run.json"
 ```
 
 ## Suggested Pull Request Text

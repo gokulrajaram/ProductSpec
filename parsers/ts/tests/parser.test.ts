@@ -1501,7 +1501,7 @@ In: transcript search.
     const docs = readFileSync(`${root}/docs/agent-usage.md`, "utf8");
     const starterSkill = readFileSync(`${root}/starter-kit/skills/productspec/SKILL.md`, "utf8");
 
-    expect(skill).toContain("control file for the work");
+    expect(skill).toContain("intent harness for the work");
     expect(skill).toContain("Acceptance Criteria are the build contract");
     expect(docs).toContain("Load `skills/productspec/SKILL.md`");
     expect(starterSkill).toBe(skill);
@@ -2032,10 +2032,12 @@ Keep this around.
     })).valid).toBe(true);
   });
 
-  it("ships a GitHub Action that can validate Product Specs and Decision Traces", () => {
+  it("ships a GitHub Action that can validate Product Specs, Decision Traces, and Agent Runs", () => {
     const action = readFileSync(`${root}/action.yml`, "utf8");
     expect(action).toContain("decision_traces:");
     expect(action).toContain("validate-trace");
+    expect(action).toContain("agent_runs:");
+    expect(action).toContain("validate-run");
   });
   it("parses and round-trips product_spec related artifacts", () => {
     const markdown = readFileSync(

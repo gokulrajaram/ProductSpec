@@ -1,5 +1,5 @@
 name: Validate ProductSpec files
-description: Validate ProductSpec Markdown files in a GitHub Actions workflow.
+description: Validate ProductSpec Markdown, Decision Trace, and Agent Run files in a GitHub Actions workflow.
 author: Gokul Rajaram
 
 branding:
@@ -13,6 +13,10 @@ inputs:
     default: "**/*.product-spec.md"
   decision_traces:
     description: "Optional space-separated Decision Trace JSON files or globs to validate."
+    required: false
+    default: ""
+  agent_runs:
+    description: "Optional space-separated Agent Run JSON files or globs to validate."
     required: false
     default: ""
 
@@ -29,6 +33,7 @@ runs:
       env:
         FILES: ${{ inputs.files }}
         DECISION_TRACES: ${{ inputs.decision_traces }}
+        AGENT_RUNS: ${{ inputs.agent_runs }}
       run: |
         set -euo pipefail
         shopt -s globstar nullglob
@@ -52,5 +57,17 @@ runs:
 
           for trace in "${traces[@]}"; do
             npm exec --yes --package @productspec/parser -- productspec validate-trace "$trace"
+          done
+        fi
+
+        if [ -n "$AGENT_RUNS" ]; then
+          runs=($AGENT_RUNS)
+          if [ ${#runs[@]} -eq 0 ]; then
+            echo "No Agent Run files matched: $AGENT_RUNS"
+            exit 0
+          fi
+
+          for run in "${runs[@]}"; do
+            npm exec --yes --package @productspec/parser -- productspec validate-run "$run"
           done
         fi

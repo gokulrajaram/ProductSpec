@@ -4,6 +4,8 @@ This repo uses ProductSpec for consequential software work where intent needs to
 
 Product Specs live in `docs/product-specs/`.
 
+Agent Runs live in `docs/agent-runs/` when an AI agent leaves a receipt for one execution against a pinned Product Spec revision.
+
 Decision Traces live in `docs/decision-traces/` when intent changes, implementation drifts, or launch outcomes create a learning.
 
 Before implementation begins, the Product Spec should answer:
@@ -20,3 +22,8 @@ Validate a Product Spec:
 npm exec --package @productspec/parser -- productspec validate docs/product-specs/my-feature.product-spec.md
 ```
 
+Validate an Agent Run:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-run docs/agent-runs/my-feature.agent-run.json
+```

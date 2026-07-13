@@ -12,7 +12,13 @@ Validate a Decision Trace:
 npm exec --package @productspec/parser -- productspec validate-trace path/to/file.decision-trace.json
 ```
 
-The validator returns errors for structurally invalid Product Specs and warnings for weak-but-parseable specs. Decision Trace validation returns errors for structurally invalid trace files.
+Validate an Agent Run:
+
+```bash
+npm exec --package @productspec/parser -- productspec validate-run path/to/file.agent-run.json
+```
+
+The validator returns errors for structurally invalid Product Specs and warnings for weak-but-parseable specs. Decision Trace and Agent Run validation return errors for structurally invalid JSON files.
 
 ## Schema Parity
 
@@ -41,6 +47,93 @@ Use the TypeScript validator as the reference implementation when behavior diffe
 ## Errors
 
 Errors fail validation.
+
+## Agent Run Errors
+
+### `invalid_agent_run`
+
+The Agent Run file is not a JSON object.
+
+Fix: make the file valid JSON and run `productspec validate-run` again.
+
+### `missing_required_agent_run_field`
+
+A required Agent Run field is absent or empty.
+
+Required top-level fields:
+
+- `agent_run_format_version`
+- `run_id`
+- `agent`
+- `product_spec`
+- `started_at`
+- `status`
+- `checked_items`
+- `drift`
+
+Checked items require:
+
+- `item_id`
+- `status`
+
+Fix: add the missing field.
+
+### `unsupported_agent_run_version`
+
+`agent_run_format_version` is not supported by this validator.
+
+Fix: use `"0.1"` or upgrade the validator when newer versions exist.
+
+### `invalid_agent_run_id`
+
+`run_id` does not use the portable ID shape.
+
+Fix: use lowercase words separated by hyphens or underscores, such as `checkout-redesign-run`.
+
+### `invalid_agent_run_status`
+
+`status` is not one of the supported Agent Run statuses.
+
+Supported values:
+
+- `completed`
+- `blocked`
+- `failed`
+
+### `invalid_agent_run_item`
+
+A checked item is malformed, uses an unsupported status, or references an invalid item ID.
+
+Valid item IDs reference durable ProductSpec items:
+
+- `AC-<number>`
+- `EVAL-<number>`
+- `SM-<number>`
+
+Supported checked item statuses:
+
+- `passed`
+- `failed`
+- `not_checked`
+- `blocked`
+
+### `duplicate_agent_run_item_id`
+
+Two checked items reference the same durable ProductSpec item ID.
+
+Fix: merge the evidence into one checked item.
+
+### `invalid_agent_run_revision`
+
+The referenced Product Spec revision is not a positive integer.
+
+Fix: use `1` or higher.
+
+### `invalid_agent_run_agent`, `invalid_agent_run_product_spec`, `invalid_agent_run_drift`
+
+One of the Agent Run nested objects is malformed.
+
+Fix: follow [`docs/agent-run.md`](agent-run.md) and [`schema/agent-run.schema.json`](../schema/agent-run.schema.json).
 
 ## Decision Trace Errors
 
@@ -93,7 +186,7 @@ Fix: use lowercase words separated by hyphens or underscores, such as `checkout-
 
 ### `invalid_datetime`
 
-A Product Spec or Decision Trace date-time field is not an ISO 8601 date-time.
+A Product Spec, Decision Trace, or Agent Run date-time field is not an ISO 8601 date-time.
 
 Product Spec fields:
 
@@ -105,6 +198,11 @@ Decision Trace fields:
 - `created_at`
 - `updated_at`
 - `events[].occurred_at`
+
+Agent Run fields:
+
+- `started_at`
+- `completed_at`
 
 Fix: use a full date-time such as `2026-07-13T00:00:00Z`.
 
