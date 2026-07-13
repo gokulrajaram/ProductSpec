@@ -111,6 +111,7 @@ It should include:
 Validate the run:
 
 ```bash
+npm exec --yes --package @productspec/parser -- productspec init-run docs/product-specs/checkout-redesign.product-spec.md docs/agent-runs/checkout-redesign.agent-run.json
 npm exec --yes --package @productspec/parser -- productspec validate-run docs/agent-runs/checkout-redesign.agent-run.json
 ```
 

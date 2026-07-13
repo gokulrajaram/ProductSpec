@@ -37,7 +37,7 @@
     },
     "started_at": { "type": "string", "format": "date-time" },
     "completed_at": { "type": "string", "format": "date-time" },
-    "status": { "enum": ["completed", "blocked", "failed"] },
+    "status": { "enum": ["draft", "completed", "blocked", "failed"] },
     "checked_items": {
       "type": "array",
       "items": {

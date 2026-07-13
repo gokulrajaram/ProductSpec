@@ -39,10 +39,11 @@ Validate the starter Product Spec:
 npm exec --package @productspec/parser -- productspec validate docs/product-specs/example.product-spec.md
 ```
 
-Validate the starter Agent Run:
+Draft and validate a new Agent Run:
 
 ```bash
-npm exec --package @productspec/parser -- productspec validate-run docs/agent-runs/example.agent-run.json
+npm exec --package @productspec/parser -- productspec init-run docs/product-specs/my-feature.product-spec.md docs/agent-runs/my-feature.agent-run.json
+npm exec --package @productspec/parser -- productspec validate-run docs/agent-runs/my-feature.agent-run.json
 ```
 
 ## Working Pattern

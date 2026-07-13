@@ -118,6 +118,14 @@ v0.21 keeps the Product Spec document shape at `spec_format_version: "0.1"` and 
 - Agent Run records the pinned Product Spec revision, checked `AC-`, `EVAL-`, and `SM-` IDs, evidence links, drift state, and completion claim.
 - The GitHub Action accepts optional `agent_runs` globs.
 
+## v0.22 Agent Run Drafting Milestone
+
+v0.22 keeps the Product Spec document shape at `spec_format_version: "0.1"` and makes Agent Run receipts easier for agents and humans to create:
+
+- `productspec init-run <spec.product-spec.md> [run.agent-run.json]` drafts an Agent Run receipt from a Product Spec.
+- `draft_agent_run` exposes the same draft receipt through MCP.
+- Agent Run accepts `status: "draft"` until the agent records checked items, evidence, drift, and a completion claim.
+
 ## v1.0 Bar
 
 v1.0 is the first compatibility promise.

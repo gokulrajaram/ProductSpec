@@ -91,9 +91,10 @@ Validate the Product Spec, call begin_spec_session, load Scope, Acceptance Crite
 Stay inside scope.in, avoid scope.out and scope.cut, verify every AC- and EVAL- item, call check_spec_session before claiming done, and leave an Agent Run receipt.
 ```
 
-4. Validate the run receipt:
+4. Draft and validate the run receipt:
 
 ```bash
+npm exec --package @productspec/parser -- productspec init-run path/to/file.product-spec.md path/to/file.agent-run.json
 npm exec --package @productspec/parser -- productspec validate-run path/to/file.agent-run.json
 ```
 
@@ -375,7 +376,7 @@ ProductSpec distinguishes the standard version from the document revision:
 - `spec_format_version` tells tools which ProductSpec format the file uses.
 - `spec_revision` is an optional positive integer for this particular product decision. It starts at `1` and increments when intent materially changes.
 
-The current v0.x standard includes conformance fixtures, a structured validator, examples, a CLI, optional `spec_revision` frontmatter, traceability fields, an MCP server, a loadable agent skill, a copyable repo starter kit, Decision Trace validation, and Agent Run validation:
+The current v0.x standard includes conformance fixtures, a structured validator, examples, a CLI, optional `spec_revision` frontmatter, traceability fields, an MCP server, a loadable agent skill, a copyable repo starter kit, Decision Trace validation, and Agent Run drafting and validation:
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate examples/minimal.product-spec.md
@@ -391,6 +392,12 @@ To validate an Agent Run:
 
 ```bash
 npm exec --package @productspec/parser -- productspec validate-run examples/agent-ready-repo/docs/agent-runs/transcript-search.agent-run.json
+```
+
+To draft an Agent Run from a Product Spec:
+
+```bash
+npm exec --package @productspec/parser -- productspec init-run examples/minimal.product-spec.md examples/minimal.agent-run.json
 ```
 
 To create a starter Product Spec:

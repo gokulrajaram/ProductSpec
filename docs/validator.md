@@ -96,9 +96,12 @@ Fix: use lowercase words separated by hyphens or underscores, such as `checkout-
 
 Supported values:
 
+- `draft`
 - `completed`
 - `blocked`
 - `failed`
+
+`productspec init-run` creates `draft` receipts. Change the status after the agent records checked items, evidence, drift, and completion claim.
 
 ### `invalid_agent_run_item`
 

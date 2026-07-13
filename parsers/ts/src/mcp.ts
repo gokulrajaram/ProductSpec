@@ -3,6 +3,7 @@ import {
   beginSpecSession,
   checkCompletionClaim,
   checkSpecSession,
+  draftAgentRun,
   getAcceptanceCriteria,
   getAiEvals,
   getEvidenceChecklist,
@@ -97,6 +98,22 @@ const tools: Record<string, { description: string; inputSchema: object; handler:
     inputSchema: specPathSchema(),
     handler: (args) => getEvidenceChecklist(specPathArgs(args))
   },
+  draft_agent_run: {
+    description: "Draft an Agent Run receipt from a Product Spec, with every AC, EVAL, and SM marked not_checked.",
+    inputSchema: objectSchema({
+      root: stringProperty("Root directory. Defaults to current working directory."),
+      path: requiredStringProperty("Path to a .product-spec.md file."),
+      agent_name: stringProperty("Agent name to record in the Agent Run."),
+      agent_version: stringProperty("Agent version to record in the Agent Run."),
+      run_id: stringProperty("Optional Agent Run id. Defaults to the spec filename plus -run.")
+    }, ["path"]),
+    handler: (args) => draftAgentRun({
+      ...specPathArgs(args),
+      agent_name: optionalString(args.agent_name),
+      agent_version: optionalString(args.agent_version),
+      run_id: optionalString(args.run_id)
+    })
+  },
   check_completion_claim: {
     description: "Return the Acceptance Criteria and AI Evals an agent must verify before claiming implementation is complete.",
     inputSchema: objectSchema({
@@ -111,7 +128,7 @@ const tools: Record<string, { description: string; inputSchema: object; handler:
   }
 };
 
-const SERVER_VERSION = "0.21.0";
+const SERVER_VERSION = "0.22.0";
 
 export function runProductSpecMcpServer() {
   const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { draftAgentRun } from "./mcp-tools.js";
 import {
   resolveProductSpecGraph,
   validateAgentRunJson,
@@ -12,7 +13,7 @@ import { runProductSpecMcpServer } from "./mcp.js";
 
 const args = process.argv.slice(2);
 const positional = args.filter((arg) => !arg.startsWith("--"));
-const [command, filePath] = positional;
+const [command, filePath, outputPath] = positional;
 const jsonOutput = args.includes("--json");
 
 function collectSpecFiles(dir: string): string[] {
@@ -90,6 +91,24 @@ if (command === "init" && filePath) {
   writeFileSync(filePath, starterProductSpec(new Date().toISOString()), "utf8");
   console.log(`${filePath}: created`);
   process.exit(0);
+}
+
+if (command === "init-run" && filePath) {
+  const targetPath = outputPath ?? defaultAgentRunPath(filePath);
+  if (existsSync(targetPath)) {
+    console.error(`${targetPath} already exists`);
+    process.exit(1);
+  }
+
+  try {
+    const run = draftAgentRun({ root: process.cwd(), path: filePath });
+    writeFileSync(targetPath, `${JSON.stringify(run, null, 2)}\n`, "utf8");
+    console.log(`${targetPath}: created`);
+    process.exit(0);
+  } catch (error) {
+    console.error(`error: ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  }
 }
 
 if (command === "mcp") {
@@ -176,7 +195,7 @@ if (command === "mcp") {
   }
   process.exit(0);
 } else if (command !== "validate" || !filePath) {
-  console.error("Usage: productspec validate path/to/file.product-spec.md\n       productspec validate-trace path/to/file.decision-trace.json\n       productspec validate-run path/to/file.agent-run.json\n       productspec graph path/to/spec-directory [--json]\n       productspec init path/to/file.product-spec.md\n       productspec mcp");
+  console.error("Usage: productspec validate path/to/file.product-spec.md\n       productspec validate-trace path/to/file.decision-trace.json\n       productspec validate-run path/to/file.agent-run.json\n       productspec graph path/to/spec-directory [--json]\n       productspec init path/to/file.product-spec.md\n       productspec init-run path/to/file.product-spec.md [path/to/file.agent-run.json]\n       productspec mcp");
   process.exit(1);
 } else {
   const result = validateProductSpecMarkdown(readFileOrExit(filePath));
@@ -194,4 +213,10 @@ if (command === "mcp") {
     console.error(`${error.code}: ${error.message}`);
   }
   process.exit(1);
+}
+
+function defaultAgentRunPath(path: string): string {
+  return path.endsWith(".product-spec.md")
+    ? path.replace(/\.product-spec\.md$/, ".agent-run.json")
+    : `${path}.agent-run.json`;
 }

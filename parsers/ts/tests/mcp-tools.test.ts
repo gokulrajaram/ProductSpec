@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   beginSpecSession,
   checkSpecSession,
+  draftAgentRun,
   getAcceptanceCriteria,
   getAiEvals,
   getEvidenceChecklist,
@@ -212,6 +213,36 @@ describe("ProductSpec MCP tools", () => {
         { id: "AC-2", status: "needs_verification" }
       ],
       ai_evals: [{ id: "EVAL-1", status: "not_run_by_productspec" }]
+    });
+  });
+
+  it("drafts an Agent Run receipt from a Product Spec", () => {
+    const dir = writeFixture();
+
+    expect(draftAgentRun({
+      root: dir,
+      path: "search.product-spec.md",
+      agent_name: "Codex",
+      agent_version: "cli"
+    })).toMatchObject({
+      agent_run_format_version: "0.1",
+      run_id: "search-run",
+      agent: {
+        name: "Codex",
+        version: "cli"
+      },
+      product_spec: {
+        path: "search.product-spec.md",
+        spec_revision: 1
+      },
+      status: "draft",
+      checked_items: [
+        { item_id: "AC-1", status: "not_checked" },
+        { item_id: "AC-2", status: "not_checked" },
+        { item_id: "EVAL-1", status: "not_checked" },
+        { item_id: "SM-1", status: "not_checked" }
+      ],
+      drift: { detected: false }
     });
   });
 

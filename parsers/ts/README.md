@@ -22,6 +22,9 @@ npx --yes -p @productspec/parser productspec validate-trace path/to/file.decisio
 # Validate an Agent Run
 npx --yes -p @productspec/parser productspec validate-run path/to/file.agent-run.json
 
+# Draft an Agent Run from a Product Spec
+npx --yes -p @productspec/parser productspec init-run path/to/file.product-spec.md path/to/file.agent-run.json
+
 # Resolve the spec dependency graph under a directory
 npx --yes -p @productspec/parser productspec graph path/to/spec-directory
 

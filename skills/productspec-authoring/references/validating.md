@@ -20,6 +20,12 @@ Validate one Agent Run:
 npm exec --yes --package @productspec/parser -- productspec validate-run path/to/file.agent-run.json
 ```
 
+Draft one Agent Run from a Product Spec:
+
+```bash
+npm exec --yes --package @productspec/parser -- productspec init-run path/to/file.product-spec.md path/to/file.agent-run.json
+```
+
 Resolve a folder of specs into a build graph (buildable, blocked, order):
 
 ```bash

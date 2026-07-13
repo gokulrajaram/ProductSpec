@@ -86,6 +86,7 @@ export const DECISION_TRACE_OUTCOMES = [
   "no_action"
 ] as const;
 export const AGENT_RUN_STATUSES = [
+  "draft",
   "completed",
   "blocked",
   "failed"

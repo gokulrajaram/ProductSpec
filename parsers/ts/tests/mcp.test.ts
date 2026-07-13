@@ -16,6 +16,7 @@ describe("ProductSpec MCP server", () => {
           expect.objectContaining({ name: "get_acceptance_criteria" }),
           expect.objectContaining({ name: "get_spec_graph" }),
           expect.objectContaining({ name: "get_evidence_checklist" }),
+          expect.objectContaining({ name: "draft_agent_run" }),
           expect.objectContaining({ name: "check_completion_claim" })
         ])
       }

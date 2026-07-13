@@ -8,6 +8,15 @@ Changed:
 - GitHub Action now accepts optional `agent_runs` globs and validates Agent Run files.
 - Starter kit now includes an Agent Run example and validates it in CI.
 
+## v0.22.0 - Agent Run Drafting
+
+Added:
+
+- `productspec init-run <spec.product-spec.md> [run.agent-run.json]` drafts an Agent Run receipt from a Product Spec.
+- `draft_agent_run` MCP tool drafts the same receipt for agents using the stdio MCP server.
+- Agent Run `status` now accepts `draft`.
+- Agent Run conformance fixtures for valid draft receipts and invalid statuses.
+
 ## v0.21.0 - Agent Harness Records
 
 Added:

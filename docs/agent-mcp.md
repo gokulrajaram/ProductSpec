@@ -43,6 +43,7 @@ For MCP clients that support stdio servers:
 - `get_related_artifacts`: returns Related Artifacts.
 - `get_spec_graph`: resolves `product_spec` links across all specs under a root into buildable, blocked, and ordered work.
 - `get_evidence_checklist`: returns the implementation, eval, and post-launch evidence expected for a Product Spec.
+- `draft_agent_run`: drafts an Agent Run receipt with every `AC-`, `EVAL-`, and `SM-` item marked `not_checked`.
 - `check_completion_claim`: returns the criteria and evals an agent must verify before claiming implementation is complete.
 
 ## Spec Sessions
@@ -71,7 +72,7 @@ Use ProductSpec MCP before coding:
 6. Before claiming done, call check_spec_session. If the Product Spec changed, re-read and re-plan.
 7. Call get_evidence_checklist to identify which pull requests, tests, eval runs, dashboards, or analytics snapshots should attach to AC-, EVAL-, and SM- IDs.
 8. Call check_completion_claim and verify each returned Acceptance Criterion and AI Eval.
-9. Write an Agent Run artifact if the repo wants a durable record of what the agent checked.
+9. Call draft_agent_run, fill in checked statuses and evidence, and write an Agent Run artifact if the repo wants a durable record of what the agent checked.
 ```
 
 ## Boundary

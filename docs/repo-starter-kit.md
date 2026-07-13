@@ -47,9 +47,10 @@ Validate a Product Spec:
 npm exec --package @productspec/parser -- productspec validate docs/product-specs/my-feature.product-spec.md
 ```
 
-Validate an Agent Run:
+Draft and validate an Agent Run:
 
 ```bash
+npm exec --package @productspec/parser -- productspec init-run docs/product-specs/my-feature.product-spec.md docs/agent-runs/my-feature.agent-run.json
 npm exec --package @productspec/parser -- productspec validate-run docs/agent-runs/my-feature.agent-run.json
 ```
 ````

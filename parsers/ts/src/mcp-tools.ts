@@ -4,6 +4,7 @@ import { isAbsolute, join, normalize, relative, resolve } from "node:path";
 import {
   parseProductSpecMarkdown,
   resolveProductSpecGraph,
+  type AgentRunDocument,
   type ProductSpecAcceptanceCriterion,
   type ProductSpecAiEval,
   type ProductSpecDocument,
@@ -97,6 +98,12 @@ export interface ProductSpecSessionCheckArgs extends ProductSpecMcpArgs {
   session_id?: string;
   started_revision?: number;
   started_hash?: string;
+}
+
+export interface DraftAgentRunArgs extends ProductSpecMcpArgs {
+  agent_name?: string;
+  agent_version?: string;
+  run_id?: string;
 }
 
 const DEFAULT_ROOT = process.cwd();
@@ -273,6 +280,42 @@ export function getEvidenceChecklist(args: ProductSpecMcpArgs): EvidenceChecklis
   };
 }
 
+export function draftAgentRun(args: DraftAgentRunArgs): AgentRunDocument {
+  const root = resolveRoot(args.root);
+  if (!args.path) throw new Error("path is required");
+  const absolutePath = resolveSpecPath(root, args.path);
+  const path = relative(root, absolutePath);
+  const markdown = readFileSync(absolutePath, "utf8");
+  const result = validateProductSpecMarkdown(markdown);
+  if (!result.valid) {
+    throw new Error(`Invalid Product Spec: ${result.errors.map((error) => error.message).join("; ")}`);
+  }
+
+  const checked_items = result.document.sections.flatMap((section) => [
+    ...(section.acceptance_criteria ?? []).map((criterion) => criterion.id),
+    ...(section.ai_evals ?? []).map((evalSpec) => evalSpec.id),
+    ...(section.success_metrics ?? []).map((metric) => metric.id)
+  ]).map((item_id) => ({ item_id, status: "not_checked" as const }));
+
+  const agent: AgentRunDocument["agent"] = { name: args.agent_name ?? "unknown" };
+  if (args.agent_version) agent.version = args.agent_version;
+
+  return {
+    agent_run_format_version: "0.1",
+    run_id: args.run_id ?? runIdForPath(path),
+    agent,
+    product_spec: {
+      path,
+      spec_revision: result.document.frontmatter.spec_revision ?? 1,
+      content_hash: contentHash(markdown)
+    },
+    started_at: new Date().toISOString(),
+    status: "draft",
+    checked_items,
+    drift: { detected: false }
+  };
+}
+
 export function checkCompletionClaim(args: ProductSpecMcpArgs & { claim?: string }): CompletionClaimCheck {
   const result = validateProductSpec(args);
   const claim = args.claim ?? "";
@@ -352,6 +395,16 @@ function resolveSessionCheckArgs(args: ProductSpecSessionCheckArgs) {
 
 function contentHash(markdown: string): string {
   return `sha256:${createHash("sha256").update(markdown).digest("hex")}`;
+}
+
+function runIdForPath(path: string): string {
+  const name = path.split("/").pop() ?? "productspec";
+  return name
+    .replace(/\.product-spec\.md$/, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase()
+    .concat("-run");
 }
 
 export function getSpecGraph(args: { root?: string } = {}): ProductSpecGraph {

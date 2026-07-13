@@ -59,6 +59,16 @@ Use it when Claude, Codex, Cursor, or another coding agent implements against a 
 
 Use `not_checked` for Success Metrics that are post-launch and should not block implementation completion.
 
+## Draft
+
+Use `init-run` to create a draft receipt from the current Product Spec. It copies every `AC-`, `EVAL-`, and `SM-` ID into `checked_items` with `status: "not_checked"`.
+
+```bash
+npm exec --package @productspec/parser -- productspec init-run docs/product-specs/transcript-search.product-spec.md docs/agent-runs/transcript-search.agent-run.json
+```
+
+The generated receipt uses `status: "draft"`. Change it to `completed`, `blocked`, or `failed` only after the agent records what it checked, links evidence, and writes a completion claim.
+
 ## Drift
 
 If the agent detects that implementation changed product intent, set:

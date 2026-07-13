@@ -1830,6 +1830,19 @@ Keep this around.
     if (result.valid) expect(result.document.checked_items[0].item_id).toBe("AC-1");
   });
 
+  it("validates Agent Run conformance fixtures", () => {
+    const valid = validateAgentRunJson(
+      readFileSync(`${root}/conformance/valid/minimal.agent-run.json`, "utf8")
+    );
+    expect(valid.valid).toBe(true);
+
+    const invalid = validateAgentRunJson(
+      readFileSync(`${root}/conformance/invalid/invalid-agent-run-status.agent-run.json`, "utf8")
+    );
+    expect(invalid.valid).toBe(false);
+    if (!invalid.valid) expect(invalid.errors.map((error) => error.code)).toContain("invalid_agent_run_status");
+  });
+
   it("rejects Agent Run files with invalid item ids", () => {
     const result = validateAgentRunJson(JSON.stringify({
       agent_run_format_version: "0.1",
@@ -1872,6 +1885,51 @@ Keep this around.
 
     expect(invalid.status).toBe(1);
     expect(invalid.stderr).toContain("missing_required_agent_run_field");
+  }, 30000);
+
+  it("initializes a draft Agent Run from the CLI", () => {
+    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
+    expect(build.status, build.stderr).toBe(0);
+
+    const dir = mkdtempSync(join(tmpdir(), "productspec-init-run-"));
+    const specPath = join(dir, "search.product-spec.md");
+    const runPath = join(dir, "search.agent-run.json");
+
+    try {
+      writeFileSync(specPath, readFileSync(`${root}/examples/minimal.product-spec.md`, "utf8"), "utf8");
+
+      const initRun = spawnSync("node", [
+        fileURLToPath(new URL("../dist/cli.js", import.meta.url)),
+        "init-run",
+        "search.product-spec.md",
+        "search.agent-run.json"
+      ], { cwd: dir, encoding: "utf8" });
+
+      expect(initRun.status).toBe(0);
+      expect(initRun.stdout).toContain("created");
+      expect(existsSync(runPath)).toBe(true);
+
+      const result = validateAgentRunJson(readFileSync(runPath, "utf8"));
+      expect(result.valid).toBe(true);
+      if (result.valid) {
+        expect(result.document.status).toBe("draft");
+        expect(result.document.product_spec.path).toBe("search.product-spec.md");
+        expect(result.document.checked_items).toContainEqual({ item_id: "AC-1", status: "not_checked" });
+        expect(result.document.checked_items).toContainEqual({ item_id: "SM-1", status: "not_checked" });
+      }
+
+      const secondInitRun = spawnSync("node", [
+        fileURLToPath(new URL("../dist/cli.js", import.meta.url)),
+        "init-run",
+        "search.product-spec.md",
+        "search.agent-run.json"
+      ], { cwd: dir, encoding: "utf8" });
+
+      expect(secondInitRun.status).toBe(1);
+      expect(secondInitRun.stderr).toContain("already exists");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   }, 30000);
 
   it("initializes a starter Product Spec from the CLI", () => {
