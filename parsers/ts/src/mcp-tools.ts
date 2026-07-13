@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { isAbsolute, join, normalize, relative, resolve } from "node:path";
 import {
   parseProductSpecMarkdown,
@@ -319,6 +319,13 @@ function resolveSpecPath(root: string, filePath: string): string {
     throw new Error(`Product Spec path must stay inside root: ${filePath}`);
   }
   if (!existsSync(absolutePath)) throw new Error(`Product Spec not found: ${filePath}`);
+
+  // Re-check containment against real paths so a symlink that is lexically
+  // inside root but resolves outside it cannot be read.
+  const realRelative = relative(realpathSync(root), realpathSync(absolutePath));
+  if (realRelative.startsWith("..") || isAbsolute(realRelative)) {
+    throw new Error(`Product Spec path must stay inside root: ${filePath}`);
+  }
   return absolutePath;
 }
 
@@ -328,15 +335,17 @@ function findProductSpecFiles(root: string): string[] {
   return results.sort((a, b) => relative(root, a).localeCompare(relative(root, b)));
 
   function visit(dir: string) {
-    for (const entry of readdirSync(dir)) {
-      if (shouldSkip(entry)) continue;
-      const absolutePath = join(dir, entry);
-      const stat = statSync(absolutePath);
-      if (stat.isDirectory()) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (shouldSkip(entry.name)) continue;
+      // Skip symlinks: they can point outside root and can form cycles that
+      // would otherwise abort the whole scan with ELOOP.
+      if (entry.isSymbolicLink()) continue;
+      const absolutePath = join(dir, entry.name);
+      if (entry.isDirectory()) {
         visit(absolutePath);
         continue;
       }
-      if (entry.endsWith(".product-spec.md")) results.push(absolutePath);
+      if (entry.isFile() && entry.name.endsWith(".product-spec.md")) results.push(absolutePath);
     }
   }
 }

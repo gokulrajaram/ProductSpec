@@ -26,13 +26,16 @@ runs:
 
     - name: Validate ProductSpec files
       shell: bash
+      env:
+        FILES: ${{ inputs.files }}
+        DECISION_TRACES: ${{ inputs.decision_traces }}
       run: |
         set -euo pipefail
         shopt -s globstar nullglob
 
-        files=(${{ inputs.files }})
+        files=($FILES)
         if [ ${#files[@]} -eq 0 ]; then
-          echo "No ProductSpec files matched: ${{ inputs.files }}"
+          echo "No ProductSpec files matched: $FILES"
           exit 0
         fi
 
@@ -40,10 +43,10 @@ runs:
           npm exec --yes --package @productspec/parser -- productspec validate "$file"
         done
 
-        if [ -n "${{ inputs.decision_traces }}" ]; then
-          traces=(${{ inputs.decision_traces }})
+        if [ -n "$DECISION_TRACES" ]; then
+          traces=($DECISION_TRACES)
           if [ ${#traces[@]} -eq 0 ]; then
-            echo "No Decision Trace files matched: ${{ inputs.decision_traces }}"
+            echo "No Decision Trace files matched: $DECISION_TRACES"
             exit 0
           fi
 
