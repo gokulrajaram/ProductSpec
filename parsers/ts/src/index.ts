@@ -162,6 +162,9 @@ export interface ProductSpecRelatedArtifact {
 export interface ProductSpecDocument {
   frontmatter: ProductSpecFrontmatter;
   sections: ProductSpecSection[];
+  parser_metadata?: {
+    unknown_frontmatter?: string[];
+  };
 }
 
 export interface ProductSpecValidationError {
@@ -256,7 +259,7 @@ export function parseProductSpecMarkdown(input: string): ProductSpecDocument {
   const frontmatterMatch = /^---\n([\s\S]*?)\n---\n?/.exec(markdown);
   if (!frontmatterMatch) throw new Error("Product Spec frontmatter is required.");
 
-  const frontmatter = parseFrontmatter(frontmatterMatch[1]);
+  const { frontmatter, parser_metadata } = parseFrontmatter(frontmatterMatch[1]);
   const body = markdown.slice(frontmatterMatch[0].length);
   const sections = parseSections(body, frontmatter.custom_sections ?? []);
 
@@ -266,7 +269,11 @@ export function parseProductSpecMarkdown(input: string): ProductSpecDocument {
     }
   }
 
-  return { frontmatter, sections };
+  return {
+    frontmatter,
+    sections,
+    ...(parser_metadata ? { parser_metadata } : {})
+  };
 }
 
 export function validateProductSpecMarkdown(markdown: string): ProductSpecValidationResult {
@@ -306,7 +313,7 @@ export function validateDecisionTraceJson(json: string): DecisionTraceValidation
 }
 
 export function serializeProductSpecMarkdown(doc: ProductSpecDocument): string {
-  const frontmatter = serializeFrontmatter(doc.frontmatter);
+  const frontmatter = serializeFrontmatter(doc.frontmatter, doc.parser_metadata);
   const body = doc.sections
     .map((section) => `## ${section.label}\n\n${section.content.trim()}`)
     .join("\n\n");
@@ -1047,9 +1054,27 @@ function positiveInteger(value: unknown): boolean {
   return Number.isInteger(value) && Number(value) >= 1;
 }
 
-function parseFrontmatter(raw: string): ProductSpecFrontmatter {
+const KNOWN_FRONTMATTER_KEYS = new Set([
+  "spec_format_version",
+  "title",
+  "artifact_type",
+  "spec_revision",
+  "author",
+  "created_at",
+  "updated_at",
+  "linked_github_repo",
+  "applies_to",
+  "custom_sections",
+  "tool_metadata"
+]);
+
+function parseFrontmatter(raw: string): {
+  frontmatter: ProductSpecFrontmatter;
+  parser_metadata?: ProductSpecDocument["parser_metadata"];
+} {
   const lines = raw.split("\n");
   const result: Record<string, unknown> = {};
+  const unknownFrontmatter: string[] = [];
   let customSections: Array<{ id: string; label: string; after: string }> | undefined;
   let appliesTo: ProductSpecAppliesTo[] | undefined;
 
@@ -1104,6 +1129,16 @@ function parseFrontmatter(raw: string): ProductSpecFrontmatter {
       result.tool_metadata = metadata;
       continue;
     }
+    const key = frontmatterKey(line);
+    if (key && !KNOWN_FRONTMATTER_KEYS.has(key)) {
+      const block = [line];
+      while (lines[index + 1] !== undefined && /^[ \t]/.test(lines[index + 1]) && lines[index + 1].trim()) {
+        index += 1;
+        block.push(lines[index]);
+      }
+      unknownFrontmatter.push(block.join("\n"));
+      continue;
+    }
     assignKeyValue(result, line);
   }
 
@@ -1122,7 +1157,16 @@ function parseFrontmatter(raw: string): ProductSpecFrontmatter {
     result.spec_revision = revision;
   }
 
-  return result as unknown as ProductSpecFrontmatter;
+  return {
+    frontmatter: result as unknown as ProductSpecFrontmatter,
+    ...(unknownFrontmatter.length
+      ? { parser_metadata: { unknown_frontmatter: unknownFrontmatter } }
+      : {})
+  };
+}
+
+function frontmatterKey(line: string): string | undefined {
+  return /^([A-Za-z0-9_]+):/.exec(line)?.[1];
 }
 
 function assignKeyValue(target: Record<string, unknown>, line: string) {
@@ -1504,7 +1548,10 @@ function sectionIdForLabel(label: string, customSections: Array<{ id: string; la
   return `custom-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
 }
 
-function serializeFrontmatter(frontmatter: ProductSpecFrontmatter): string {
+function serializeFrontmatter(
+  frontmatter: ProductSpecFrontmatter,
+  parserMetadata?: ProductSpecDocument["parser_metadata"]
+): string {
   let output = "";
   for (const key of ["spec_format_version", "title", "artifact_type", "spec_revision", "author", "created_at", "updated_at", "linked_github_repo"] as const) {
     const value = frontmatter[key];
@@ -1531,6 +1578,9 @@ function serializeFrontmatter(frontmatter: ProductSpecFrontmatter): string {
     for (const [key, value] of Object.entries(frontmatter.tool_metadata)) {
       output += `  ${key}: "${value}"\n`;
     }
+  }
+  for (const block of parserMetadata?.unknown_frontmatter ?? []) {
+    output += `${block}\n`;
   }
   return output;
 }

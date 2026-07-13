@@ -1,11 +1,22 @@
 # Changelog
 
-## Unreleased
+## v0.20.0 - Parser Preservation And Agent Examples
 
 Added:
 
 - `docs/productspec-to-tickets.md`: guide for projecting a Product Spec into Jira or Linear tickets by reference instead of by copy.
 - `examples/lending-covenant-monitoring.product-spec.md`: a regulated-lending example with committed and provisional Success Metrics and ticket back-links via `Related Artifacts`.
+- `examples/agent-ready-repo/`: a tiny repo layout showing a Product Spec, Decision Trace, validation commands, and MCP usage for coding agents.
+- `examples/decision-traces/implementation-drift.decision-trace.json`: a focused implementation drift example.
+- ProductSpec philosophy now includes a product discipline sequence: make requirements less wrong, delete before building, simplify before optimizing, accelerate after intent is clear, and automate last.
+
+Changed:
+
+- AI eval examples now use concrete model-behavior cases instead of placeholders.
+
+Fixed:
+
+- The reference parser now preserves unknown frontmatter blocks under parser-owned `parser_metadata.unknown_frontmatter` and re-emits them on serialization without treating them as portable ProductSpec frontmatter.
 
 ## v0.19.0 - Validator Semantics
 

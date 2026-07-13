@@ -66,6 +66,22 @@ It does not define product taste. It does not decide whether a product bet is go
 
 The open standard should stay small enough that many teams can adopt it and many tools can implement it.
 
+## Product discipline
+
+ProductSpec should make teams slower at the right moment and faster after that.
+
+The discipline is:
+
+1. Make the requirement less wrong.
+2. Delete before building.
+3. Simplify before optimizing.
+4. Accelerate after intent is clear.
+5. Automate last.
+
+`problem` and `hypothesis` force the team to make the requirement less wrong before work begins. `scope` creates an explicit place to delete work, including work that sounds useful but does not belong in this version. `acceptance_criteria` and AI evals simplify the build contract into pass/fail checks. `success_metrics` keeps the team honest about whether the work mattered after launch.
+
+Agents should enter after that discipline, not before it. A faster implementation loop is valuable only when it is pointed at clear intent.
+
 ## Consequential work
 
 ProductSpec is for work where intent needs to survive handoff.

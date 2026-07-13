@@ -44,6 +44,8 @@ Optional fields:
 
 Exports intended for public sharing should strip `tool_metadata` by default.
 
+Files may include unknown frontmatter keys from editors, local scripts, or migration tools. Tools should preserve unknown frontmatter on round-trip when possible, but unknown keys are not portable ProductSpec semantics. The reference parser exposes preserved unknown blocks under parser-owned `parser_metadata.unknown_frontmatter`, not under standard `frontmatter`.
+
 `custom_sections[].after` is advisory metadata for authoring tools. The reference parser preserves it, but section order follows the physical order of `##` headings in the Markdown body.
 
 ## Canonical Section Vocabulary

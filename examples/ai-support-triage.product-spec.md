@@ -59,8 +59,10 @@ https://example.com/support-triage-dashboard
 - id: EVAL-1
   type: llm_judge
   cases:
-    - input: "Representative input for this eval."
-      expected: "Expected behavior for this eval."
+    - input: "Enterprise customer reports that checkout has been down for 20 minutes and renewal is due tomorrow."
+      expected: "Classify urgency as account_risk and recommend the owner queue responsible for checkout incidents."
+    - input: "Small customer asks how to change invoice email recipients."
+      expected: "Classify urgency as routine and do not escalate."
   evaluator: llm
   pass_threshold: 0.92
   checks:
@@ -68,10 +70,12 @@ https://example.com/support-triage-dashboard
     - owner recommendation matches the expected support queue
     - confidence below threshold is marked needs_review
 - id: EVAL-2
-  type: contains
+  type: regex
   cases:
-    - input: "Model prepares redacted ticket context before classification."
-      expected: "Private customer data is replaced with redaction placeholders."
+    - input: "Ticket includes user email sam@example.com, account token sk_live_123, and complaint about SSO failure."
+      expected: "Model-visible context replaces private email and token values before classification."
+    - input: "Ticket includes phone +1-415-555-1212 and account-risk language."
+      expected: "Model-visible context preserves account-risk language while redacting the phone number."
   evaluator: deterministic
   pass_threshold: 1
   checks:

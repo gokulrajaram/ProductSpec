@@ -1,0 +1,37 @@
+{
+  "decision_trace_format_version": "0.1",
+  "trace_id": "transcript-search-agent-ready",
+  "title": "Transcript Search Agent-Ready Decision Trace",
+  "created_at": "2026-07-13T00:00:00Z",
+  "updated_at": "2026-07-13T00:00:00Z",
+  "subject": {
+    "type": "product_spec",
+    "id": "transcript-search",
+    "title": "Transcript Search",
+    "product_spec_path": "../product-specs/transcript-search.product-spec.md",
+    "product_spec_revision": 1
+  },
+  "events": [
+    {
+      "event_id": "copy-format-kept-small",
+      "event_type": "implementation_tradeoff",
+      "occurred_at": "2026-07-13T00:00:00Z",
+      "summary": "The implementation kept copy output to passage, video URL, and timestamp instead of adding rich citation formats.",
+      "source": {
+        "product_spec_revision": 1,
+        "links": [
+          {
+            "type": "github_pr",
+            "url": "https://github.com/example/transcript-search/pull/18",
+            "title": "Implement timestamped passage copy"
+          }
+        ]
+      },
+      "decision": {
+        "outcome": "no_action",
+        "rationale": "The current Product Spec only requires sourceable copy output. Rich citation formats remain outside scope.",
+        "approved_by": ["Product lead"]
+      }
+    }
+  ]
+}

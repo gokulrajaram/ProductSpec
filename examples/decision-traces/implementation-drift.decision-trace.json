@@ -1,0 +1,51 @@
+{
+  "decision_trace_format_version": "0.1",
+  "trace_id": "implementation-drift",
+  "title": "Implementation Drift Decision Trace",
+  "created_at": "2026-07-13T00:00:00Z",
+  "updated_at": "2026-07-13T00:00:00Z",
+  "subject": {
+    "type": "product_spec",
+    "id": "transcript-search",
+    "title": "Transcript Search",
+    "product_spec_path": "../full-prd.product-spec.md",
+    "product_spec_revision": 2
+  },
+  "events": [
+    {
+      "event_id": "speaker-labels-added",
+      "event_type": "scope_drift",
+      "occurred_at": "2026-07-13T00:00:00Z",
+      "summary": "Implementation added speaker labels even though speaker labels were cut from the current Product Spec revision.",
+      "source": {
+        "product_spec_revision": 2,
+        "links": [
+          {
+            "type": "github_pr",
+            "url": "https://github.com/example/transcript-search/pull/42",
+            "title": "Add transcript search and speaker labels"
+          }
+        ]
+      },
+      "drift": {
+        "spec_claim": "Speaker labels are listed under scope.cut for this revision.",
+        "observed_reality": "The implementation branch adds speaker label extraction and displays labels beside transcript lines."
+      },
+      "decision": {
+        "outcome": "update_implementation",
+        "rationale": "Speaker labels require separate evals and UI review. They remain outside this release.",
+        "approved_by": ["Product lead", "Engineering lead"]
+      },
+      "result": {
+        "linked_artifacts": [
+          {
+            "type": "github_pr",
+            "url": "https://github.com/example/transcript-search/pull/43",
+            "title": "Remove speaker labels from first transcript search release"
+          }
+        ],
+        "learning": "Scope cuts need to be checked before implementation is marked complete."
+      }
+    }
+  ]
+}
