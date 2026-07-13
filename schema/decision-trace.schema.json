@@ -138,9 +138,11 @@
             "linear_issue",
             "figma",
             "eval_run",
+            "dashboard",
             "analytics_snapshot",
             "experiment",
             "release",
+            "code",
             "other"
           ]
         },

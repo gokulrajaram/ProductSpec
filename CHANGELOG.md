@@ -4,6 +4,20 @@
 
 No unreleased changes.
 
+## v0.19.0 - Validator Semantics
+
+Fixed:
+
+- Product Spec and Decision Trace validators now reject invalid ISO date-time fields.
+- Product Spec validation now rejects duplicate durable `AC-`, `EVAL-`, and `SM-` item IDs.
+- Decision Trace validation now rejects duplicate `event_id` values.
+- Decision Trace JSON Schema link types now include `code` and `dashboard`, matching the parser's evidence vocabulary.
+
+Changed:
+
+- Spec graph resolution now warns when a `product_spec_revision` pin does not match the target spec's `spec_revision`.
+- Agent docs and `skills/productspec` now document `RESOLVE-IN-PLAN:` markers for unresolved technical bindings.
+
 ## v0.18.0 - Tooling Hardening
 
 Fixed:

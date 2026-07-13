@@ -111,7 +111,7 @@ const tools: Record<string, { description: string; inputSchema: object; handler:
   }
 };
 
-const SERVER_VERSION = "0.18.0";
+const SERVER_VERSION = "0.19.0";
 
 export function runProductSpecMcpServer() {
   const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });

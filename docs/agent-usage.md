@@ -41,12 +41,14 @@ Agents should:
 - treat `scope.out` and `scope.cut` as explicit non-goals
 - use `applies_to` and `Related Artifacts` to find linked code, issues, pull requests, designs, eval runs, and dashboards
 - resolve `product_spec` related artifacts across the repo before planning, so build order follows the dependency graph. `productspec graph <dir> --json` resolves a whole folder in one call: buildable set, blocked set with reasons, and build order
+- treat `RESOLVE-IN-PLAN:` markers as planning questions to answer against the codebase before coding
 - propose a Product Spec revision or Decision Trace when implementation diverges from intent
 
 Agents should not:
 
 - treat Success Metrics as implementation tasks
 - expand scope because the implementation path makes it convenient
+- treat unresolved technical bindings as implementation instructions
 - silently change product intent
 - treat code drift as intent without an explicit decision
 
@@ -60,6 +62,8 @@ Implement the work in specs/example.product-spec.md.
 If ProductSpec MCP is available, call begin_spec_session before planning and check_spec_session before claiming done.
 
 Create a plan that maps tasks to Acceptance Criteria. Keep scope.out and scope.cut out of the implementation. If you need to change product intent, stop and propose a Product Spec revision or Decision Trace.
+
+Resolve every `RESOLVE-IN-PLAN:` marker with a source citation before coding. Do not implement guessed table names, fields, endpoints, services, or file paths as if they were binding.
 ```
 
 ## Pull Request Summary Pattern

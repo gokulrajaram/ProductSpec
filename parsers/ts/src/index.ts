@@ -366,6 +366,17 @@ function validateDocument(document: ProductSpecDocument): {
   const errors: ProductSpecValidationError[] = [];
   const warnings: ProductSpecValidationWarning[] = [];
   const seenSectionIds = new Set<string>();
+  const seenItemIds = new Set<string>();
+
+  for (const field of ["created_at", "updated_at"] as const) {
+    if (!isoDateTime(document.frontmatter[field])) {
+      errors.push({
+        code: "invalid_datetime",
+        message: `Invalid Product Spec date-time: ${field} must be ISO 8601.`,
+        path: `frontmatter.${field}`
+      });
+    }
+  }
 
   for (const section of document.sections) {
     if (seenSectionIds.has(section.id)) {
@@ -491,6 +502,7 @@ function validateDocument(document: ProductSpecDocument): {
           path
         });
       }
+      addDuplicateItemIdError(errors, seenItemIds, criterion.id, `${path}.id`);
     }
 
     if (section.id === "acceptance_criteria" && !section.acceptance_criteria?.length) {
@@ -527,6 +539,7 @@ function validateDocument(document: ProductSpecDocument): {
           path
         });
       }
+      addDuplicateItemIdError(errors, seenItemIds, aiEval.id, `${path}.id`);
       if (aiEval.type && !AI_EVAL_TYPES.includes(aiEval.type as AiEvalType)) {
         errors.push({
           code: "invalid_ai_eval",
@@ -600,6 +613,7 @@ function validateDocument(document: ProductSpecDocument): {
           path
         });
       }
+      addDuplicateItemIdError(errors, seenItemIds, metric.id, `${path}.id`);
       if (!["committed", "provisional"].includes(metric.target_status)) {
         errors.push({
           code: "invalid_success_metric",
@@ -799,6 +813,15 @@ function validateDecisionTraceValue(value: unknown): ProductSpecValidationError[
       });
     }
   }
+  for (const field of ["created_at", "updated_at"] as const) {
+    if (value[field] !== undefined && !isoDateTime(value[field])) {
+      errors.push({
+        code: "invalid_datetime",
+        message: `Invalid Decision Trace date-time: ${field} must be ISO 8601.`,
+        path: field
+      });
+    }
+  }
 
   errors.push(...validateDecisionTraceSubject(value.subject));
   if (!Array.isArray(value.events) || value.events.length === 0) {
@@ -808,8 +831,19 @@ function validateDecisionTraceValue(value: unknown): ProductSpecValidationError[
       path: "events"
     });
   } else {
+    const seenEventIds = new Set<string>();
     for (const [index, event] of value.events.entries()) {
       errors.push(...validateDecisionTraceEvent(event, `events.${index}`));
+      if (isRecord(event) && typeof event.event_id === "string") {
+        if (seenEventIds.has(event.event_id)) {
+          errors.push({
+            code: "duplicate_trace_event_id",
+            message: `Duplicate Decision Trace event_id: ${event.event_id}.`,
+            path: `events.${index}.event_id`
+          });
+        }
+        seenEventIds.add(event.event_id);
+      }
     }
   }
   return errors;
@@ -872,6 +906,13 @@ function validateDecisionTraceEvent(value: unknown, path: string): ProductSpecVa
       code: "invalid_trace_event",
       message: `Invalid event_type: ${String(value.event_type)}`,
       path: `${path}.event_type`
+    });
+  }
+  if (value.occurred_at !== undefined && !isoDateTime(value.occurred_at)) {
+    errors.push({
+      code: "invalid_datetime",
+      message: "Invalid Decision Trace date-time: occurred_at must be ISO 8601.",
+      path: `${path}.occurred_at`
     });
   }
   if (value.source !== undefined) errors.push(...validateDecisionTraceSource(value.source, `${path}.source`));
@@ -978,6 +1019,28 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function nonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function isoDateTime(value: unknown): value is string {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) && !Number.isNaN(Date.parse(value));
+}
+
+function addDuplicateItemIdError(
+  errors: ProductSpecValidationError[],
+  seenItemIds: Set<string>,
+  id: string,
+  path: string
+) {
+  if (!id) return;
+  if (seenItemIds.has(id)) {
+    errors.push({
+      code: "duplicate_item_id",
+      message: `Duplicate Product Spec item id: ${id}.`,
+      path
+    });
+    return;
+  }
+  seenItemIds.add(id);
 }
 
 function positiveInteger(value: unknown): boolean {
@@ -1620,6 +1683,18 @@ export function resolveProductSpecGraph(inputs: ProductSpecGraphInput[]): Produc
           warnings.push({
             code: "missing_link_target",
             message: `${path} declares ${relation} on ${target}, which is not in the graph.`,
+            path
+          });
+        }
+        const targetRevision = nodes.get(target)?.document.frontmatter.spec_revision;
+        if (
+          artifact.product_spec_revision !== undefined &&
+          targetRevision !== undefined &&
+          artifact.product_spec_revision !== targetRevision
+        ) {
+          warnings.push({
+            code: "revision_pin_mismatch",
+            message: `${path} pins ${target} at revision ${artifact.product_spec_revision}, but the target spec is revision ${targetRevision}.`,
             path
           });
         }

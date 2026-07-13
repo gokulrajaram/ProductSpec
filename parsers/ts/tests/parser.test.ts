@@ -127,6 +127,57 @@ In: optional positive integer revision in frontmatter.
     expect(parseProductSpecMarkdown(serialized).frontmatter.spec_revision).toBe(2);
   });
 
+  it("rejects invalid Product Spec date-time frontmatter", () => {
+    const markdown = `---
+spec_format_version: "0.1"
+title: "Bad Dates"
+artifact_type: "prd"
+author: "ProductSpec"
+created_at: "NOT-A-DATE"
+updated_at: "2026-07-05T00:00:00Z"
+---
+
+## Problem
+
+Teams cannot trust invalid timestamps.
+
+## Hypothesis
+
+If timestamps are valid date-times, tools can compare specs reliably.
+
+## Scope
+
+In: date-time validation.
+
+## Acceptance Criteria
+
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: Invalid date-time frontmatter is rejected.
+\`\`\`
+
+## Success Metrics
+
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: invalid_dates_rejected
+  target: "100%"
+  window: per validation
+\`\`\`
+`;
+
+    const result = validateProductSpecMarkdown(markdown);
+
+    expect(result.valid).toBe(false);
+    if (!result.valid) {
+      expect(result.errors).toContainEqual({
+        code: "invalid_datetime",
+        message: "Invalid Product Spec date-time: created_at must be ISO 8601.",
+        path: "frontmatter.created_at"
+      });
+    }
+  });
+
   it("extracts structured AI evals from Acceptance Criteria", () => {
     const markdown = `---
 spec_format_version: "0.1"
@@ -204,6 +255,94 @@ In: transcript search, timestamp citations, and quote copy.
       }
     ]);
     expect(parseProductSpecMarkdown(serializeProductSpecMarkdown(parsed))).toEqual(parsed);
+  });
+
+  it("rejects duplicate durable item ids", () => {
+    const markdown = `---
+spec_format_version: "0.1"
+title: "Duplicate IDs"
+artifact_type: "prd"
+author: "ProductSpec"
+created_at: "2026-07-05T00:00:00Z"
+updated_at: "2026-07-05T00:00:00Z"
+---
+
+## Problem
+
+Teams cannot attach evidence when item IDs collide.
+
+## Hypothesis
+
+If durable IDs are unique, evidence links resolve to one thing.
+
+## Scope
+
+In: duplicate ID validation.
+
+## Acceptance Criteria
+
+\`\`\`productspec-acceptance-criteria
+- id: AC-1
+  criterion: First criterion.
+- id: AC-1
+  criterion: Duplicate criterion.
+\`\`\`
+
+\`\`\`productspec-ai-evals
+- id: EVAL-1
+  type: contains
+  cases:
+    - input: "Find quote"
+      expected: "quote"
+  evaluator: deterministic
+  pass_threshold: 1
+- id: EVAL-1
+  type: contains
+  cases:
+    - input: "Find metric"
+      expected: "metric"
+  evaluator: deterministic
+  pass_threshold: 1
+\`\`\`
+
+## Success Metrics
+
+\`\`\`productspec-success-metrics
+- id: SM-1
+  metric: first_metric
+  target: ">= 1"
+  window: weekly
+- id: SM-1
+  metric: duplicate_metric
+  target: ">= 1"
+  window: weekly
+\`\`\`
+`;
+
+    const result = validateProductSpecMarkdown(markdown);
+
+    expect(result.valid).toBe(false);
+    if (!result.valid) {
+      expect(result.errors).toEqual(
+        expect.arrayContaining([
+          {
+            code: "duplicate_item_id",
+            message: "Duplicate Product Spec item id: AC-1.",
+            path: "sections.acceptance_criteria.acceptance_criteria.1.id"
+          },
+          {
+            code: "duplicate_item_id",
+            message: "Duplicate Product Spec item id: EVAL-1.",
+            path: "sections.acceptance_criteria.ai_evals.1.id"
+          },
+          {
+            code: "duplicate_item_id",
+            message: "Duplicate Product Spec item id: SM-1.",
+            path: "sections.success_metrics.success_metrics.1.id"
+          }
+        ])
+      );
+    }
   });
 
   it("extracts ProductSpec blocks written with tilde fences", () => {
@@ -1647,6 +1786,94 @@ Keep this around.
     if (!invalid.valid) expect(invalid.errors.map((error) => error.code)).toContain("missing_required_trace_field");
   });
 
+  it("rejects invalid Decision Trace date-times and duplicate event ids", () => {
+    const trace = {
+      decision_trace_format_version: "0.1",
+      trace_id: "bad-trace",
+      title: "Bad Trace",
+      created_at: "NOT-A-DATE",
+      updated_at: "2026-07-13T00:00:00Z",
+      subject: {
+        type: "product_spec",
+        id: "specs/search.product-spec.md"
+      },
+      events: [
+        {
+          event_id: "same-event",
+          event_type: "intent_decision",
+          occurred_at: "ALSO-NOT-A-DATE",
+          summary: "First event.",
+          decision: { outcome: "record_learning", rationale: "Recorded." }
+        },
+        {
+          event_id: "same-event",
+          event_type: "outcome_review",
+          occurred_at: "2026-07-13T00:00:00Z",
+          summary: "Duplicate event.",
+          decision: { outcome: "record_learning", rationale: "Recorded." }
+        }
+      ]
+    };
+
+    const result = validateDecisionTraceJson(JSON.stringify(trace));
+
+    expect(result.valid).toBe(false);
+    if (!result.valid) {
+      expect(result.errors).toEqual(
+        expect.arrayContaining([
+          {
+            code: "invalid_datetime",
+            message: "Invalid Decision Trace date-time: created_at must be ISO 8601.",
+            path: "created_at"
+          },
+          {
+            code: "invalid_datetime",
+            message: "Invalid Decision Trace date-time: occurred_at must be ISO 8601.",
+            path: "events.0.occurred_at"
+          },
+          {
+            code: "duplicate_trace_event_id",
+            message: "Duplicate Decision Trace event_id: same-event.",
+            path: "events.1.event_id"
+          }
+        ])
+      );
+    }
+  });
+
+  it("keeps Decision Trace link types aligned with ProductSpec evidence types", () => {
+    const schema = JSON.parse(readFileSync(`${root}/schema/decision-trace.schema.json`, "utf8"));
+    const traceLinkTypes = schema.$defs.link.properties.type.enum;
+
+    expect(traceLinkTypes).toEqual(expect.arrayContaining(["code", "dashboard"]));
+    expect(validateDecisionTraceJson(JSON.stringify({
+      decision_trace_format_version: "0.1",
+      trace_id: "linked-trace",
+      title: "Linked Trace",
+      created_at: "2026-07-13T00:00:00Z",
+      updated_at: "2026-07-13T00:00:00Z",
+      subject: {
+        type: "product_spec",
+        id: "specs/search.product-spec.md"
+      },
+      events: [
+        {
+          event_id: "link-review",
+          event_type: "outcome_review",
+          occurred_at: "2026-07-13T00:00:00Z",
+          summary: "Reviewed evidence.",
+          source: {
+            links: [
+              { type: "code", url: "apps/search/index.ts" },
+              { type: "dashboard", url: "https://analytics.example.com/search" }
+            ]
+          },
+          decision: { outcome: "record_learning", rationale: "Evidence linked." }
+        }
+      ]
+    })).valid).toBe(true);
+  });
+
   it("ships a GitHub Action that can validate Product Specs and Decision Traces", () => {
     const action = readFileSync(`${root}/action.yml`, "utf8");
     expect(action).toContain("decision_traces:");
@@ -1873,7 +2100,8 @@ function productSpecFiles(directory: string): string[] {
 describe("resolveProductSpecGraph", () => {
   function graphInput(
     path: string,
-    links: Array<{ to: string; relation?: "depends_on" | "blocks" | "supersedes" | "relates_to"; revision?: number }> = []
+    links: Array<{ to: string; relation?: "depends_on" | "blocks" | "supersedes" | "relates_to"; revision?: number }> = [],
+    revision?: number
   ): ProductSpecGraphInput {
     return {
       path,
@@ -1882,6 +2110,7 @@ describe("resolveProductSpecGraph", () => {
           spec_format_version: "0.1",
           title: path,
           artifact_type: "prd",
+          ...(revision !== undefined ? { spec_revision: revision } : {}),
           author: "ProductSpec",
           created_at: "2026-07-11T00:00:00Z",
           updated_at: "2026-07-11T00:00:00Z"
@@ -2044,6 +2273,19 @@ describe("resolveProductSpecGraph", () => {
         product_spec_revision: 2
       }
     ]);
+  });
+
+  it("warns when a dependency revision pin does not match the target spec revision", () => {
+    const graph = resolveProductSpecGraph([
+      graphInput("a.product-spec.md", [{ to: "b.product-spec.md", relation: "depends_on", revision: 2 }]),
+      graphInput("b.product-spec.md", [], 3)
+    ]);
+
+    expect(graph.warnings).toContainEqual({
+      code: "revision_pin_mismatch",
+      message: "a.product-spec.md pins b.product-spec.md at revision 2, but the target spec is revision 3.",
+      path: "a.product-spec.md"
+    });
   });
 
   it("reports each dependency cycle separately and leaves downstream specs out of it", () => {

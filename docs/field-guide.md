@@ -184,6 +184,28 @@ Use plain bullets when the eval is still a rough human note. Use the structured 
 
 Acceptance Criteria use generated durable IDs (`AC-1`, `AC-2`) because agents, tickets, pull requests, and Decision Traces may need to cite the exact build condition. Eval cases and optional checks stay un-IDed; cite them positionally if needed, such as `EVAL-1.case[2]`.
 
+### Unresolved Technical Bindings
+
+Product Specs should not confidently invent implementation identifiers. If a field name, endpoint, table, service, event, or file path requires reading the codebase to be accurate, do not write it as a bare assertion.
+
+Use `RESOLVE-IN-PLAN:` when the product intent is clear but the technical binding must be resolved by an engineering agent or engineer during planning:
+
+```text
+RESOLVE-IN-PLAN: storage field for the computed debt-service coverage ratio.
+```
+
+Agents should treat these markers as planning questions, not implementation instructions. Each marker should be resolved with a source citation before code is written.
+
+Good:
+
+> AC-3: The covenant screen shows the computed debt-service coverage ratio. RESOLVE-IN-PLAN: storage field and service that own the computed ratio.
+
+Bad:
+
+> AC-3: The covenant screen reads `dscr_value` from `loan_covenants`.
+
+The bad version may sound precise, but if the author guessed those identifiers, the agent will faithfully build against fiction.
+
 **Relationship to Success Metrics:**
 
 Acceptance Criteria are the build contract. Success Metrics are the market contract.

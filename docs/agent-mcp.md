@@ -65,9 +65,10 @@ Use ProductSpec MCP before coding:
 2. Call begin_spec_session and include the pinned spec_revision in your plan.
 3. Load Scope, Acceptance Criteria, AI Evals, Success Metrics, and Related Artifacts.
 4. Keep implementation inside Scope.
-5. Before claiming done, call check_spec_session. If the Product Spec changed, re-read and re-plan.
-6. Call get_evidence_checklist to identify which pull requests, tests, eval runs, dashboards, or analytics snapshots should attach to AC-, EVAL-, and SM- IDs.
-7. Call check_completion_claim and verify each returned Acceptance Criterion and AI Eval.
+5. Resolve every `RESOLVE-IN-PLAN:` marker against the codebase with a source citation before coding.
+6. Before claiming done, call check_spec_session. If the Product Spec changed, re-read and re-plan.
+7. Call get_evidence_checklist to identify which pull requests, tests, eval runs, dashboards, or analytics snapshots should attach to AC-, EVAL-, and SM- IDs.
+8. Call check_completion_claim and verify each returned Acceptance Criterion and AI Eval.
 ```
 
 ## Boundary

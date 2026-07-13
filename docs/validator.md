@@ -91,6 +91,29 @@ Fix: use `"0.1"` or upgrade the validator when newer versions exist.
 
 Fix: use lowercase words separated by hyphens or underscores, such as `checkout-redesign-trace`.
 
+### `invalid_datetime`
+
+A Product Spec or Decision Trace date-time field is not an ISO 8601 date-time.
+
+Product Spec fields:
+
+- `created_at`
+- `updated_at`
+
+Decision Trace fields:
+
+- `created_at`
+- `updated_at`
+- `events[].occurred_at`
+
+Fix: use a full date-time such as `2026-07-13T00:00:00Z`.
+
+### `duplicate_trace_event_id`
+
+Two Decision Trace events use the same `event_id`.
+
+Fix: give each event a unique durable ID.
+
 ### `invalid_trace_subject`
 
 The Decision Trace subject is malformed or uses an unsupported type.
@@ -199,6 +222,12 @@ Fix: choose one of the supported values.
 `spec_revision` is present but is not a positive integer.
 
 Fix: remove `spec_revision` or set it to `1` or higher.
+
+### `duplicate_item_id`
+
+Two Acceptance Criteria, AI Evals, or Success Metrics use the same durable item ID.
+
+Fix: keep `AC-`, `EVAL-`, and `SM-` IDs unique within a Product Spec.
 
 ### `invalid_ai_eval`
 
@@ -374,3 +403,20 @@ Fix: add enough content for a reader or downstream tool to understand the intent
 A required section is present but very short.
 
 Fix: add enough detail to make the section useful for human review and AI handoff.
+
+### `unusual_related_artifact_target`
+
+A Related Artifact points at a valid item ID, but the artifact type usually attaches to a different item family.
+
+Examples:
+
+- `eval_run` usually attaches to `EVAL-<number>`.
+- `dashboard`, `analytics_snapshot`, and `experiment` usually attach to `SM-<number>`.
+
+Fix: either retarget the artifact or keep it if the unusual pairing is intentional.
+
+### `revision_pin_mismatch`
+
+A `product_spec` related artifact pins `product_spec_revision`, but the target Product Spec in the graph has a different `spec_revision`.
+
+Fix: update the pin, update the target spec, or review whether the dependency still points at the intended revision.
