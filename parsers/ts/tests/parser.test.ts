@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import {
   CANONICAL_SECTION_IDS,
   MANDATORY_SECTION_IDS,
@@ -18,6 +18,15 @@ import {
 
 const root = fileURLToPath(new URL("../../..", import.meta.url));
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
+
+// The CLI tests run the built dist, and `npm test` is only `vitest run`, so
+// nothing builds it first. One build for the whole file, above the describes, so
+// no test depends on another describe having run first, a filtered run still
+// builds what it needs, and no test timeout has to cover a compile.
+beforeAll(() => {
+  const built = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
+  expect(built.status, built.stderr).toBe(0);
+}, 120000);
 
 describe("@productspec/parser", () => {
   it("round-trips the minimal example", () => {
@@ -2018,9 +2027,6 @@ Keep this around.
   });
 
   it("provides a CLI validator with success and failure exit codes", () => {
-    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
-    expect(build.status, build.stderr).toBe(0);
-
     const valid = spawnSync("node", [
       fileURLToPath(new URL("../dist/cli.js", import.meta.url)),
       "validate",
@@ -2041,9 +2047,6 @@ Keep this around.
   }, 30000);
 
   it("provides a CLI validator for Decision Trace files", () => {
-    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
-    expect(build.status, build.stderr).toBe(0);
-
     const valid = spawnSync("node", [
       fileURLToPath(new URL("../dist/cli.js", import.meta.url)),
       "validate-trace",
@@ -2149,9 +2152,6 @@ Keep this around.
   });
 
   it("provides a CLI validator for Agent Run files", () => {
-    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
-    expect(build.status, build.stderr).toBe(0);
-
     const valid = spawnSync("node", [
       fileURLToPath(new URL("../dist/cli.js", import.meta.url)),
       "validate-run",
@@ -2172,9 +2172,6 @@ Keep this around.
   }, 30000);
 
   it("prints MCP client configs from the CLI", () => {
-    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
-    expect(build.status, build.stderr).toBe(0);
-
     const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
     const claude = spawnSync("node", [cli, "mcp-config", "claude"], { encoding: "utf8" });
     const cursor = spawnSync("node", [cli, "mcp-config", "cursor"], { encoding: "utf8" });
@@ -2199,9 +2196,6 @@ Keep this around.
   }, 30000);
 
   it("initializes a draft Agent Run from the CLI", () => {
-    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
-    expect(build.status, build.stderr).toBe(0);
-
     const dir = mkdtempSync(join(tmpdir(), "productspec-init-run-"));
     const specPath = join(dir, "search.product-spec.md");
     const runPath = join(dir, "search.agent-run.json");
@@ -2244,9 +2238,6 @@ Keep this around.
   }, 30000);
 
   it("initializes a starter Product Spec from the CLI", () => {
-    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
-    expect(build.status, build.stderr).toBe(0);
-
     const dir = mkdtempSync(join(tmpdir(), "productspec-init-"));
     const target = join(dir, "starter.product-spec.md");
 
@@ -2899,8 +2890,6 @@ describe("resolveProductSpecGraph", () => {
   });
 
   it("provides a CLI graph command with table and JSON output", () => {
-    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
-    expect(build.status, build.stderr).toBe(0);
     const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 
     const table = spawnSync("node", [cli, "graph", `${root}/conformance/graph`], { encoding: "utf8" });
@@ -2920,8 +2909,6 @@ describe("resolveProductSpecGraph", () => {
   }, 30000);
 
   it("surfaces skipped invalid specs in graph JSON output and fails when nothing is valid", () => {
-    const build = spawnSync("npm", ["run", "build"], { cwd: packageRoot, encoding: "utf8" });
-    expect(build.status, build.stderr).toBe(0);
     const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 
     const mixedDir = mkdtempSync(join(tmpdir(), "productspec-graph-"));
