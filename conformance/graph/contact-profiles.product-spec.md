@@ -3,6 +3,7 @@ spec_format_version: "0.1"
 title: "Contact Profiles"
 artifact_type: "prd"
 spec_revision: 1
+lifecycle_status: in_review
 author: "ProductSpec"
 created_at: "2026-07-11T00:00:00Z"
 updated_at: "2026-07-11T00:00:00Z"
@@ -18,9 +19,7 @@ If every conversation resolves to one contact record, follow-ups read the histor
 
 ## Scope
 
-In: one contact record per customer, matched across channels.
 
-Out: enrichment from third-party data sources.
 
 ## Acceptance Criteria
 
