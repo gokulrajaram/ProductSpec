@@ -100,6 +100,7 @@ If you want to use ProductSpec as an intent harness for coding agents, start her
 - [Use the MCP server](docs/agent-mcp.md): expose Product Specs to coding agents as structured tools.
 - [Install MCP in Claude or Cursor](docs/mcp-install.md): generate a copy-pasteable MCP client config.
 - [5-minute agent harness demo](docs/agent-harness-demo.md): see Product Spec, MCP, Agent Run, and Decision Trace working together.
+- [Agent Handoff](docs/agent-handoff.md): generate an implementation brief from a Product Spec without making handoff a canonical spec section.
 - [60-second demo script](docs/demo-script.md): record the ProductSpec loop closing in a short GIF or Loom.
 - [Status badge spec](docs/status-badge.md): factual badge shapes for valid specs, run receipts, evidence, and revisions.
 - [Evidence loop](docs/evidence-loop.md): connect Product Specs to implementation, evals, metrics, and Decision Trace.
@@ -367,6 +368,7 @@ Early ecosystem contributions are welcome: examples, importer/exporter experimen
 - [docs/get-started-with-agents.md](docs/get-started-with-agents.md): the shortest path from existing docs to agent-authored and agent-implemented Product Specs.
 - [docs/use-in-your-repo.md](docs/use-in-your-repo.md): copy-paste setup for using ProductSpec in an existing repository.
 - [docs/agent-usage.md](docs/agent-usage.md): how to use ProductSpec as an intent harness for coding agents.
+- [docs/agent-handoff.md](docs/agent-handoff.md): how to generate an implementation brief from a Product Spec without duplicating canonical intent.
 - [docs/agent-run.md](docs/agent-run.md): how to record one agent execution against a pinned Product Spec.
 - [docs/graph.md](docs/graph.md): resolving a folder of Product Specs into buildable, blocked, and ordered work.
 - [docs/adoption.md](docs/adoption.md): how teams can adopt ProductSpec across Git, Jira, Linear, Figma, CI, engineering specs, and agents.

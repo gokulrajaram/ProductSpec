@@ -67,6 +67,16 @@ Create a plan that maps tasks to Acceptance Criteria. Keep scope.out and scope.c
 Resolve every `RESOLVE-IN-PLAN:` marker with a source citation before coding. Do not implement guessed table names, fields, endpoints, services, or file paths as if they were binding.
 ```
 
+## Agent Handoff
+
+Agent Handoff is a generated implementation brief, not a required ProductSpec section.
+
+Use it when an execution environment needs a compact build contract compiled from the Product Spec: Product Summary, Scope guardrails, Acceptance Criteria, AI Evals, evidence expectations, and revision pin.
+
+Do not add `## Agent Handoff` to the Product Spec itself. If the handoff needs product intent that is not already in the Product Spec, update the Product Spec or add a Decision Trace first.
+
+See [Agent Handoff](agent-handoff.md) for the recommended generated shape.
+
 ## Pull Request Summary Pattern
 
 ```md
