@@ -383,7 +383,7 @@ Traceability uses two shapes:
 
 Early ecosystem contributions are welcome: examples, importer/exporter experiments, editor integrations, CI validation actions, review tools, and mappings into engineering-spec systems.
 
-Want a small first contribution? Start with pinned issue [#7: add an internal admin tool ProductSpec example](https://github.com/gokulrajaram/ProductSpec/issues/7).
+Want a small first contribution? Start with pinned issue [#43: add a real Product Harness example](https://github.com/gokulrajaram/ProductSpec/issues/43).
 
 ## What Is Included
 
