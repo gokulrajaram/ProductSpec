@@ -101,10 +101,14 @@ If you want to use ProductSpec as a Product Harness for coding agents, start her
 - [Get started with agents](docs/get-started-with-agents.md): install the skills, convert a PRD, validate in CI, implement from a Product Spec, and record drift.
 - [Use the MCP server](docs/agent-mcp.md): expose Product Specs to coding agents as structured tools.
 - [Install MCP in Claude or Cursor](docs/mcp-install.md): generate a copy-pasteable MCP client config.
+- [Use with Claude Code](docs/use-with-claude-code.md), [Cursor](docs/use-with-cursor.md), or [Codex](docs/use-with-codex.md): tool-specific agent walkthroughs.
 - [5-minute Product Harness demo](docs/agent-harness-demo.md): see Product Spec, MCP, Agent Run, and Decision Trace working together.
 - [Product Harness](docs/product-harness.md): the outer-loop frame around coding agents and engineering specs.
 - [Agent Handoff](docs/agent-handoff.md): generate an implementation brief from a Product Spec without making handoff a canonical spec section.
 - [60-second demo script](docs/demo-script.md): record the ProductSpec loop closing in a short GIF or Loom.
+- [Real-world example gallery](examples/real-world/): copy patterns from product, AI, platform, and agent-led specs.
+- [CI badge demo](docs/ci-badge-demo.md): validate Product Specs in GitHub Actions and show a factual status badge.
+- [Awesome ProductSpec](awesome-productspec.md): curated docs, examples, workflows, and adjacent tools.
 - [Status badge spec](docs/status-badge.md): factual badge shapes for valid specs, run receipts, evidence, and revisions.
 - [Evidence loop](docs/evidence-loop.md): connect Product Specs to implementation, evals, metrics, and Decision Trace.
 - [Agent Run](docs/agent-run.md): record one Claude, Codex, Cursor, or other agent execution against a pinned Product Spec.

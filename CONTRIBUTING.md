@@ -26,6 +26,8 @@ Good first contributions:
 - Propose a small clarification to `docs/field-guide.md`.
 - Add a Decision Trace example showing how intent changed after implementation.
 - Try the validator on one of your own Product Specs and report confusing errors or warnings.
+- Add a Claude Code, Cursor, Codex, or CI walkthrough that shows ProductSpec inside a real repo workflow.
+- Improve Agent Handoff wording with a concrete before/after example.
 
 You do not need to write parser code to shape ProductSpec. A clear issue with a real example is enough to move the standard forward.
 
@@ -223,6 +225,34 @@ Before opening the pull request:
 - explain in the PR what product-work pattern the example teaches
 
 Maintainers will review the example for validity, specificity, and whether it teaches a distinct ProductSpec pattern.
+
+## Best First Contributions
+
+If you want a bounded first PR, pick one of these:
+
+1. Add a real Product Harness example.
+   - Start from `examples/product-harness/video-transcript.product-spec.md`.
+   - Add a new `.product-spec.md` under `examples/`.
+   - Include Acceptance Criteria, Success Metrics, and at least one Related Artifact if evidence exists.
+   - Validate it with `npm run validate -- examples/your-example.product-spec.md`.
+
+2. Improve Agent Handoff wording.
+   - Read `docs/agent-handoff.md`.
+   - Generate a handoff with `productspec handoff`.
+   - Propose a clearer phrase, section label, or evidence instruction.
+   - Include the before/after text in the pull request.
+
+3. Add a Cursor, Claude Code, Codex, or other agent walkthrough.
+   - Start from `docs/use-with-claude-code.md`, `docs/use-with-cursor.md`, or `docs/use-with-codex.md`.
+   - Keep it command-first and repo-local.
+   - Show how to validate, generate handoff, use MCP if available, and return evidence.
+
+4. Add a CI example.
+   - Start from `docs/ci-badge-demo.md`.
+   - Show the workflow file and README badge.
+   - Keep the badge factual: valid, invalid, revision, evidence, or run receipt.
+
+Good first PRs should be small. One example, one walkthrough, or one clarification is enough.
 
 ## Development
 

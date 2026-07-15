@@ -121,6 +121,8 @@ You can also validate Product Specs, Decision Traces, and Agent Runs with the Gi
     agent_runs: "docs/agent-runs/**/*.agent-run.json"
 ```
 
+To show validation status in your README, see the [CI badge demo](ci-badge-demo.md).
+
 ## Suggested Pull Request Text
 
 ```md

@@ -4,6 +4,8 @@ Start here if you want to see ProductSpec as a working artifact rather than a sc
 
 `minimal.product-spec.md` shows the smallest complete Product Spec. Richer examples add structured Scope, AI eval blocks, optional sections, and revision history.
 
+If you want examples grouped by product-work pattern, start with the [real-world gallery](real-world/).
+
 ## Which Example Should I Read?
 
 | Example | Use this when you want to see |
