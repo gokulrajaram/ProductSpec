@@ -198,31 +198,24 @@ export function reconcileProductSpec(rootPath: string, specPath: string, runPath
   const driftDetected = Boolean(run?.document?.drift.detected);
   const driftRequiresTrace = Boolean(driftDetected && !run?.document?.drift.decision_trace_path);
   const runCompleted = run?.document?.status === "completed";
-  const satisfied = Boolean(
-    run?.valid
-    && runCompleted
-    && !missingItems.length
-    && !incompleteItems.length
-    && !passedWithoutEvidence.length
-    && !staleRun
-    && !driftRequiresTrace
-    && !errors.length
-  );
-  const recommendedActions: string[] = [];
+  const blockers: string[] = [];
 
-  if (!run) recommendedActions.push("Create an Agent Run receipt with productspec init-run before claiming implementation complete.");
-  if (run && !run.valid) recommendedActions.push("Fix Agent Run validation errors before relying on this execution receipt.");
-  if (run?.valid && !runCompleted) recommendedActions.push("Mark the Agent Run completed before claiming implementation complete.");
-  if (staleRun) recommendedActions.push("Re-plan against the current Product Spec revision and update the Agent Run revision pin.");
-  if (missingItems.length) recommendedActions.push(`Check remaining ProductSpec items: ${missingItems.join(", ")}.`);
-  if (incompleteItems.length) recommendedActions.push(`Do not claim completion while these items are not passed: ${incompleteItems.join(", ")}.`);
+  if (!run) blockers.push("Create an Agent Run receipt with productspec init-run before claiming implementation complete.");
+  if (run && !run.valid) blockers.push("Fix Agent Run validation errors before relying on this execution receipt.");
+  if (run?.valid && !runCompleted) blockers.push("Mark the Agent Run completed before claiming implementation complete.");
+  if (staleRun) blockers.push("Re-plan against the current Product Spec revision and update the Agent Run revision pin.");
+  if (missingItems.length) blockers.push(`Check remaining ProductSpec items: ${missingItems.join(", ")}.`);
+  if (incompleteItems.length) blockers.push(`Do not claim completion while these items are not passed: ${incompleteItems.join(", ")}.`);
   for (const item of passedWithoutEvidence) {
-    recommendedActions.push(`Attach evidence for ${item} before treating it as complete.`);
+    blockers.push(`Attach evidence for ${item} before treating it as complete.`);
   }
   if (driftRequiresTrace) {
-    recommendedActions.push("Record a Decision Trace or link one from the Agent Run because drift was detected.");
+    blockers.push("Record a Decision Trace or link one from the Agent Run because drift was detected.");
   }
-  if (satisfied) recommendedActions.push("No reconciliation blockers found in ProductSpec artifacts.");
+  const satisfied = blockers.length === 0;
+  const recommendedActions = satisfied
+    ? ["No reconciliation blockers found in ProductSpec artifacts."]
+    : [...new Set(blockers)];
 
   return {
     spec_path: relative(root, absoluteSpecPath),
@@ -240,7 +233,7 @@ export function reconcileProductSpec(rootPath: string, specPath: string, runPath
     drift_detected: driftDetected,
     drift_requires_trace: driftRequiresTrace,
     satisfied,
-    recommended_actions: [...new Set(recommendedActions)],
+    recommended_actions: recommendedActions,
     errors
   };
 }

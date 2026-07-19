@@ -59,6 +59,12 @@ function cliRun(argv: string[], cwd: string = repoRoot): { status: number; stdou
   }
 }
 
+function reconcileFixture(dir: string, run: Record<string, unknown>): { status: number; stdout: string; stderr: string } {
+  writeFileSync(join(dir, "spec.product-spec.md"), readFileSync(resolve(repoRoot, minimalSpec), "utf8"));
+  writeFileSync(join(dir, "spec.agent-run.json"), JSON.stringify(run, null, 2));
+  return cliRun(["reconcile", "spec.product-spec.md", "--against", "spec.agent-run.json", "--json"], dir);
+}
+
 async function unusedPort(): Promise<number> {
   const server = createServer();
   server.listen(0, "127.0.0.1");
@@ -165,6 +171,67 @@ describe("CLI behavior", () => {
       expect(result.status).toBe(0);
       expect(result.stdout.length).toBeGreaterThan(65_536);
       expect(JSON.parse(result.stdout).product_specs).toHaveLength(80);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects an Agent Run that does not satisfy the whole Product Spec", () => {
+    const dir = mkdtempSync(join(tmpdir(), "productspec-cli-reconcile-"));
+    try {
+      const result = reconcileFixture(dir, {
+        agent_run_format_version: "0.1",
+        run_id: "spec-run",
+        agent: { name: "Codex" },
+        product_spec: { path: "spec.product-spec.md", spec_revision: 1 },
+        started_at: "2026-07-17T00:00:00Z",
+        status: "completed",
+        checked_items: [
+          { item_id: "AC-1", status: "passed" },
+          { item_id: "SM-1", status: "not_checked" }
+        ],
+        drift: { detected: false },
+        completion_claim: "AC-1 passed."
+      });
+
+      expect(result.status).toBe(1);
+      const report = JSON.parse(result.stdout);
+      expect(report.checked).toContainEqual({ item_id: "AC-1", status: "passed", evidence_count: 0 });
+      expect(report.satisfied).toBe(false);
+      expect(report.incomplete_items).toContain("SM-1");
+      expect(report.passed_without_evidence).toContain("AC-1");
+      expect(report.recommended_actions).toContain("Attach evidence for AC-1 before treating it as complete.");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("accepts an Agent Run only when it satisfies the whole Product Spec", () => {
+    const dir = mkdtempSync(join(tmpdir(), "productspec-cli-reconcile-complete-"));
+    try {
+      const result = reconcileFixture(dir, {
+        agent_run_format_version: "0.1",
+        run_id: "spec-run-complete",
+        agent: { name: "Codex" },
+        product_spec: { path: "spec.product-spec.md", spec_revision: 1 },
+        started_at: "2026-07-17T00:00:00Z",
+        completed_at: "2026-07-17T00:05:00Z",
+        status: "completed",
+        checked_items: ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "SM-1", "SM-2", "SM-3"].map((item_id) => ({
+          item_id,
+          status: "passed",
+          evidence: [{ type: "code", url: `evidence/${item_id}.json` }]
+        })),
+        drift: { detected: false },
+        completion_claim: "The Product Spec is satisfied."
+      });
+
+      expect(result.status).toBe(0);
+      const report = JSON.parse(result.stdout);
+      expect(report.satisfied).toBe(true);
+      expect(report.incomplete_items).toEqual([]);
+      expect(report.passed_without_evidence).toEqual([]);
+      expect(report.recommended_actions).toEqual(["No reconciliation blockers found in ProductSpec artifacts."]);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
