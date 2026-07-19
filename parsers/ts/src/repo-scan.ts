@@ -83,11 +83,16 @@ export interface ReconciliationReport {
   spec_valid: boolean;
   run_path?: string;
   run_valid?: boolean;
+  run_status?: AgentRunDocument["status"];
   checked: Array<{ item_id: string; status: string; evidence_count: number }>;
   missing_items: string[];
   failed_items: string[];
+  incomplete_items: string[];
+  passed_without_evidence: string[];
   stale_run: boolean;
   drift_detected: boolean;
+  drift_requires_trace: boolean;
+  satisfied: boolean;
   recommended_actions: string[];
   errors: ProductSpecValidationError[];
 }
@@ -158,8 +163,12 @@ export function reconcileProductSpec(rootPath: string, specPath: string, runPath
       checked: [],
       missing_items: [],
       failed_items: [],
+      incomplete_items: [],
+      passed_without_evidence: [],
       stale_run: false,
       drift_detected: false,
+      drift_requires_trace: false,
+      satisfied: false,
       recommended_actions: ["Fix Product Spec validation errors before reconciling execution evidence."],
       errors
     };
@@ -177,24 +186,43 @@ export function reconcileProductSpec(rootPath: string, specPath: string, runPath
   const checkedById = new Map(checked.map((item) => [item.item_id, item]));
   const missingItems = expectedItems.filter((item) => !checkedById.has(item));
   const failedItems = checked.filter((item) => item.status === "failed").map((item) => item.item_id);
+  const incompleteItems = expectedItems.filter((item) => {
+    const checkedItem = checkedById.get(item);
+    return checkedItem !== undefined && checkedItem.status !== "passed";
+  });
+  const passedWithoutEvidence = expectedItems.filter((item) => {
+    const checkedItem = checkedById.get(item);
+    return checkedItem?.status === "passed" && checkedItem.evidence_count === 0;
+  });
   const staleRun = Boolean(run?.document && run.document.product_spec.spec_revision !== spec.document.frontmatter.spec_revision);
   const driftDetected = Boolean(run?.document?.drift.detected);
+  const driftRequiresTrace = Boolean(driftDetected && !run?.document?.drift.decision_trace_path);
+  const runCompleted = run?.document?.status === "completed";
+  const satisfied = Boolean(
+    run?.valid
+    && runCompleted
+    && !missingItems.length
+    && !incompleteItems.length
+    && !passedWithoutEvidence.length
+    && !staleRun
+    && !driftRequiresTrace
+    && !errors.length
+  );
   const recommendedActions: string[] = [];
 
   if (!run) recommendedActions.push("Create an Agent Run receipt with productspec init-run before claiming implementation complete.");
   if (run && !run.valid) recommendedActions.push("Fix Agent Run validation errors before relying on this execution receipt.");
+  if (run?.valid && !runCompleted) recommendedActions.push("Mark the Agent Run completed before claiming implementation complete.");
   if (staleRun) recommendedActions.push("Re-plan against the current Product Spec revision and update the Agent Run revision pin.");
   if (missingItems.length) recommendedActions.push(`Check remaining ProductSpec items: ${missingItems.join(", ")}.`);
-  if (failedItems.length) recommendedActions.push(`Do not claim completion while these items are failed: ${failedItems.join(", ")}.`);
-  for (const item of checked) {
-    if (item.status === "passed" && item.evidence_count === 0) {
-      recommendedActions.push(`Attach evidence for ${item.item_id} before treating it as complete.`);
-    }
+  if (incompleteItems.length) recommendedActions.push(`Do not claim completion while these items are not passed: ${incompleteItems.join(", ")}.`);
+  for (const item of passedWithoutEvidence) {
+    recommendedActions.push(`Attach evidence for ${item} before treating it as complete.`);
   }
-  if (driftDetected && !run?.document?.drift.decision_trace_path) {
+  if (driftRequiresTrace) {
     recommendedActions.push("Record a Decision Trace or link one from the Agent Run because drift was detected.");
   }
-  if (!recommendedActions.length) recommendedActions.push("No reconciliation blockers found in ProductSpec artifacts.");
+  if (satisfied) recommendedActions.push("No reconciliation blockers found in ProductSpec artifacts.");
 
   return {
     spec_path: relative(root, absoluteSpecPath),
@@ -202,11 +230,16 @@ export function reconcileProductSpec(rootPath: string, specPath: string, runPath
     spec_valid: true,
     run_path: run?.path,
     run_valid: run?.valid,
+    run_status: run?.document?.status,
     checked,
     missing_items: missingItems,
     failed_items: failedItems,
+    incomplete_items: incompleteItems,
+    passed_without_evidence: passedWithoutEvidence,
     stale_run: staleRun,
     drift_detected: driftDetected,
+    drift_requires_trace: driftRequiresTrace,
+    satisfied,
     recommended_actions: [...new Set(recommendedActions)],
     errors
   };
@@ -247,12 +280,17 @@ export function reconciliationText(report: ReconciliationReport): string {
   const lines = ["Reconciliation report", "", `Spec: ${report.spec_path}`];
   if (report.spec_revision !== undefined) lines.push(`Revision: ${report.spec_revision}`);
   if (report.run_path) lines.push(`Agent Run: ${report.run_path}`);
+  lines.push(`Satisfied: ${report.satisfied ? "yes" : "no"}`);
   lines.push("", "Checked:");
   pushList(lines, report.checked.map((item) => `${item.item_id}: ${item.status} (${item.evidence_count} evidence links)`));
   lines.push("Missing items:");
   pushList(lines, report.missing_items);
   lines.push("Failed items:");
   pushList(lines, report.failed_items);
+  lines.push("Incomplete items:");
+  pushList(lines, report.incomplete_items);
+  lines.push("Passed without evidence:");
+  pushList(lines, report.passed_without_evidence);
   lines.push("Recommended actions:");
   pushList(lines, report.recommended_actions);
   return `${lines.join("\n")}\n`;

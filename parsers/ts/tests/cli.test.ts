@@ -1,5 +1,7 @@
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
+import { once } from "node:events";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -55,6 +57,16 @@ function cliRun(argv: string[], cwd: string = repoRoot): { status: number; stdou
     const e = error as { status?: number; stdout?: string; stderr?: string };
     return { status: typeof e.status === "number" ? e.status : 1, stdout: e.stdout ?? "", stderr: e.stderr ?? "" };
   }
+}
+
+async function unusedPort(): Promise<number> {
+  const server = createServer();
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("unable to allocate a test port");
+  await new Promise<void>((resolveClose) => server.close(() => resolveClose()));
+  return address.port;
 }
 
 /** No V8 stack frame ("at fn file:line:col") leaked into user-facing output. */
@@ -140,6 +152,48 @@ describe("CLI behavior", () => {
 
   it("requires --against for session check", () => {
     expect(cliExit(["session", "check", minimalSpec])).not.toBe(0);
+  });
+
+  it("flushes a Garden JSON report larger than a pipe buffer", () => {
+    const dir = mkdtempSync(join(tmpdir(), "productspec-cli-garden-"));
+    try {
+      const source = readFileSync(resolve(repoRoot, minimalSpec), "utf8");
+      for (let index = 0; index < 80; index += 1) {
+        writeFileSync(join(dir, `spec-${index}.product-spec.md`), source);
+      }
+      const result = cliRun(["garden", dir, "--json"]);
+      expect(result.status).toBe(0);
+      expect(result.stdout.length).toBeGreaterThan(65_536);
+      expect(JSON.parse(result.stdout).product_specs).toHaveLength(80);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("keeps serve alive and returns the Garden dashboard", async () => {
+    const port = await unusedPort();
+    const child = spawn("node", [cli, "serve", validDir, "--port", String(port)], {
+      cwd: repoRoot,
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    let stdout = "";
+    const listening = new Promise<void>((resolveListening, rejectListening) => {
+      child.stdout.on("data", (chunk) => {
+        stdout += chunk.toString();
+        if (stdout.includes("dashboard listening")) resolveListening();
+      });
+      child.once("exit", (status) => rejectListening(new Error(`serve exited before listening with status ${status}`)));
+    });
+
+    try {
+      await listening;
+      const response = await fetch(`http://127.0.0.1:${port}`);
+      expect(response.status).toBe(200);
+      expect(await response.text()).toContain("<title>ProductSpec Repo</title>");
+    } finally {
+      child.kill("SIGTERM");
+      if (child.exitCode === null && child.signalCode === null) await once(child, "exit");
+    }
   });
 });
 

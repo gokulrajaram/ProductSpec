@@ -248,6 +248,14 @@ function readFileOrExit(path: string): string {
   }
 }
 
+async function writeStdout(output: string): Promise<void> {
+  await new Promise<void>((resolveWrite, rejectWrite) => {
+    process.stdout.write(output, (error) => {
+      if (error) rejectWrite(error);
+      else resolveWrite();
+    });
+  });
+}
 
 if (command === "garden" && filePath) {
   if (!existsSync(filePath) || !statSync(filePath).isDirectory()) {
@@ -256,16 +264,14 @@ if (command === "garden" && filePath) {
   }
 
   const report = scanProductSpecRepo(filePath);
-  if (jsonOutput) console.log(JSON.stringify(report, null, 2));
-  else process.stdout.write(gardenText(report));
+  await writeStdout(jsonOutput ? `${JSON.stringify(report, null, 2)}\n` : gardenText(report));
   process.exit(0);
 }
 
 if (command === "reconcile" && filePath) {
   const report = reconcileProductSpec(process.cwd(), filePath, flagValue("--against"));
-  if (jsonOutput) console.log(JSON.stringify(report, null, 2));
-  else process.stdout.write(reconciliationText(report));
-  process.exit(report.errors.length ? 1 : 0);
+  await writeStdout(jsonOutput ? `${JSON.stringify(report, null, 2)}\n` : reconciliationText(report));
+  process.exit(report.satisfied ? 0 : 1);
 }
 
 if (command === "serve" && filePath) {
@@ -279,8 +285,10 @@ if (command === "serve" && filePath) {
     process.exit(1);
   }
   const report = scanProductSpecRepo(filePath);
-  serveProductSpecRepo(report, port);
+  const server = serveProductSpecRepo(report, port);
   console.log(`ProductSpec repo dashboard listening on http://localhost:${port}`);
+  await new Promise<void>((resolveServerClosed) => server.once("close", resolveServerClosed));
+  process.exit(0);
 }
 
 if (command === "init" && filePath) {

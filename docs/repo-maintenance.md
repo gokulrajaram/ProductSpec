@@ -46,13 +46,17 @@ The reconciliation report checks:
 
 - whether the Product Spec validates
 - whether the Agent Run validates
+- whether the Agent Run is marked completed
 - whether the Agent Run pins the current `spec_revision`
 - which `AC-`, `EVAL-`, and `SM-` items are missing from `checked_items`
-- which checked items failed
+- which checked items are not passed
 - whether passed items have evidence links
 - whether drift was detected without a Decision Trace link
 
 `reconcile` is intentionally stricter than `validate-run`. A syntactically valid Agent Run can still be incomplete as execution evidence.
+The command exits successfully only when the Agent Run satisfies the complete
+Product Spec revision; an incomplete reconciliation exits nonzero while still
+printing the full report.
 
 ## Serve
 
